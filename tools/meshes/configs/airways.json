@@ -1,0 +1,212 @@
+{
+  "name": "airways",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py",
+  "source_root": "${ASSETS}/zanatomy/obj",
+  "transform": "zanatomy",
+  "center": "part:trachea",
+  "default_budget": 280,
+  "parts": {
+    "trachea": {
+      "files": [
+        "Trachea.obj"
+      ],
+      "budget": 1400
+    },
+    "main_bronchus_r": {
+      "files": [
+        "Right_main_bronchus.obj"
+      ],
+      "budget": 260
+    },
+    "main_bronchus_l": {
+      "files": [
+        "Left_main_bronchus.obj"
+      ],
+      "budget": 360
+    },
+    "intermediate_bronchus_r": {
+      "files": [
+        "Intermediate_bronchus.r.obj"
+      ],
+      "budget": 200
+    },
+    "lobar_r_upper": {
+      "files": [
+        "Right_superior_lobar_bronchus.obj"
+      ],
+      "budget": 200
+    },
+    "lobar_r_middle": {
+      "files": [
+        "../../zanatomy-airways/Middle_lobar_bronchus.r.obj"
+      ],
+      "budget": 200
+    },
+    "lobar_r_lower": {
+      "files": [
+        "Right_inferior_lobar_bronchus.obj"
+      ],
+      "budget": 300
+    },
+    "lobar_l_upper": {
+      "files": [
+        "Left_superior_lobar_bronchus.obj"
+      ],
+      "budget": 300
+    },
+    "lobar_l_lower": {
+      "files": [
+        "Left_inferior_lobar_bronchus.obj"
+      ],
+      "budget": 300
+    },
+    "seg_r_b1_apical": {
+      "files": [
+        "Apical_segmental_bronchus_of_right_lung_(BI).obj"
+      ]
+    },
+    "seg_r_b2_posterior": {
+      "files": [
+        "Posterior_segmental_bronchus_of_right_lung_(BII).obj"
+      ]
+    },
+    "seg_r_b3_anterior": {
+      "files": [
+        "Anterior_segmental_bronchus_of_right_lung_(BIII).obj"
+      ]
+    },
+    "seg_r_b4_lateral": {
+      "files": [
+        "Lateral_segmental_bronchus_of_right_lung_(BIV).obj"
+      ]
+    },
+    "seg_r_b5_medial": {
+      "files": [
+        "Medial_segmental_bronchus_of_right_lung_(BV).obj"
+      ]
+    },
+    "seg_r_b6_superior": {
+      "files": [
+        "Superior_segmental_bronchus_of_right_lung_(BVI).obj"
+      ]
+    },
+    "seg_r_b7_medial_basal": {
+      "files": [
+        "Medial_basal_segmental_bronchus_of_right_lung_(BVII).obj"
+      ]
+    },
+    "seg_r_b8_anterior_basal": {
+      "files": [
+        "Anterior_basal_segmental_bronchus_of_right_lung_(BVIII).obj"
+      ]
+    },
+    "seg_r_b9_lateral_basal": {
+      "files": [
+        "Lateral_basal_segmental_bronchus_of_right_lung_(BIX).obj"
+      ]
+    },
+    "seg_r_b10_posterior_basal": {
+      "files": [
+        "Posterior_basal_segmental_bronchus_of_right_lung_(BX).obj"
+      ]
+    },
+    "seg_l_b1_2_apicoposterior": {
+      "files": [
+        "Apicoposterior_segmental_bronchus_of_left_lung_(BI+BII).obj"
+      ]
+    },
+    "seg_l_b3_anterior": {
+      "files": [
+        "Anterior_segmental_bronchus_of_left_lung_(BIII).obj"
+      ]
+    },
+    "seg_l_b4_superior_lingular": {
+      "files": [
+        "Superior_lingular_segmental_bronchus_of_left_lung_(BIV).obj"
+      ]
+    },
+    "seg_l_b5_inferior_lingular": {
+      "files": [
+        "Inferior_lingular_segmental_bronchus_of_left_lung_(BV).obj"
+      ]
+    },
+    "seg_l_b6_superior": {
+      "files": [
+        "Superior_segmental_bronchus_of_left_lung_(BVI).obj"
+      ]
+    },
+    "seg_l_b7_medial_basal": {
+      "files": [
+        "Medial_basal_segmental_bronchus_of_left_lung_(BVII).obj"
+      ]
+    },
+    "seg_l_b7_8_anteromedial_basal": {
+      "files": [
+        "(Anteromedial_basal_segmental_bronchus_of_left_lung).obj"
+      ]
+    },
+    "seg_l_b8_anterior_basal": {
+      "files": [
+        "Anterior_basal_segmental_bronchus_of_left_lung_(BVIII).obj"
+      ]
+    },
+    "seg_l_b9_lateral_basal": {
+      "files": [
+        "Lateral_basal_segmental_bronchus_of_left_lung_(BIX).obj"
+      ]
+    },
+    "seg_l_b10_posterior_basal": {
+      "files": [
+        "Posterior_basal_segmental_bronchus_of_left_lung_(BX).obj"
+      ]
+    },
+    "lobe_rul": {
+      "files": [
+        "Superior_lobe_of_right_lung.obj"
+      ],
+      "budget": 2600,
+      "subdivide": 1,
+      "smooth": 8
+    },
+    "lobe_rml": {
+      "files": [
+        "Middle_lobe_of_right_lung.obj"
+      ],
+      "budget": 2000,
+      "subdivide": 1,
+      "smooth": 8
+    },
+    "lobe_rll": {
+      "files": [
+        "Inferior_lobe_of_right_lung.obj"
+      ],
+      "budget": 2800,
+      "subdivide": 1,
+      "smooth": 8
+    },
+    "lobe_lul": {
+      "files": [
+        "Superior_lobe_of_left_lung.obj"
+      ],
+      "budget": 2800,
+      "subdivide": 1,
+      "smooth": 8
+    },
+    "lobe_lll": {
+      "files": [
+        "Inferior_lobe_of_left_lung.obj"
+      ],
+      "budget": 2800,
+      "subdivide": 1,
+      "smooth": 8
+    },
+    "thoracic_spine": {
+      "files": [
+        "Vertebra_T*.obj"
+      ],
+      "budget": 2400
+    }
+  }
+}
