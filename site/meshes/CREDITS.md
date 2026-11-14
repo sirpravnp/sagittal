@@ -114,3 +114,19 @@ branches, venae cavae and pulmonary-vein stubs as swept tubes whose centre lines
 fit on chamber centroids and valve centres. The combined scene is shared under CC BY-SA 4.0.
 
 Used by: `heart.js`, `heart-blood.js` (scene `heart`).
+## eye (Z-Anatomy right eye)
+
+`eye.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP):
+`Sclera.r`, `Cornea.r`, `Iris.r`, `Lens.r`, `Retina.r`, `Vitreous_body.r`,
+`Anterior_chamber_of_eyeball.r` and `Optic_nerve_(II).r` (config `tools/meshes/configs/eye.json`).
+Changes: the coarse subdivision cages were subdivided and Taubin-smoothed, then decimated; the mesh
+is centred on the sclera. Z-Anatomy has no choroid or ciliary body: the `eye` scene adds them
+procedurally (a grown copy of the retina shell; a swept profile fitted to the sclera, iris and
+lens), with the trabecular meshwork, canal of Schlemm, optic-nerve sheath, disc and retinal vessels.
+Used by: `scenes/eye.js`.
+
+## Procedural uterus (no mesh)
+
+There is no open (CC BY / CC BY-SA) female pelvis mesh in the asset cache: Z-Anatomy and
+BodyParts3D are male models. The uterus, cervix, upper vagina, tubes and ovaries of
+`scenes/fib.js` are built in code from an anatomical coronal profile; no third-party model is used.
