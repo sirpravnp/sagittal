@@ -1,0 +1,32 @@
+{
+  "name": "groin",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py (hip bone, pectineus and iliopsoas extracted into zanatomy-abdomen/obj)",
+  "source_root": "${ASSETS}",
+  "transform": "zanatomy",
+  "center": [-5.0, 89.0, 4.0],
+  "default_budget": 1500,
+  "parts": {
+    "inguinal_ligament": { "files": ["zanatomy/obj/Inguinal_ligament.r.obj"], "budget": 900, "smooth": 4 },
+    "external_oblique": { "files": ["zanatomy/obj/External_abdominal_oblique_muscle.r.obj"], "budget": 2600 },
+    "internal_oblique": { "files": ["zanatomy/obj/Internal_abdominal_oblique_muscle.r.obj"], "budget": 2300 },
+    "transversus": { "files": ["zanatomy/obj/Transversus_abdominis_muscle.r.obj"], "budget": 2300 },
+    "transversalis_fascia": { "files": ["zanatomy/obj/Transversalis_fascia.obj"], "budget": 1600 },
+    "rectus": { "files": ["zanatomy/obj/Rectus_abdominis_muscle.r.obj", "zanatomy/obj/Pyramidalis_muscle.r.obj"], "budget": 2200 },
+    "inferior_epigastric_artery": { "files": ["zanatomy/obj/Inferior_epigastric_artery.r.obj"], "budget": 400 },
+    "inferior_epigastric_vein": { "files": ["zanatomy/obj/Inferior_epigastric_vein.r.obj"], "budget": 400 },
+    "artery": { "files": ["zanatomy/obj/External_iliac_artery.r.obj", "zanatomy/obj/Femoral_artery.r.obj"], "budget": 900 },
+    "vein": { "files": ["zanatomy/obj/External_iliac_vein.r.obj", "zanatomy/obj/Femoral_vein.r.obj"], "budget": 900 },
+    "femoral_nerve": { "files": ["zanatomy/obj/Femoral_nerve.r.obj"], "budget": 600 },
+    "ductus_deferens": { "files": ["zanatomy/obj/Ductus_deferens.r.obj"], "budget": 600 },
+    "testicular_vessels": {
+      "files": ["zanatomy/obj/Right_testicular_artery.r.obj", "zanatomy/obj/Right_testicular_vein.obj"], "budget": 1100
+    },
+    "testis": { "files": ["zanatomy/obj/Testis.r.obj", "zanatomy/obj/Epididymis.r.obj"], "budget": 700, "subdivide": 1, "smooth": 6 },
+    "hip_bone": { "files": ["zanatomy-abdomen/obj/Hip_bone.r.obj"], "budget": 3800 },
+    "pubic_symphysis": { "files": ["zanatomy-abdomen/obj/Pubic_symphysis.obj"], "budget": 300, "subdivide": 1, "smooth": 4 },
+    "pectineus": { "files": ["zanatomy-abdomen/obj/Pectineus_muscle.r.obj"], "budget": 1000 },
+    "iliopsoas": { "files": ["zanatomy-abdomen/obj/Iliacus_muscle.r.obj", "zanatomy-abdomen/obj/Psoas_major.r.obj"], "budget": 1800 }
+  }
+}
