@@ -1,0 +1,20 @@
+{
+  "name": "eye",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), right eye, extracted with tools/meshes/extract_blend.py",
+  "source_root": "${ASSETS}/zanatomy/obj",
+  "transform": "zanatomy",
+  "center": "part:sclera",
+  "default_budget": 2000,
+  "parts": {
+    "sclera": { "files": ["Sclera.r.obj"], "budget": 5000, "subdivide": 2, "smooth": 8 },
+    "cornea": { "files": ["Cornea.r.obj"], "budget": 2000, "subdivide": 2, "smooth": 6 },
+    "iris": { "files": ["Iris.r.obj"], "budget": 3000, "subdivide": 1, "smooth": 4 },
+    "lens": { "files": ["Lens.r.obj"], "budget": 2000, "subdivide": 1, "smooth": 6 },
+    "retina": { "files": ["Retina.r.obj"], "budget": 4500, "subdivide": 2, "smooth": 8 },
+    "vitreous": { "files": ["Vitreous_body.r.obj"], "budget": 3000, "subdivide": 1, "smooth": 4 },
+    "anterior_chamber": { "files": ["Anterior_chamber_of_eyeball.r.obj"], "budget": 1500, "subdivide": 2, "smooth": 6 },
+    "optic_nerve": { "files": ["Optic_nerve_(II).r.obj"], "budget": 1600 }
+  }
+}
