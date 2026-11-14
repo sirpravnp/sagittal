@@ -199,6 +199,7 @@
 
     function frame(once) {
       if (!cur) return;
+      if (!canvas.isConnected) return; // card replaced (e.g. Anki flip): stop the loop
       if (update) update(clock.getElapsedTime());
       placeLabels();
       renderer.render(scene, cam);

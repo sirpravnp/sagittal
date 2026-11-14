@@ -9,6 +9,7 @@
     "e2e": "playwright test",
     "cards": "node tools/render_cards.mjs",
     "decks": ".venv/bin/python tools/build_decks.py --site site --cards build/cards --out build/decks",
+    "decks:3d": ".venv/bin/python tools/build_decks.py --site site --cards build/cards --out build/decks --include-3d",
     "test:py": ".venv/bin/pytest tests/python -q"
   },
   "devDependencies": {

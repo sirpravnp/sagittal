@@ -1,0 +1,51 @@
+<div id="s3d-stage"><canvas id="s3d-cv"></canvas><div id="s3d-labels"></div></div>
+<div id="s3d-fallback" style="display:none">{{Fallback}}</div>
+<div id="s3d-status" class="status">Loading 3D...</div>
+<script>
+(function () {
+  var sceneId = "{{SceneId}}", ctl = "{{VariantControl}}", variant = "{{VariantKey}}";
+  var G = window.__sagittal3d = window.__sagittal3d || { done: {} };
+
+  function fallback(why) {
+    var st = document.getElementById('s3d-stage');
+    var fb = document.getElementById('s3d-fallback');
+    var s = document.getElementById('s3d-status');
+    if (st) st.style.display = 'none';
+    if (fb) fb.style.display = '';
+    if (s) s.textContent = '3D unavailable — showing image';
+    try { console.log('sagittal 3D fallback: ' + why); } catch (e) {}
+  }
+
+  // Load scripts one after another; skip any already loaded in this web view.
+  function chain(srcs, ok, bad) {
+    if (!srcs.length) return ok();
+    var src = srcs[0], rest = srcs.slice(1);
+    if (G.done[src]) return chain(rest, ok, bad);
+    var el = document.createElement('script');
+    el.onload = function () { G.done[src] = true; chain(rest, ok, bad); };
+    el.onerror = function () { bad(src); };
+    el.src = src;
+    document.head.appendChild(el);
+  }
+
+  function render() {
+    var cv = document.getElementById('s3d-cv');
+    if (!cv || !cv.isConnected) return; // card already replaced while scripts loaded
+    try {
+      var viewer = window.Kit.createViewer({
+        canvas: cv, labelsEl: document.getElementById('s3d-labels')
+      });
+      var state = {};
+      state[ctl] = variant;
+      if (!viewer.available || !viewer.open(sceneId, state)) return fallback('viewer unavailable');
+      var s = document.getElementById('s3d-status');
+      if (s) s.textContent = '3D OK';
+    } catch (e) {
+      fallback(String(e));
+    }
+  }
+
+  chain(['_three.min.js', '_labels.js', '_kit.js', '_scene_' + sceneId + '.js'], render,
+    function (src) { fallback('failed to load ' + src); });
+})();
+</script>

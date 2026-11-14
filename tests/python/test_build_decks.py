@@ -139,3 +139,86 @@ def test_build_all_cli(tmp_path, scenes, cards):
     out = tmp_path / "out"
     build_decks.main(["--site", str(tmp_path / "site"), "--cards", str(cards), "--out", str(out)])
     assert [p.name for p in out.glob("*.apkg")] == ["sagittal-cardiology.apkg"]
+
+
+# ---- Task 9: experimental 3D note type ----
+SITE = Path(__file__).resolve().parents[2] / "site"
+
+
+@pytest.fixture
+def site3d(tmp_path, scenes):
+    """Fake site dir with the shared libs and a scene script per scene."""
+    s = tmp_path / "site3d"
+    (s / "vendor").mkdir(parents=True)
+    (s / "kit").mkdir()
+    (s / "scenes").mkdir()
+    (s / "vendor" / "three.min.js").write_text("/*three*/")
+    (s / "kit" / "labels.js").write_text("/*labels*/")
+    (s / "kit" / "kit.js").write_text("/*kit*/")
+    for sc in scenes:
+        (s / "scenes" / f"{sc['id']}.js").write_text("/*scene*/")
+    return s
+
+
+def test_3d_media_exactly_once(tmp_path, scenes, cards, site3d):
+    out = tmp_path / "t3.apkg"
+    build_decks.build_deck("T", scenes, cards, out, include_3d=True, site_dir=site3d)
+    notes, _, media = read_apkg(out)
+    names = list(media.values())
+    assert len(names) == len(set(names))
+    for n in ("_three.min.js", "_labels.js", "_kit.js", "_scene_alpha.js", "_scene_beta.js"):
+        assert names.count(n) == 1
+    assert "alpha__a__back.png" in names
+
+
+def test_no_3d_media_when_disabled(tmp_path, scenes, cards, site3d):
+    out = tmp_path / "t2.apkg"
+    build_decks.build_deck("T", scenes, cards, out, include_3d=False, site_dir=site3d)
+    notes, _, media = read_apkg(out)
+    assert not [n for n in media.values() if n.startswith("_")]
+    assert len(notes) == 3
+
+
+def test_3d_note_count_and_guids(tmp_path, scenes, cards, site3d):
+    a, b = tmp_path / "a" / "x.apkg", tmp_path / "b" / "x.apkg"
+    a.parent.mkdir(); b.parent.mkdir()
+    build_decks.build_deck("T", scenes, cards, a, include_3d=True, site_dir=site3d)
+    build_decks.build_deck("T", scenes, cards, b, include_3d=True, site_dir=site3d)
+    na, _, _ = read_apkg(a)
+    nb, _, _ = read_apkg(b)
+    assert len(na) == 6  # 3 image + 3 3D
+    assert sorted(n[0] for n in na) == sorted(n[0] for n in nb)
+    assert len({n[0] for n in na}) == 6
+    import genanki
+    assert genanki.guid_for("alpha", "a", "3d") in [n[0] for n in na]
+    f3 = [n[1].split("\x1f") for n in na if len(n[1].split("\x1f")) == 7]
+    assert len(f3) == 3
+    assert f3[0][1:4] == ["alpha", "d", "a"]
+    assert '<img src="alpha__a__back.png">' in f3[0][4]
+
+
+def test_3d_template_safe():
+    t = (Path(build_decks.__file__).parent / "anki3d_template.html").read_text(encoding="utf-8")
+    assert "{{Fallback}}" in t
+    assert "import " not in t and "import(" not in t and 'type="module"' not in t
+    for n in ("_three.min.js", "_labels.js", "_kit.js", "_scene_", "onerror", "isConnected"):
+        assert n in t
+    assert "3D unavailable" in t and "3D OK" in t
+
+
+def test_3d_model_name_and_id():
+    m = build_decks.make_model_3d()
+    assert m.name == "Anatomy 3D (experimental)"
+    assert m.model_id == build_decks.stable_id("sagittal-model-3d-v1")
+    assert [f["name"] for f in m.fields] == ["Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Status"]
+
+
+def test_cli_include_3d(tmp_path, scenes, cards, site3d):
+    site = site3d
+    (site / "scenes" / "index.json").write_text(json.dumps([s["id"] for s in scenes]))
+    for s in scenes:
+        (site / "scenes" / f"{s['id']}.meta.json").write_text(json.dumps(dict(s, topic="Cardiology")))
+    out = tmp_path / "out"
+    build_decks.main(["--site", str(site), "--cards", str(cards), "--out", str(out), "--include-3d"])
+    _, _, media = read_apkg(out / "sagittal-cardiology.apkg")
+    assert "_kit.js" in media.values()
