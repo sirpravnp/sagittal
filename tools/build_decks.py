@@ -158,7 +158,8 @@ def main(argv=None) -> None:
         by_topic.setdefault(meta["topic"], []).append(meta)
     out_dir = Path(args.out)
     for topic, scenes in by_topic.items():
-        target = out_dir / f"{slugify(topic)}.apkg"
+        suffix = "-3d" if args.include_3d else ""
+        target = out_dir / f"{slugify(topic)}{suffix}.apkg"
         build_deck(topic, scenes, Path(args.cards), target,
                    include_3d=args.include_3d, site_dir=args.site)
         print(f"{target} ({sum(len(s['variants']) for s in scenes)} cards)")

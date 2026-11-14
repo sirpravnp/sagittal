@@ -220,5 +220,6 @@ def test_cli_include_3d(tmp_path, scenes, cards, site3d):
         (site / "scenes" / f"{s['id']}.meta.json").write_text(json.dumps(dict(s, topic="Cardiology")))
     out = tmp_path / "out"
     build_decks.main(["--site", str(site), "--cards", str(cards), "--out", str(out), "--include-3d"])
-    _, _, media = read_apkg(out / "sagittal-cardiology.apkg")
+    assert [p.name for p in out.glob("*.apkg")] == ["sagittal-cardiology-3d.apkg"]
+    _, _, media = read_apkg(out / "sagittal-cardiology-3d.apkg")
     assert "_kit.js" in media.values()
