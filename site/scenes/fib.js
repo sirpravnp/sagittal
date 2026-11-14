@@ -205,7 +205,7 @@
         add(capGeo(cav, 0.007), T('endometrium', { color: 0x6a1e2c, roughness: 0.35 }));
       }
       // Upper vagina with the fornices around the cervix (sectioned too).
-      var VAG = [[1.26, -1.75], [1.62, -1.95], [1.86, -2.5], [1.82, -3.2], [1.7, -3.9], [1.4, -3.9], [1.52, -3.2], [1.55, -2.55], [1.4, -2.12], [1.22, -1.98]];
+      var VAG = [[1.26, -1.75], [1.62, -1.95], [1.86, -2.5], [1.82, -3.2], [1.72, -3.7], [1.42, -3.7], [1.52, -3.2], [1.55, -2.55], [1.4, -2.12], [1.22, -1.98]];
       var vg = new THREE.LatheGeometry(VAG.concat([VAG[0]]).map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 64);
       var vp = vg.attributes.position;
       for (var i = 0; i < vp.count; i++) vp.setZ(i, vp.getZ(i) * 0.8);
@@ -251,12 +251,21 @@
         var r = f[4];
         var m = add(lump(r, k + 1), C('fibroid'));
         m.position.set(f[2], f[3], 0);
-        var cp = add(new THREE.CircleGeometry(r * 0.985, 48), T('fibroid', { map: tex, color: 0xffffff, clearcoat: 0.2 }));
+        // Cut surface: whorled, bulging slightly above the cut (fibroids pout when sectioned).
+        var dome = new THREE.RingGeometry(0, r * 0.985, 64, 10), dp = dome.attributes.position;
+        for (var q = 0; q < dp.count; q++) {
+          var rho = Math.hypot(dp.getX(q), dp.getY(q)) / r;
+          dp.setZ(q, 0.16 * r * Math.sqrt(Math.max(0, 1 - rho * rho)));
+        }
+        dome.computeVertexNormals();
+        var cp = add(dome, T('fibroid', { map: tex, color: 0xffffff, clearcoat: 0.2 }));
         cp.position.set(f[2], f[3], 0.011);
         if (f[5]) {
-          var a = V(f[5][0], f[5][1], 0), b = V(f[2], f[3], 0);
+          var a = V(f[5][0], f[5][1], 0), c0 = V(f[2], f[3], 0);
+          var b = c0.clone().add(a.clone().sub(c0).normalize().multiplyScalar(r * 0.8));
           var mid = a.clone().lerp(b, 0.5).add(V(0.1, 0, -0.1));
-          add(vtube(new THREE.CatmullRomCurve3([a, mid, b]), function (t) { return 0.15 - 0.04 * Math.sin(Math.PI * t); }, 16, 10), C('fibroid', { color: 0xd8b8ae }));
+          // The stalk is drawn whole so it stays visible over the cavity section.
+          add(vtube(new THREE.CatmullRomCurve3([a, mid.setZ(0.02), b]), function (t) { return 0.15 - 0.04 * Math.sin(Math.PI * t); }, 16, 10), T('fibroid', { color: 0xd8b0a6 }));
         }
         lbl.push({ t: 'FIGO ' + f[0], p: [S * (f[2] + (f[2] < 0 ? -r * 0.7 : r * 0.7)), S * (f[3] + r * 0.55), S * 0.02] });
       });
