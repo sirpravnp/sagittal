@@ -39,3 +39,16 @@ extreme and average four-chamber heart meshes from statistical shape model", Zen
 doi:[10.5281/zenodo.4593739](https://doi.org/10.5281/zenodo.4593739).
 Licence: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 Add `"credit": "rodero-heart"` to a bake config that uses it.
+
+## airways (mesh, credit `zanatomy`)
+
+`airways.js`: trachea; right and left main bronchi; right intermediate bronchus; the five lobar
+bronchi; all 20 segmental bronchi (BI-BX each side, as Z-Anatomy names them); the five lung lobes
+(subdivided once and Taubin-smoothed); thoracic vertebrae T1-T12 for orientation. Source: Z-Anatomy
+`Startup.blend` (BodyParts3D-derived), CC BY-SA 4.0 on CC BY-SA 2.1 JP; see the `zanatomy` entry
+above for full attribution. Changes: extracted with `tools/meshes/extract_blend.py` (bronchi swept
+from their centre-line curves into tubes; "Middle lobar bronchus.r" extracted separately into
+`sagittal-assets-cache/zanatomy-airways/`), converted to sagittal's frame, decimated per
+`tools/meshes/configs/airways.json`. The `asp` scene derives bronchopulmonary segment territories
+at runtime by assigning each lobe surface point to its nearest segmental bronchus (an
+approximation, not segment meshes from the source).
