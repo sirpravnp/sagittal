@@ -49,7 +49,14 @@
     }
   }
 
-  chain(['_three.min.js', '_labels.js', '_kit.js', '_scene_' + sceneId + '.js'], render,
-    function (src) { fallback('failed to load ' + src); });
+  function bad(src) { fallback('failed to load ' + src); }
+  // The scene script registers its SceneDef; then load the baked meshes it declares, then render.
+  chain(['_three.min.js', '_labels.js', '_kit.js', '_scene_' + sceneId + '.js'], function () {
+    var def = window.Kit && window.Kit.get(sceneId);
+    var meshes = ((def && def.meshes) || []).filter(function (m) {
+      return !(window.SagittalMeshes && window.SagittalMeshes[m]);
+    }).map(function (m) { return '_mesh_' + m + '.js'; });
+    chain(meshes, render, bad);
+  }, bad);
 })();
 </script>

@@ -77,6 +77,15 @@ def status_text(scene: dict) -> str:
     return UNREVIEWED
 
 
+MESHES_RE = re.compile(r"\bmeshes\s*:\s*\[([^\]]*)\]")
+
+
+def scene_meshes(js: str) -> list:
+    """Mesh names a scene script declares in its SceneDef (`meshes: ['thorax', ...]`)."""
+    m = MESHES_RE.search(js)
+    return re.findall(r"""['"]([a-z0-9-]+)['"]""", m.group(1)) if m else []
+
+
 def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -> None:
     cards_dir, out = Path(cards_dir), Path(out)
     model = make_model()
@@ -101,8 +110,17 @@ def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -
         stage = out.parent / f".{out.stem}-3d-media"
         stage.mkdir(parents=True, exist_ok=True)
         staged = []
+        meshes = []
+        for sc in scenes:
+            for m in scene_meshes((site_dir / "scenes" / f"{sc['id']}.js").read_text(encoding="utf-8")):
+                if m not in meshes:
+                    meshes.append(m)
+        for m in meshes:
+            if not (site_dir / "meshes" / f"{m}.js").is_file():
+                raise FileNotFoundError(f"Missing mesh script: meshes/{m}.js")
         for src, name in libs + [(site_dir / "scenes" / f"{sc['id']}.js", f"_scene_{sc['id']}.js")
-                                 for sc in scenes]:
+                                 for sc in scenes] + [(site_dir / "meshes" / f"{m}.js", f"_mesh_{m}.js")
+                                                      for m in meshes]:
             dst = stage / name
             shutil.copyfile(src, dst)
             staged.append(str(dst))

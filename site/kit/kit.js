@@ -2,8 +2,10 @@
 // Needs window.THREE (vendor/three.min.js) and window.KitLabels (kit/labels.js) loaded first.
 (function () {
   var THREE = window.THREE;
-  var BG = 0x0f141b;
+  var BG_RGB = [0x0f, 0x14, 0x1b]; // #0f141b, the clear colour, written to the framebuffer as-is
   var LABEL_OFFSET_X = 8;
+  // Modern colour workflow: hex colours are sRGB, lighting runs in linear space, output is sRGB.
+  if (THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
   var FALLBACK_TEXT = '3D is not available in this browser (WebGL could not start). The notes and claims for this scene are still shown.';
 
   /* ---------- geometry helpers (ported from the prototype) ---------- */
@@ -54,6 +56,151 @@
     return add(g, new THREE.SphereGeometry(r || 0.1, 16, 12), mat(col, 1, { emissive: col, emissiveIntensity: 0.7 }), p);
   }
 
+  /* ---------- tissue materials ---------- */
+  // MeshPhysicalMaterial presets. Kit.tissue(kind, opts?) returns a NEW material each call;
+  // opts override any material property (color, opacity, emissive, side, clippingPlanes...).
+  // No transmission (it costs an extra render pass): see-through tissues use opacity instead.
+  var TISSUE = {
+    'myocardium':    { color: 0x9e2f2a, roughness: 0.55, clearcoat: 0.35, clearcoatRoughness: 0.45, sheen: 0.4, sheenColor: 0xd46a5f, sheenRoughness: 0.6 },
+    'vessel-artery': { color: 0xc23b30, roughness: 0.38, clearcoat: 0.6, clearcoatRoughness: 0.3 },
+    'vessel-vein':   { color: 0x3c5fa8, roughness: 0.4, clearcoat: 0.55, clearcoatRoughness: 0.32 },
+    'blood-oxy':     { color: 0xd8403a, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.2 },
+    'blood-deoxy':   { color: 0x3a6fd8, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.2 },
+    'blood-mixed':   { color: 0x9553c9, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.2 },
+    'bone':          { color: 0xc9b48c, roughness: 0.68, clearcoat: 0.15, clearcoatRoughness: 0.6, sheen: 0.15, sheenColor: 0xfff1d6 },
+    'cartilage':     { color: 0x9fb4b8, roughness: 0.35, clearcoat: 0.6, clearcoatRoughness: 0.25, sheen: 0.3, sheenColor: 0xe8f4ff },
+    'lung':          { color: 0xd9a0a0, roughness: 0.8, sheen: 0.7, sheenColor: 0xffd6d6, sheenRoughness: 0.5 },
+    'liver':         { color: 0x7a2e22, roughness: 0.42, clearcoat: 0.55, clearcoatRoughness: 0.3 },
+    'gallbladder':   { color: 0x5f7a3a, roughness: 0.35, clearcoat: 0.7, clearcoatRoughness: 0.2 },
+    'bile-duct':     { color: 0x7f9a3c, roughness: 0.4, clearcoat: 0.5, clearcoatRoughness: 0.3 },
+    'pancreas':      { color: 0xd9b07a, roughness: 0.65, clearcoat: 0.3, clearcoatRoughness: 0.5, sheen: 0.3, sheenColor: 0xffe3b8 },
+    'bowel':         { color: 0xd88f7c, roughness: 0.45, clearcoat: 0.6, clearcoatRoughness: 0.3, sheen: 0.3, sheenColor: 0xffc8b8 },
+    'fascia':        { color: 0xe8e4dc, roughness: 0.5, clearcoat: 0.4, clearcoatRoughness: 0.4, sheen: 0.6, sheenColor: 0xffffff, opacity: 0.55 },
+    'muscle':        { color: 0x9b3a33, roughness: 0.6, clearcoat: 0.2, clearcoatRoughness: 0.5, sheen: 0.5, sheenColor: 0xc8605a, sheenRoughness: 0.5 },
+    'fat':           { color: 0xf0cf6e, roughness: 0.5, clearcoat: 0.4, clearcoatRoughness: 0.35 },
+    'uterus-serosa': { color: 0xd88a8a, roughness: 0.45, clearcoat: 0.6, clearcoatRoughness: 0.25, sheen: 0.3, sheenColor: 0xffd0d0 },
+    'myometrium':    { color: 0xb5524f, roughness: 0.6, sheen: 0.4, sheenColor: 0xd98080 },
+    'endometrium':   { color: 0xc9606e, roughness: 0.5, clearcoat: 0.5, clearcoatRoughness: 0.3 },
+    'fibroid':       { color: 0xe0cdbf, roughness: 0.55, clearcoat: 0.3, clearcoatRoughness: 0.4, sheen: 0.3, sheenColor: 0xffffff },
+    'sclera':        { color: 0xf2efe8, roughness: 0.4, clearcoat: 0.5, clearcoatRoughness: 0.2 },
+    'cornea':        { color: 0xdfefff, roughness: 0.05, clearcoat: 1, clearcoatRoughness: 0.05, opacity: 0.25 },
+    'iris':          { color: 0x5b7aa0, roughness: 0.6, sheen: 0.3, sheenColor: 0xa8c4e0 },
+    'lens':          { color: 0xf3f0de, roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.1, opacity: 0.45 },
+    'retina':        { color: 0xd97a5a, roughness: 0.55, clearcoat: 0.3, clearcoatRoughness: 0.4 },
+    'choroid':       { color: 0x5a2a2a, roughness: 0.6 },
+    'nerve':         { color: 0xf0d77a, roughness: 0.45, clearcoat: 0.4, clearcoatRoughness: 0.35, sheen: 0.4, sheenColor: 0xfff1b8 },
+    'air':           { color: 0xbfe3ff, roughness: 0.2, opacity: 0.18 },
+    'highlight':     { color: 0xffd23f, roughness: 0.4, emissive: 0xffd23f, emissiveIntensity: 0.55 },
+  };
+  var COLOR_KEYS = ['color', 'emissive', 'sheenColor', 'specularColor', 'attenuationColor'];
+  function tissue(kind, opts) {
+    var base = TISSUE[kind];
+    if (!base) throw new Error('Kit.tissue: unknown kind "' + kind + '" (known: ' + Object.keys(TISSUE).join(', ') + ')');
+    var p = Object.assign({ metalness: 0, side: THREE.DoubleSide, envMapIntensity: 0.7 }, base, opts || {});
+    var o = p.opacity === undefined ? 1 : p.opacity;
+    if (p.transparent === undefined) p.transparent = o < 1;
+    if (p.depthWrite === undefined) p.depthWrite = o >= 0.95;
+    COLOR_KEYS.forEach(function (k) { if (p[k] !== undefined && !(p[k] && p[k].isColor)) p[k] = new THREE.Color(p[k]); });
+    var m = new THREE.MeshPhysicalMaterial(p);
+    m.userData.tissue = kind;
+    return m;
+  }
+
+  /* ---------- baked anatomical meshes (site/meshes/<name>.js) ---------- */
+  // Each mesh script sets window.SagittalMeshes[name] = { parts: { part: { p, i, it, n?, bbox } }, unit: 'cm', ... }.
+  // Geometries are decoded once and shared; disposeTree() leaves them alone (userData.kitShared).
+  var meshCache = {};
+  function meshLib(name) {
+    var lib = window.SagittalMeshes && window.SagittalMeshes[name];
+    if (!lib) throw new Error('Kit: mesh "' + name + '" is not loaded. List it in the scene\'s meshes: [...] so the page loads meshes/' + name + '.js');
+    return lib;
+  }
+  function b64bytes(s) {
+    var bin = atob(s), n = bin.length, u = new Uint8Array(n);
+    for (var i = 0; i < n; i++) u[i] = bin.charCodeAt(i);
+    return u;
+  }
+  function meshGeometry(name, part) {
+    var key = name + '/' + part;
+    if (meshCache[key]) return meshCache[key];
+    var lib = meshLib(name), pd = lib.parts[part];
+    if (!pd) throw new Error('Kit: mesh "' + name + '" has no part "' + part + '" (parts: ' + Object.keys(lib.parts).join(', ') + ')');
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(b64bytes(pd.p).buffer), 3));
+    var ib = b64bytes(pd.i).buffer;
+    geo.setIndex(new THREE.BufferAttribute(pd.it === 'u32' ? new Uint32Array(ib) : new Uint16Array(ib), 1));
+    if (pd.n) geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(b64bytes(pd.n).buffer), 3));
+    else geo.computeVertexNormals();
+    geo.computeBoundingBox(); geo.computeBoundingSphere();
+    geo.userData = { kitShared: true, mesh: name, part: part };
+    meshCache[key] = geo;
+    return geo;
+  }
+  // Adds one part of a baked mesh to group g and returns the THREE.Mesh.
+  // material: a THREE.Material or a tissue kind string (default 'bone').
+  function meshPart(g, name, part, material) {
+    if (typeof material === 'string') material = tissue(material);
+    if (!material) material = tissue('bone');
+    var me = new THREE.Mesh(meshGeometry(name, part), material);
+    me.name = name + '/' + part;
+    g.add(me);
+    return me;
+  }
+  function meshParts(name) {
+    var lib = window.SagittalMeshes && window.SagittalMeshes[name];
+    return lib ? Object.keys(lib.parts) : [];
+  }
+  function meshInfo(name) {
+    var lib = meshLib(name), bb = {};
+    Object.keys(lib.parts).forEach(function (k) { bb[k] = lib.parts[k].bbox ? lib.parts[k].bbox.slice() : null; });
+    return { unit: lib.unit, credit: lib.credit, frame: lib.frame, offset: (lib.offset || [0, 0, 0]).slice(), bbox: bb };
+  }
+
+  /* ---------- lighting environment ---------- */
+  // A small procedural studio, painted into a 128x64 equirectangular texture (gradient sky/floor plus
+  // three soft boxes) and prefiltered with PMREM. The tiny source keeps PMREM cheap on software GL.
+  // No external HDR files; built once per viewer.
+  var ENV_W = 128, ENV_H = 64;
+  var ENV_BOXES = [ // direction (towards the light), angular radius (rad), linear rgb
+    { d: [0.38, 0.62, 0.68], r: 0.42, c: [1.0, 0.95, 0.88] }, // key, upper front right
+    { d: [-0.62, 0.3, -0.72], r: 0.3, c: [0.75, 0.84, 1.0] },  // rim, behind left
+    { d: [-0.66, -0.1, 0.74], r: 0.35, c: [0.45, 0.45, 0.45] }, // low fill, front left
+  ];
+  function envPixels() {
+    var data = new Uint8Array(ENV_W * ENV_H * 4), i, x, y;
+    // three.js equirect lookup: u = atan2(z, x) / 2pi + 0.5, v = asin(y) / pi + 0.5 (row 0 is v = 0).
+    for (y = 0; y < ENV_H; y++) {
+      var lat = ((y + 0.5) / ENV_H - 0.5) * Math.PI;
+      var dy = Math.sin(lat), cl = Math.cos(lat);
+      for (x = 0; x < ENV_W; x++) {
+        var th = ((x + 0.5) / ENV_W - 0.5) * Math.PI * 2;
+        var dx = Math.cos(th) * cl, dz = Math.sin(th) * cl;
+        var r, g, b, t;
+        if (dy > 0) { t = Math.pow(dy, 0.8); r = 0.11 + 0.62 * t; g = 0.12 + 0.66 * t; b = 0.14 + 0.72 * t; }
+        else { t = Math.min(1, -dy * 1.6); r = 0.11 - 0.1 * t; g = 0.12 - 0.11 * t; b = 0.14 - 0.12 * t; }
+        for (var k = 0; k < ENV_BOXES.length; k++) {
+          var bx = ENV_BOXES[k], L = Math.hypot(bx.d[0], bx.d[1], bx.d[2]);
+          var cos = (dx * bx.d[0] + dy * bx.d[1] + dz * bx.d[2]) / L;
+          var w = Math.max(0, Math.min(1, (cos - Math.cos(bx.r)) / (1 - Math.cos(bx.r)) * 3));
+          r += w * bx.c[0]; g += w * bx.c[1]; b += w * bx.c[2];
+        }
+        i = (y * ENV_W + x) * 4;
+        data[i] = Math.min(255, r * 255); data[i + 1] = Math.min(255, g * 255); data[i + 2] = Math.min(255, b * 255); data[i + 3] = 255;
+      }
+    }
+    return data;
+  }
+  function buildEnvironment(renderer) {
+    var src = new THREE.DataTexture(envPixels(), ENV_W, ENV_H, THREE.RGBAFormat);
+    src.mapping = THREE.EquirectangularReflectionMapping;
+    src.magFilter = THREE.LinearFilter; src.minFilter = THREE.LinearFilter;
+    src.flipY = false; src.needsUpdate = true;
+    var pm = new THREE.PMREMGenerator(renderer);
+    var tex = pm.fromEquirectangular(src).texture;
+    pm.dispose(); src.dispose();
+    return tex;
+  }
+
   /* ---------- scene registry ---------- */
   var scenes = {};
   function register(def) {
@@ -81,13 +228,13 @@
 
   function disposeTree(obj) {
     obj.traverse(function (o) {
-      if (o.geometry) o.geometry.dispose();
+      if (o.geometry && !(o.geometry.userData && o.geometry.userData.kitShared)) o.geometry.dispose();
       if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) { m.dispose(); });
     });
   }
 
   /* ---------- viewer ---------- */
-  // opts: { canvas, labelsEl, controlsEl?, infoEl? }
+  // opts: { canvas, labelsEl, controlsEl?, infoEl?, environment? (default true) }
   function createViewer(opts) {
     var canvas = opts.canvas, labelsEl = opts.labelsEl;
     var controlsEl = opts.controlsEl || null, infoEl = opts.infoEl || null;
@@ -96,14 +243,27 @@
       renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: true });
       renderer.localClippingEnabled = true;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.0;
     } catch (e) {
       renderer = null;
     }
 
-    var scene = new THREE.Scene(); scene.background = new THREE.Color(BG);
+    var scene = new THREE.Scene();
+    // Colour(hex) decodes sRGB to linear; three re-encodes the clear colour for the sRGB output,
+    // so the canvas background stays exactly #0f141b (tone mapping does not touch the clear colour).
+    scene.background = new THREE.Color((BG_RGB[0] << 16) | (BG_RGB[1] << 8) | BG_RGB[2]);
     var cam = new THREE.PerspectiveCamera(40, 1, 0.1, 100); cam.position.set(0, 0, 9);
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 1.0));
-    var dl = new THREE.DirectionalLight(0xffffff, 0.9); dl.position.set(3, 5, 7); scene.add(dl);
+    // Lights stay with the camera rig (not children of root), so the model is lit from the viewer's
+    // side whichever way it is turned: soft sky/ground fill, warm key, cool rim; plus the PMREM studio.
+    scene.add(new THREE.HemisphereLight(0xf2f5ff, 0x30363f, 0.35));
+    var dl = new THREE.DirectionalLight(0xfff1e2, 2.0); dl.position.set(5, 6, 4); scene.add(dl);
+    var rim = new THREE.DirectionalLight(0xbcd4ff, 1.1); rim.position.set(-5, 3, -6); scene.add(rim);
+    // opts.environment === false skips the PMREM studio (about 1.5x cheaper per frame on software GL).
+    if (renderer && opts.environment !== false) {
+      try { scene.environment = buildEnvironment(renderer); } catch (e) { scene.environment = null; }
+    }
     var root = new THREE.Group(); scene.add(root);
 
     var cur = null, st = {}, labels = [], labEls = [], labSizes = [], update = null;
@@ -274,7 +434,7 @@
       var w = gl.drawingBufferWidth, h = gl.drawingBufferHeight;
       var px = new Uint8Array(w * h * 4);
       gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
-      var bg = new THREE.Color(BG), br = bg.r * 255, bgg = bg.g * 255, bb = bg.b * 255;
+      var br = BG_RGB[0], bgg = BG_RGB[1], bb = BG_RGB[2];
       for (var i = 0; i < px.length; i += 4) {
         if (Math.abs(px[i] - br) + Math.abs(px[i + 1] - bgg) + Math.abs(px[i + 2] - bb) > 24) return true;
       }
@@ -304,6 +464,11 @@
     ids: function () { return Object.keys(scenes); },
     initialState: initialState,
     helpers: { V: V, mat: mat, add: add, ell: ell, seg: seg, tube: tube, arrow: arrow, ring: ring, sector: sector, disk: disk, dot: dot },
+    tissue: tissue,
+    tissueKinds: function () { return Object.keys(TISSUE); },
+    meshPart: meshPart,
+    meshParts: meshParts,
+    meshInfo: meshInfo,
     BADGE_TEXT: 'Unreviewed: verify against your textbook',
   };
 })();

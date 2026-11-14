@@ -234,3 +234,32 @@ def test_3d_front_has_title_prompt_and_hides_labels_until_back():
     afmt = m.templates[0]["afmt"]
     assert 'id="sagittal-back"' in afmt
     assert afmt.index('id="sagittal-back"') < afmt.index("{{FrontSide}}")
+
+
+# ---- baked meshes in the 3D deck ----
+def test_scene_meshes_parses_scene_def():
+    js = "Kit.register({ id: 'x', meshes: ['thorax', \"heart-ct\"], build: function () {} });"
+    assert build_decks.scene_meshes(js) == ["thorax", "heart-ct"]
+    assert build_decks.scene_meshes("Kit.register({ id: 'x' })") == []
+
+
+def test_3d_deck_packs_declared_meshes_once(tmp_path, scenes, cards, site3d):
+    (site3d / "meshes").mkdir()
+    (site3d / "meshes" / "thorax.js").write_text("/*mesh*/")
+    for sc in scenes:
+        (site3d / "scenes" / f"{sc['id']}.js").write_text("Kit.register({ id: '%s', meshes: ['thorax'] });" % sc["id"])
+    out = tmp_path / "m.apkg"
+    build_decks.build_deck("T", scenes, cards, out, include_3d=True, site_dir=site3d)
+    _, _, media = read_apkg(out)
+    assert list(media.values()).count("_mesh_thorax.js") == 1
+
+
+def test_3d_deck_missing_mesh_fails(tmp_path, scenes, cards, site3d):
+    (site3d / "scenes" / f"{scenes[0]['id']}.js").write_text("Kit.register({ meshes: ['nope'] });")
+    with pytest.raises(FileNotFoundError, match="nope"):
+        build_decks.build_deck("T", scenes, cards, tmp_path / "x.apkg", include_3d=True, site_dir=site3d)
+
+
+def test_3d_template_loads_meshes():
+    t = (Path(build_decks.__file__).parent / "anki3d_template.html").read_text(encoding="utf-8")
+    assert "_mesh_" in t and "def.meshes" in t

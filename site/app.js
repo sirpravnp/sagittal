@@ -26,6 +26,17 @@
     });
   }
 
+  // Loads site/meshes/<name>.js for every mesh a registered scene lists in `meshes: [...]`.
+  // Each file assigns window.SagittalMeshes[name]; already-loaded meshes are skipped.
+  function loadMeshes(sceneId) {
+    var def = window.Kit && Kit.get(sceneId);
+    var names = (def && def.meshes) || [];
+    return Promise.all(names.map(function (n) {
+      if (window.SagittalMeshes && window.SagittalMeshes[n]) return null;
+      return loadScript('meshes/' + encodeURIComponent(n) + '.js');
+    }));
+  }
+
   function renderGallery(container, notFoundId) {
     container.innerHTML = '';
     if (notFoundId != null) {
@@ -100,6 +111,10 @@
     getJson('scenes/index.json').then(function (ids) {
       if (ids.indexOf(id) < 0) return notFound();
       return Promise.all([getJson('scenes/' + id + '.meta.json'), loadScript('scenes/' + id + '.js')]).then(function (r) {
+        // The scene script only registers its SceneDef; build() runs later, in open().
+        // Load the baked meshes it declares (meshes: [...]) before opening it.
+        return loadMeshes(id).then(function () { return r; });
+      }).then(function (r) {
         var meta = r[0];
         document.title = meta.title + ' · sagittal';
         document.querySelector('h1').textContent = meta.title;
@@ -132,5 +147,5 @@
     });
   }
 
-  window.SagittalApp = { initGallery: initGallery, initViewer: initViewer, renderGallery: renderGallery };
+  window.SagittalApp = { initGallery: initGallery, initViewer: initViewer, renderGallery: renderGallery, loadMeshes: loadMeshes };
 })();
