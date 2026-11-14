@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>sagittal</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="viewer-page">
+<header class="top">
+  <a class="brand" href="index.html">sagittal</a>
+  <h1></h1>
+  <span id="badge"></span>
+</header>
+<main class="viewer">
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="labels"></div>
+    <div id="hint">drag to rotate · scroll or pinch to zoom</div>
+  </div>
+  <aside>
+    <div id="controls"></div>
+    <div class="chk"><input type="checkbox" id="labels-toggle" checked><label for="labels-toggle">Labels</label></div>
+    <div id="info"></div>
+    <section class="claims">
+      <h2>Claims in this scene</h2>
+      <ul id="claims"></ul>
+    </section>
+    <section class="claims" hidden>
+      <h2>Sources</h2>
+      <ul id="sources"></ul>
+    </section>
+    <p class="note">Stylized teaching schematics, not to scale.</p>
+  </aside>
+</main>
+<div id="gallery"></div>
+<script src="vendor/three.min.js"></script>
+<script src="kit/labels.js"></script>
+<script src="kit/kit.js"></script>
+<script src="app.js"></script>
+<script>SagittalApp.initViewer();</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>sagittal: interactive anatomy</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="gallery-page">
+<header class="top">
+  <span class="brand">sagittal</span>
+  <h1>Interactive anatomy scenes</h1>
+</header>
+<main class="page">
+  <p class="lede">Stylized 3D teaching schematics. Rotate, zoom and switch variants.</p>
+  <div id="gallery"></div>
+</main>
+<script src="vendor/three.min.js"></script>
+<script src="kit/labels.js"></script>
+<script src="kit/kit.js"></script>
+<script src="app.js"></script>
+<script>SagittalApp.initGallery();</script>
+</body>
+</html>

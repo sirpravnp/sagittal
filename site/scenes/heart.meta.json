@@ -1,0 +1,37 @@
+{
+  "id": "heart",
+  "title": "Congenital heart defects",
+  "topic": "Cardiology",
+  "variantControl": "d",
+  "variants": [
+    { "key": "normal", "label": "Normal heart" },
+    { "key": "asd", "label": "Atrial septal defect (ASD)" },
+    { "key": "vsd", "label": "Ventricular septal defect (VSD)" },
+    { "key": "pda", "label": "Patent ductus arteriosus (PDA)" },
+    { "key": "tof", "label": "Tetralogy of Fallot" },
+    { "key": "tga", "label": "Transposition of great arteries" }
+  ],
+  "claims": [
+    "Systemic return: RA → RV → pulmonary artery. Pulmonary return: LA → LV → aorta.",
+    "Left-sided pressures exceed right-sided, so a hole between the sides shunts left → right unless the right side is obstructed.",
+    "ASD: left-to-right shunt at atrial level (ostium secundum most common; ostium primum is associated with Down syndrome).",
+    "ASD: right atrial/ventricular volume overload and increased pulmonary flow.",
+    "ASD: fixed split S2; systolic ejection murmur at the left upper sternal border (extra flow across the pulmonic valve).",
+    "ASD: paradoxical embolism is possible. Eisenmenger if the shunt reverses.",
+    "VSD: most common congenital heart defect; membranous septum is the usual site.",
+    "VSD: left-to-right shunt; holosystolic murmur at the left lower sternal border (smaller defects are louder).",
+    "VSD: large defects cause pulmonary overcirculation, heart failure, then pulmonary hypertension and Eisenmenger (shunt reverses, cyanosis, clubbing).",
+    "PDA: persistent channel between the descending aorta (just distal to the left subclavian) and the left pulmonary artery.",
+    "PDA: left-to-right shunt: continuous “machinery” murmur, bounding pulses, wide pulse pressure.",
+    "PDA: associated with prematurity and maternal rubella. Closure: indomethacin/ibuprofen. If a ductus-dependent lesion exists, keep it open with prostaglandin E1.",
+    "Tetralogy of Fallot: four features: pulmonary (infundibular) stenosis, RVH, overriding aorta, VSD.",
+    "Tetralogy of Fallot: right-to-left shunt across the VSD → cyanosis. “Tet spells” improve with squatting (raises SVR, pushes blood toward the lungs).",
+    "Tetralogy of Fallot: boot-shaped heart on CXR. Associated with 22q11 deletion. Classically the most common cyanotic CHD beyond infancy.",
+    "TGA: aorta arises from the RV; pulmonary artery from the LV → two parallel circuits.",
+    "TGA: not compatible with life without mixing (PDA, ASD or VSD). Cyanosis in the first days of life.",
+    "TGA: “egg on a string” CXR (narrow mediastinum). Associated with maternal diabetes.",
+    "TGA: keep the ductus open with prostaglandin E1; definitive fix is the arterial switch."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}
