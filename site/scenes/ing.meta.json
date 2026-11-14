@@ -1,0 +1,38 @@
+{
+  "id": "ing",
+  "title": "Inguinal canal & hernia anatomy",
+  "topic": "Surgery",
+  "variantControl": "h",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal anatomy"
+    },
+    {
+      "key": "ind",
+      "label": "Indirect inguinal hernia"
+    },
+    {
+      "key": "dir",
+      "label": "Direct inguinal hernia"
+    },
+    {
+      "key": "fem",
+      "label": "Femoral hernia"
+    }
+  ],
+  "claims": [
+    "The inguinal canal runs from the deep ring (in transversalis fascia) to the superficial ring (in the external oblique aponeurosis), carrying the spermatic cord / round ligament.",
+    "Hesselbach triangle is bounded by the inferior epigastric vessels (lateral), the lateral border of rectus (medial) and the inguinal ligament (inferior).",
+    "Femoral sheath, lateral to medial: Nerve, Artery, Vein, (empty space) Lymphatics.",
+    "An indirect hernia passes through the deep ring, lateral to the inferior epigastric vessels, and follows the spermatic cord in the canal; it can reach the scrotum.",
+    "Indirect hernia is caused by a patent processus vaginalis (congenital) and is the most common hernia in both sexes.",
+    "An indirect hernia is covered by all layers of the spermatic cord fascia. Mnemonic: \"MD's don't lie\": Medial = Direct, Lateral = indirect.",
+    "A direct hernia bulges through Hesselbach triangle, medial to the inferior epigastric vessels; it is an acquired weakness of the transversalis fascia.",
+    "Direct hernia is seen in older men, heavy lifting, chronic cough/straining; it does not follow the cord through the deep ring and rarely reaches the scrotum.",
+    "A femoral hernia goes through the femoral canal, below the inguinal ligament and medial to the femoral vein.",
+    "Femoral hernia is more common in women; its narrow neck gives the highest risk of strangulation and it needs urgent repair."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}

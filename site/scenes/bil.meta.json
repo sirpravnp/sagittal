@@ -1,0 +1,48 @@
+{
+  "id": "bil",
+  "title": "Biliary tree anatomy",
+  "topic": "Gastroenterology",
+  "variantControl": "p",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal anatomy"
+    },
+    {
+      "key": "gb",
+      "label": "Cholelithiasis (gallbladder stones)"
+    },
+    {
+      "key": "cbd",
+      "label": "Choledocholithiasis / cholangitis"
+    },
+    {
+      "key": "pan",
+      "label": "Gallstone pancreatitis (ampulla)"
+    },
+    {
+      "key": "mir",
+      "label": "Mirizzi syndrome"
+    },
+    {
+      "key": "cou",
+      "label": "Courvoisier sign (pancreatic head mass)"
+    }
+  ],
+  "claims": [
+    "Bile flows: hepatic ducts → common hepatic duct → (cystic duct to gallbladder) → common bile duct → ampulla of Vater (sphincter of Oddi) → duodenum.",
+    "Calot triangle is bounded by the cystic duct, common hepatic duct and inferior liver edge, and contains the cystic artery. It is a key landmark in cholecystectomy.",
+    "Cholelithiasis is often silent; biliary colic follows fatty meals (RUQ pain, 30 min to hours).",
+    "If a stone impacts the cystic duct and inflammation follows: acute cholecystitis (fever, Murphy sign, ↑WBC).",
+    "Choledocholithiasis dilates the duct; ↑ALP, ↑direct bilirubin.",
+    "If infected, cholangitis shows Charcot triad (fever, jaundice, RUQ pain); add shock and confusion for Reynold pentad.",
+    "Cholangitis management: broad-spectrum antibiotics and urgent biliary decompression (ERCP).",
+    "A stone at the ampulla of Vater blocks the pancreatic duct and bile duct, causing gallstone pancreatitis (the most common cause with alcohol).",
+    "Gallstone pancreatitis presents with epigastric pain radiating to the back and ↑lipase, often with ↑ALT.",
+    "Mirizzi syndrome: a stone in the Hartmann pouch/cystic duct compresses the common hepatic duct, giving obstructive jaundice with a gallbladder source; diagnosed on imaging/ERCP.",
+    "Courvoisier sign: painless jaundice plus a palpable, non-tender gallbladder suggests malignant obstruction (e.g. pancreatic head cancer), not stones.",
+    "In Courvoisier sign the mass blocks the distal common bile duct, which dilates, as does the gallbladder."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}

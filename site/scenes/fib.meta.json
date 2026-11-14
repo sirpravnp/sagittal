@@ -1,0 +1,38 @@
+{
+  "id": "fib",
+  "title": "Uterine fibroids by layer",
+  "topic": "Obstetrics & Gynecology",
+  "variantControl": "sh",
+  "variants": [
+    {
+      "key": "all",
+      "label": "All types"
+    },
+    {
+      "key": "sub",
+      "label": "Submucosal (FIGO 0-2)"
+    },
+    {
+      "key": "int",
+      "label": "Intramural (FIGO 3-4)"
+    },
+    {
+      "key": "ser",
+      "label": "Subserosal (FIGO 5-7)"
+    }
+  ],
+  "claims": [
+    "FIGO classification is by position relative to the endometrial cavity and serosa: 0-2 submucosal, 3-4 intramural, 5-7 subserosal (8 = other, e.g. cervical).",
+    "FIGO 0: pedunculated, intracavitary. FIGO 1: submucosal, <50% intramural. FIGO 2: submucosal, ≥50% intramural.",
+    "FIGO 3: intramural, touches the endometrium. FIGO 4: intramural, no contact with the endometrium.",
+    "FIGO 5: subserosal, ≥50% intramural. FIGO 6: subserosal, <50% intramural. FIGO 7: pedunculated subserosal.",
+    "Submucosal fibroids distort the cavity: heavy menstrual bleeding, anemia, infertility, recurrent pregnancy loss.",
+    "Hysteroscopic resection is an option for FIGO types 0-2.",
+    "Intramural fibroids enlarge the uterus: bulk symptoms, heavy or prolonged bleeding, pain.",
+    "Type 3 touches the endometrium and can behave like a submucosal lesion.",
+    "Subserosal fibroids bulge outward: pelvic pressure, urinary frequency (bladder), constipation; less often abnormal bleeding.",
+    "A pedunculated subserosal fibroid (FIGO 7) can torse, causing acute pain. Red degeneration is more common in pregnancy."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}

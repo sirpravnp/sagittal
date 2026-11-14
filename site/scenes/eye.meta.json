@@ -1,0 +1,39 @@
+{
+  "id": "eye",
+  "title": "Eye anatomy (cutaway)",
+  "topic": "Ophthalmology",
+  "variantControl": "c",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal anatomy"
+    },
+    {
+      "key": "ac",
+      "label": "Acute angle-closure glaucoma"
+    },
+    {
+      "key": "rd",
+      "label": "Retinal detachment"
+    },
+    {
+      "key": "cra",
+      "label": "Central retinal artery occlusion"
+    }
+  ],
+  "claims": [
+    "Light path: cornea → aqueous (anterior chamber) → pupil → lens → vitreous → retina (macula/fovea for central vision).",
+    "Aqueous is made by the ciliary body, passes through the pupil, and drains through the trabecular meshwork / canal of Schlemm at the iridocorneal angle.",
+    "Acute angle-closure: the peripheral iris bows forward against the trabecular meshwork, blocking aqueous drainage and causing a rapid IOP rise.",
+    "Angle-closure presents with painful red eye, halos, headache, nausea/vomiting, mid-dilated fixed pupil and hazy cornea. It is an emergency.",
+    "Angle-closure treatment: lower IOP (acetazolamide, topical beta-blocker, alpha agonist, pilocarpine once IOP falls) then laser peripheral iridotomy. Avoid mydriatics.",
+    "Retinal detachment: fluid passes through a tear and separates the neurosensory retina from the pigment epithelium/choroid.",
+    "Retinal detachment presents with flashes, new floaters, then a \"curtain\" over part of the visual field; painless.",
+    "Retinal detachment is an emergency: laser/cryo for tears; pneumatic retinopexy, scleral buckle or vitrectomy for detachment.",
+    "Central retinal artery occlusion: sudden, painless monocular vision loss.",
+    "In CRAO the retina turns pale (ischemic) while the fovea stays red (cherry-red spot), because the fovea is supplied by the choroid.",
+    "CRAO has an embolic source (carotid, heart); consider giant cell arteritis. Ocular emergency."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}
