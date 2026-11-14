@@ -1,0 +1,26 @@
+{
+  "name": "thorax",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py",
+  "source_root": "${ASSETS}/zanatomy/obj",
+  "transform": "zanatomy",
+  "center": "bbox",
+  "default_budget": 2000,
+  "parts": {
+    "sternum": {
+      "files": ["Manubrium_of_sternum.obj", "Body_of_sternum.obj", "Xiphoid_process.obj"],
+      "budget": 1600
+    },
+    "ribs_left": { "files": ["*_rib.l.obj"], "exclude": ["Costal_cartilage_*"], "budget": 5200 },
+    "ribs_right": { "files": ["*_rib.r.obj"], "exclude": ["Costal_cartilage_*"], "budget": 5200 },
+    "costal_cartilage_left": {
+      "files": ["Costal_cartilage_of_*_rib.l.obj"], "budget": 1300, "subdivide": 1, "smooth": 6
+    },
+    "costal_cartilage_right": {
+      "files": ["Costal_cartilage_of_*_rib.r.obj"], "budget": 1300, "subdivide": 1, "smooth": 6
+    },
+    "thoracic_spine": { "files": ["Vertebra_T*.obj"], "budget": 5200 },
+    "thoracic_discs": { "files": ["Intervertebral_disc_T*.obj", "Intervertebral_disc_C7-T1.obj"], "budget": 900 }
+  }
+}

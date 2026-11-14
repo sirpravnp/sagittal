@@ -1,0 +1,52 @@
+# Z-Anatomy objects pulled into the shared asset cache (sagittal-assets-cache/zanatomy/obj/).
+# One case-insensitive regex per line, matched against the Blender object name.
+# Run: .venv/bin/python tools/meshes/extract_blend.py <cache>/zanatomy/extracted/Z-Anatomy/Startup.blend \
+#        --out <cache>/zanatomy/obj --match-file tools/meshes/zanatomy_extract.txt
+# Objects ending in .j/.g/.t/.s/.i are label anchors or text, not anatomy, and are skipped (no faces).
+
+# --- heart ---
+^(Left|Right) (ventricle|atrium)$
+papillary muscle of (left|right) ventricle$
+leaflet of (left|right) atrioventricular valve$
+semilunar leaflet of pulmonary valve$
+^(Left|Right|Non)-?(coronary)? ?leaflet$
+^(Left|Right) coronary artery$
+^(Anterior interventricular artery|Circumflex artery of heart|Coronary sinus|Great cardiac vein|Middle cardiac vein)$
+# --- aorta, arch branches, great veins, pulmonary vessels ---
+^(Ascending aorta|Aortic arch|Thoracic aorta|Abdominal aorta)$
+^(Brachiocephalic trunk|(Left|Right) common carotid artery|(Left|Right) subclavian artery)$
+^(Superior vena cava|Inferior vena cava.*|(Left|Right) brachiocephalic vein)$
+^(Pulmonary trunk|(Left|Right) pulmonary artery|(Left|Right) (superior|inferior) pulmonary vein)$
+# --- thoracic skeleton ---
+^(Manubrium of sternum|Body of sternum|Xiphoid process)$
+^(First|Second|Third|Fourth|Fifth|Sixth|Seventh|Eighth|Ninth|Tenth|Eleventh|Twelfth) rib\.(l|r)$
+^Costal cartilage of .* rib\.(l|r)$
+^Vertebra (C[1-7]|T[0-9]+|L[1-5])$
+^(Atlas|Axis)( \(C[12]\))?$
+^(Sacrum|Coccyx)$
+^Intervertebral disc
+# --- lungs and airways ---
+lobe of (left|right) lung$
+^Trachea$
+^(Left|Right) main bronchus$
+^(Intermediate bronchus\.r|(Left|Right) (superior|middle|inferior) lobar bronchus)$
+segmental bronchus of (left|right) lung
+# --- liver, biliary, pancreas, duodenum, stomach ---
+^Liver$
+segment of liver
+^Gallbladder$
+^(Bile duct|Common hepatic duct|Cystic duct|(Left|Right) hepatic duct|Pancreatic duct|Accessory pancreatic duct)$
+^(Pancreas|Duodenum|Stomach|Oesophagus)$
+^(Hepatic portal vein|Common hepatic artery|Proper hepatic artery|Gastroduodenal artery|Coeliac trunk|Celiac trunk|Splenic artery|Splenic vein|Superior mesenteric (artery|vein))$
+# --- anterior abdominal wall, inguinal region ---
+^(Rectus abdominis|External abdominal oblique|Internal abdominal oblique|Transversus abdominis|Pyramidalis) muscle\.(l|r)$
+^(Linea alba|Transversalis fascia)$
+^Inguinal ligament\.(l|r)$
+^(Ductus deferens|Testicular artery|Testicular vein|Pampiniform plexus|Cremaster muscle|Spermatic cord|Testis|Epididymis)\.(l|r)$
+^((Left|Right) testicular (artery|vein)|Right testicular artery\.r)$
+^(Femoral nerve|Genitofemoral nerve|Genital branch of genitofemoral nerve|Ilioinguinal nerve)\.(l|r)$
+^(Femoral (artery|vein)|Deep femoral (artery|vein)|Great saphenous vein|External iliac (artery|vein)|Inferior epigastric (artery|vein))\.(l|r)$
+# --- female pelvis (not present in Z-Anatomy's male model; kept so a future source can be matched) ---
+^(Uterus|Uterine tube|Ovary|Broad ligament of uterus)
+# --- eye ---
+^(Sclera|Cornea|Iris|Lens|Retina|Vitreous body|Anterior chamber of eyeball|Ciliary body.*|Optic nerve \(II\)|Choroid)\.(l|r)$
