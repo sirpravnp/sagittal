@@ -1,0 +1,68 @@
+{
+  "name": "biliary",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py. The extrahepatic bile duct is drawn in the scene as a smooth tube along Z-Anatomy's 'Bile duct' centre line (sampled into site/scenes/bil.js), so it is not baked here.",
+  "source_root": "${ASSETS}/zanatomy/obj",
+  "transform": "zanatomy",
+  "center": [
+    -2.0,
+    113.0,
+    4.0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "liver": {
+      "files": [
+        "Liver.obj"
+      ],
+      "budget": 5200,
+      "subdivide": 1,
+      "smooth": 8
+    },
+    "gallbladder": {
+      "files": [
+        "Gallbladder.obj"
+      ],
+      "budget": 1800,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "pancreas": {
+      "files": [
+        "Pancreas.obj"
+      ],
+      "budget": 3200,
+      "smooth": 4
+    },
+    "pancreatic_duct": {
+      "files": [
+        "Pancreatic_duct.obj",
+        "Accessory_pancreatic_duct.obj"
+      ],
+      "budget": 1200
+    },
+    "duodenum": {
+      "files": [
+        "Duodenum.obj"
+      ],
+      "budget": 3200,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "portal_vein": {
+      "files": [
+        "Hepatic_portal_vein.obj"
+      ],
+      "budget": 400
+    },
+    "hepatic_artery": {
+      "files": [
+        "Common_hepatic_artery.obj",
+        "Proper_hepatic_artery.obj",
+        "Gastroduodenal_artery.obj"
+      ],
+      "budget": 1400
+    }
+  }
+}

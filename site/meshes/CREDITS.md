@@ -79,3 +79,19 @@ decimated, baked in the same frame as `thorax.js` (centre `[0, 125.49, 0.61]` cm
 The flail and tension scenes deform copies of these meshes at runtime (collapse, shift, dent).
 
 Used by: `flail` and `tension` scenes (with `thorax.js`).
+## zanatomy: biliary.js and groin.js (wave B, abdomen)
+
+Same source and licence as the `zanatomy` entry above (Z-Anatomy, CC BY-SA 4.0, on BodyParts3D,
+CC BY-SA 2.1 Japan). Credit id: `zanatomy`.
+
+- `biliary.js`: liver (subdivided and smoothed), gallbladder (subdivided and smoothed), pancreas,
+  main and accessory pancreatic ducts, duodenum (subdivided and smoothed), hepatic portal vein,
+  common hepatic, proper hepatic and gastroduodenal arteries. The extrahepatic bile duct is not
+  baked; `site/scenes/bil.js` draws it as a smooth tube along Z-Anatomy's "Bile duct" centre line
+  and adds the common hepatic and hepatic ducts (Z-Anatomy has no objects for them).
+- `groin.js` (right side): inguinal ligament, external and internal oblique, transversus abdominis,
+  transversalis fascia, rectus abdominis with pyramidalis, inferior epigastric artery and vein,
+  external iliac and femoral artery and vein, femoral nerve, ductus deferens, testicular artery and
+  vein, testis with epididymis, hip bone, pubic symphysis, pectineus, iliacus with psoas major.
+  The hip bone, pubic symphysis, pectineus, iliacus and psoas were extracted into the asset cache's
+  `zanatomy-abdomen/obj/` with `tools/meshes/extract_blend.py`.
