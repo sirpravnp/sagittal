@@ -34,7 +34,7 @@ export async function renderCards({ siteDir, outDir, ids }) {
   mkdirSync(outDir, { recursive: true });
   const server = await serve(siteDir);
   const origin = `http://127.0.0.1:${server.address().port}/`;
-  const browser = await chromium.launch({ channel: 'chrome', args: GL_ARGS });
+  const browser = await chromium.launch({ ...(process.env.CI ? {} : { channel: 'chrome' }), args: GL_ARGS });
   const results = [];
   try {
     const page = await (await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1 })).newPage();

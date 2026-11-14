@@ -10,7 +10,8 @@ export default defineConfig({
   workers: 2,
   use: {
     baseURL: `http://127.0.0.1:${PORT}/`,
-    channel: 'chrome',
+    // Locally use the installed Chrome; CI uses Playwright's bundled chromium.
+    ...(process.env.CI ? {} : { channel: 'chrome' }),
     launchOptions: { args: GL_ARGS },
   },
   webServer: {

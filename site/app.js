@@ -37,6 +37,7 @@
     return getJson('scenes/index.json').then(function (ids) {
       return Promise.all(ids.map(function (id) { return getJson('scenes/' + id + '.meta.json'); }));
     }).then(function (metas) {
+      renderDecks(metas);
       metas.forEach(function (m) {
         var li = el('li', 'card');
         var a = el('a', null, m.title);
@@ -47,6 +48,33 @@
         list.appendChild(li);
       });
     });
+  }
+
+  // Same slug rule as tools/build_decks.py slugify().
+  function deckSlug(topic) {
+    return 'sagittal-' + topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+  function renderDecks(metas) {
+    var section = document.getElementById('decks');
+    var list = document.getElementById('deck-list');
+    if (!section || !list) return;
+    list.innerHTML = '';
+    var topics = [];
+    metas.forEach(function (m) { if (topics.indexOf(m.topic) < 0) topics.push(m.topic); });
+    topics.forEach(function (t) {
+      var slug = deckSlug(t);
+      var li = el('li', 'card');
+      var a = el('a', null, t + ' deck');
+      a.href = 'decks/' + slug + '.apkg';
+      a.setAttribute('download', '');
+      li.appendChild(a);
+      var a3 = el('a', 'topic', '3D (experimental)');
+      a3.href = 'decks/' + slug + '-3d.apkg';
+      a3.setAttribute('download', '');
+      li.appendChild(a3);
+      list.appendChild(li);
+    });
+    section.hidden = topics.length === 0;
   }
 
   function initGallery() {
