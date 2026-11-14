@@ -45,7 +45,14 @@ Phone and tablet clients (AnkiMobile, AnkiDroid) are unverified. The default
 
 See `CONTRIBUTING.md` for adding scenes and the review process.
 
+Scenes can build on real open anatomical meshes (Z-Anatomy / BodyParts3D, CC BY-SA),
+baked into `site/meshes/` by `tools/meshes/bake.py`. See `docs/meshes.md` for the format,
+the `Kit.meshPart` / `Kit.tissue` API and the licence rule, and `site/meshes/CREDITS.md`
+for attributions.
+
 ## Licenses
 
 - Code: MIT (see `LICENSE`).
 - Scene content (text, metadata, claims): CC BY-SA 4.0 (see `LICENSE-CONTENT.md`).
+- Baked anatomical meshes (`site/meshes/*.js`): licence of their source, CC BY-SA 4.0 for
+  Z-Anatomy-derived meshes (see `site/meshes/CREDITS.md`).
