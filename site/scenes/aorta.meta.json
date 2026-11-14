@@ -1,0 +1,30 @@
+{
+  "id": "aorta",
+  "title": "Aortic dissection",
+  "topic": "Cardiology",
+  "variantControl": "v",
+  "variants": [
+    {
+      "key": "ext",
+      "label": "Aortic (external, whole aorta)"
+    },
+    {
+      "key": "int",
+      "label": "Intimal (wall layers in cross-section)"
+    }
+  ],
+  "claims": [
+    "Stanford A involves the ascending aorta (± arch/descending). Surgical emergency.",
+    "Stanford A complications: aortic regurgitation, tamponade, coronary (usually RCA) occlusion, stroke.",
+    "Stanford B is distal to the left subclavian artery. Usually medical: IV beta-blocker first (impulse control), then vasodilator.",
+    "Stanford B complications: renal or mesenteric malperfusion, limb ischemia, rupture.",
+    "Presentation: tearing chest/back pain, BP difference between arms, widened mediastinum on CXR.",
+    "Risk factors: hypertension, Marfan/Ehlers-Danlos, bicuspid valve, cocaine, trauma.",
+    "The aortic wall has three layers: intima (endothelium), media (elastic lamellae and smooth muscle, most of the strength), adventitia.",
+    "Cystic medial degeneration weakens the media (Marfan, aging, hypertension).",
+    "An intimal tear lets blood enter the media and split the layers, creating a false lumen.",
+    "The intimal flap separates true and false lumens and can occlude branch vessels (malperfusion)."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}

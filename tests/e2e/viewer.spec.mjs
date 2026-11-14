@@ -2,6 +2,7 @@ import { test, expect, chromium } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 const BADGE = 'Unreviewed: verify against your textbook';
+const sceneIds = JSON.parse(readFileSync(new URL('../../site/scenes/index.json', import.meta.url), 'utf8'));
 const heartMeta = JSON.parse(readFileSync(new URL('../../site/scenes/heart.meta.json', import.meta.url), 'utf8'));
 
 // Collects console errors and uncaught page errors.
@@ -57,8 +58,8 @@ test('unknown scene shows the gallery with "Scene not found"', async ({ page }) 
   const errors = watchErrors(page);
   await page.goto('viewer.html?scene=nope');
   await expect(page.locator('body')).toContainText('Scene not found');
-  await expect(page.locator('.card')).toHaveCount(1);
-  await expect(page.locator('.card')).toContainText(heartMeta.title);
+  await expect(page.locator('.card')).toHaveCount(sceneIds.length);
+  await expect(page.locator('.card', { hasText: heartMeta.title })).toHaveCount(1);
   expect(errors).toEqual([]);
 });
 

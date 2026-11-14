@@ -1,0 +1,26 @@
+{
+  "id": "tension",
+  "title": "Tension pneumothorax",
+  "topic": "Trauma",
+  "variantControl": "s",
+  "variants": [
+    {
+      "key": "normal",
+      "label": "Normal chest"
+    },
+    {
+      "key": "tension",
+      "label": "Tension pneumothorax (patient’s right)"
+    }
+  ],
+  "claims": [
+    "Normal coronal view: trachea midline, mediastinum central, both lungs inflated, right hemidiaphragm slightly higher than left.",
+    "Tension pneumothorax: air enters the pleural space through a one-way valve; intrapleural pressure rises.",
+    "Tension pneumothorax: the ipsilateral lung collapses; the mediastinum and trachea shift away; the hemidiaphragm flattens; the contralateral lung is compressed.",
+    "Kinking of the great veins reduces venous return, causing obstructive shock (hypotension, JVD, tachycardia).",
+    "Exam: absent breath sounds and hyperresonance on the affected side. Clinical diagnosis: do not wait for imaging.",
+    "Immediate needle decompression (classically 2nd intercostal space, midclavicular line; ATLS 10th ed. uses the 5th space, anterior axillary line), then chest tube."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}

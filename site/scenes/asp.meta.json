@@ -1,0 +1,29 @@
+{
+  "id": "asp",
+  "title": "Aspiration sites by position",
+  "topic": "Pulmonology",
+  "variantControl": "p",
+  "variants": [
+    {
+      "key": "up",
+      "label": "Upright / sitting"
+    },
+    {
+      "key": "sup",
+      "label": "Supine"
+    },
+    {
+      "key": "rl",
+      "label": "Right side down (lateral decubitus)"
+    }
+  ],
+  "claims": [
+    "Upright: aspirate follows gravity into the basal segments of the lower lobes, right more than left.",
+    "The right main bronchus is wider, shorter and runs more vertically, so aspiration favors the right.",
+    "Supine: the dependent (posterior) segments fill first: the superior segment of the right lower lobe and the posterior segment of the right upper lobe.",
+    "Right lateral decubitus: the right lung is dependent, so aspirate favors its lateral and posterior regions.",
+    "The right lateral decubitus position is commonly taught less consistently than upright vs. supine: confirm the exact segments against your question-bank resource."
+  ],
+  "sources": [],
+  "status": "unreviewed"
+}
