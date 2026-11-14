@@ -1,5 +1,7 @@
+<div>{{Title}}</div>
 <div id="s3d-stage"><canvas id="s3d-cv"></canvas><div id="s3d-labels"></div></div>
 <div id="s3d-fallback" style="display:none">{{Fallback}}</div>
+<div class="prompt">Identify the labelled structures</div>
 <div id="s3d-status" class="status">Loading 3D...</div>
 <script>
 (function () {
@@ -38,6 +40,8 @@
       var state = {};
       state[ctl] = variant;
       if (!viewer.available || !viewer.open(sceneId, state)) return fallback('viewer unavailable');
+      // labels reveal the answer: show them only on the back (marker precedes FrontSide)
+      viewer.setLabelsVisible(!!document.getElementById('sagittal-back'));
       var s = document.getElementById('s3d-status');
       if (s) s.textContent = '3D OK';
     } catch (e) {

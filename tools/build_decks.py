@@ -64,7 +64,8 @@ def make_model_3d() -> genanki.Model:
         templates=[{
             "name": "Card 1",
             "qfmt": TEMPLATE_3D.read_text(encoding="utf-8"),
-            "afmt": '{{FrontSide}}<hr id="answer">{{Claims}}<div class="status">{{Status}}</div>',
+            "afmt": '<div id="sagittal-back"></div>{{FrontSide}}<hr id="answer">{{Claims}}'
+                    '<div class="status">{{Status}}</div>',
         }],
         css=CSS_3D,
     )

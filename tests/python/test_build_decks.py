@@ -223,3 +223,14 @@ def test_cli_include_3d(tmp_path, scenes, cards, site3d):
     assert [p.name for p in out.glob("*.apkg")] == ["sagittal-cardiology-3d.apkg"]
     _, _, media = read_apkg(out / "sagittal-cardiology-3d.apkg")
     assert "_kit.js" in media.values()
+
+
+def test_3d_front_has_title_prompt_and_hides_labels_until_back():
+    t = (Path(build_decks.__file__).parent / "anki3d_template.html").read_text(encoding="utf-8")
+    assert "{{Title}}" in t
+    assert "identify the labelled structures" in t
+    assert "setLabelsVisible(" in t and "sagittal-back" in t
+    m = build_decks.make_model_3d()
+    afmt = m.templates[0]["afmt"]
+    assert 'id="sagittal-back"' in afmt
+    assert afmt.index('id="sagittal-back"') < afmt.index("{{FrontSide}}")
