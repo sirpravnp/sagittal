@@ -39,3 +39,17 @@ extreme and average four-chamber heart meshes from statistical shape model", Zen
 doi:[10.5281/zenodo.4593739](https://doi.org/10.5281/zenodo.4593739).
 Licence: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 Add `"credit": "rodero-heart"` to a bake config that uses it.
+
+## aorta (mesh `aorta.js`, credit `zanatomy`)
+
+From **Z-Anatomy** / **BodyParts3D** (see `zanatomy` above; CC BY-SA 4.0 on CC BY-SA 2.1 JP).
+Objects: Ascending aorta, Aortic arch, Thoracic aorta, Abdominal aorta; Brachiocephalic trunk,
+left and right common carotid and subclavian arteries; left and right common iliac arteries;
+coeliac trunk, superior and inferior mesenteric arteries, left and right renal arteries; left and
+right ventricles and atria (context outline). Changes: centre-line curves swept into 24-sided tubes
+(`extract_blend.py --sides 24`), heart chambers subdivided and smoothed, merged into parts,
+decimated, converted to centimetres in sagittal's frame. The scene `aorta.js` also uses the aorta's
+centre line (read off the swept rings) to place a procedural dissection flap and false lumen, and
+draws the aortic root sinuses and valve procedurally.
+
+Used by: scene `aorta` (aortic dissection).

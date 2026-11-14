@@ -1,0 +1,59 @@
+{
+  "name": "aorta",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 24 into ${ASSETS}/zanatomy-aorta/obj",
+  "source_root": "${ASSETS}/zanatomy-aorta/obj",
+  "transform": "zanatomy",
+  "center": [
+    -0.0565,
+    123.0392,
+    1.701
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "aorta": {
+      "files": [
+        "Ascending_aorta.obj",
+        "Aortic_arch.obj",
+        "Thoracic_aorta.obj",
+        "Abdominal_aorta.obj"
+      ],
+      "budget": 5000
+    },
+    "arch_branches": {
+      "files": [
+        "Brachiocephalic_trunk.obj",
+        "*_common_carotid_artery.obj",
+        "*_subclavian_artery.obj"
+      ],
+      "budget": 3000
+    },
+    "iliac": {
+      "files": [
+        "Common_iliac_artery.*.obj"
+      ],
+      "budget": 900
+    },
+    "visceral_branches": {
+      "files": [
+        "Coeliac_trunk.obj",
+        "Superior_mesenteric_artery.obj",
+        "Inferior_mesenteric_artery.obj",
+        "*_renal_artery.obj"
+      ],
+      "budget": 2600
+    },
+    "heart": {
+      "files": [
+        "Left_ventricle.obj",
+        "Right_ventricle.obj",
+        "Left_atrium.obj",
+        "Right_atrium.obj"
+      ],
+      "budget": 3500,
+      "subdivide": 1,
+      "smooth": 8
+    }
+  }
+}
