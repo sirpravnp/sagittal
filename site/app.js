@@ -75,7 +75,12 @@
         var meta = r[0];
         document.title = meta.title + ' · sagittal';
         document.querySelector('h1').textContent = meta.title;
-        var b = badge(meta); if (b) document.getElementById('badge').appendChild(b);
+        var b = badge(meta);
+        if (b) {
+          document.getElementById('badge').appendChild(b);
+          // overlay copy inside the stage, shown in embed mode where the header is hidden
+          document.getElementById('stage-badge').appendChild(badge(meta));
+        }
         var claims = document.getElementById('claims');
         meta.claims.forEach(function (c) { claims.appendChild(el('li', null, c)); });
         if (meta.sources.length) {

@@ -50,6 +50,7 @@ test('labels toggle hides labels', async ({ page }) => {
 test('embed=1 hides the side panel', async ({ page }) => {
   await openHeart(page, '&embed=1');
   await expect(page.locator('aside')).toBeHidden();
+  await expect(page.locator('#stage').getByText(BADGE)).toBeVisible();
 });
 
 test('unknown scene shows the gallery with "Scene not found"', async ({ page }) => {

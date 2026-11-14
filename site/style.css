@@ -29,7 +29,10 @@ aside h2{font-size:13px;margin:14px 0 6px;color:var(--mut);font-weight:600;text-
 .claims{border-top:1px solid var(--line);margin-top:10px;font-size:13px;color:#cdd6e1}
 .claims li{margin:3px 0}
 .note{color:var(--mut);font-size:12px;margin-top:12px}
+#stage-badge{display:none;position:absolute;left:8px;top:8px;pointer-events:none}
+#stage-badge .badge{background:rgba(15,20,27,.85)}
 body.embed .top,body.embed aside{display:none}
+body.embed #stage-badge{display:block}
 body.embed .viewer{grid-template-columns:1fr}
 body.viewer-page #gallery{display:none}
 body.missing .viewer{display:none}
