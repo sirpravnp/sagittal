@@ -95,3 +95,22 @@ CC BY-SA 2.1 Japan). Credit id: `zanatomy`.
   vein, testis with epididymis, hip bone, pubic symphysis, pectineus, iliacus with psoas major.
   The hip bone, pubic symphysis, pectineus, iliacus and psoas were extracted into the asset cache's
   `zanatomy-abdomen/obj/` with `tools/meshes/extract_blend.py`.
+## rodero-heart: heart.js, heart-blood.js (wave B, heart scene)
+
+Source: the **average** mesh of Rodero et al. 2021 (above), `average.tar.gz` / `average.vtk` from
+Zenodo doi:[10.5281/zenodo.4593739](https://doi.org/10.5281/zenodo.4593739), CC BY 4.0.
+
+Changes made for sagittal: the ASCII VTK tetrahedral mesh was parsed and its boundary faces split by
+the per-element region tag: the outer (epicardial) surface per chamber (`wall_lv`, `wall_rv`,
+`wall_la`, `wall_ra`, with the vein-inlet and valve-plane tags folded into the neighbouring chamber),
+the aortic root (`aorta`), and each closed cavity (endocardium plus valve and
+inlet lids) as a blood cast (`cav_lv`, `cav_rv`, `cav_la`, `cav_ra`, orientation flipped to face out
+of the blood). Converted from mm (LPS) to cm in sagittal's frame, lightly Taubin-smoothed and
+decimated. Both files share one centre so they register.
+
+The heart scene also draws the arch, arch branches, proximal descending aorta, pulmonary trunk and
+branches, venae cavae and pulmonary-vein stubs as swept tubes whose centre lines come from
+**Z-Anatomy** (see `zanatomy` above, CC BY-SA 4.0), registered to the Rodero heart by a similarity
+fit on chamber centroids and valve centres. The combined scene is shared under CC BY-SA 4.0.
+
+Used by: `heart.js`, `heart-blood.js` (scene `heart`).
