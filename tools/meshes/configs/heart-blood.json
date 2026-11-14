@@ -1,0 +1,16 @@
+{
+  "name": "heart-blood",
+  "credit": "rodero-heart",
+  "license": "CC BY 4.0",
+  "source": "Rodero et al. 2021 average adult four-chamber heart (Zenodo 10.5281/zenodo.4593739, average.vtk); closed cavity surfaces (blood casts)",
+  "source_root": "${ASSETS}/rodero/work/parts",
+  "transform": { "axes": ["x", "z", "-y"], "scale": 0.1 },
+  "center": [-0.4, 0.9, 0.2],
+  "default_budget": 3000,
+  "parts": {
+    "cav_lv": { "files": ["cav_lv.obj"], "budget": 3000, "smooth": 4 },
+    "cav_rv": { "files": ["cav_rv.obj"], "budget": 3200, "smooth": 4 },
+    "cav_la": { "files": ["cav_la.obj"], "budget": 2600, "smooth": 4 },
+    "cav_ra": { "files": ["cav_ra.obj"], "budget": 2600, "smooth": 4 }
+  }
+}
