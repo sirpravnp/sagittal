@@ -7,7 +7,9 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "e2e": "playwright test",
-    "cards": "node tools/render_cards.mjs"
+    "cards": "node tools/render_cards.mjs",
+    "decks": ".venv/bin/python tools/build_decks.py --site site --cards build/cards --out build/decks",
+    "test:py": ".venv/bin/pytest tests/python -q"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1"
