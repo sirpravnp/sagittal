@@ -39,3 +39,18 @@ extreme and average four-chamber heart meshes from statistical shape model", Zen
 doi:[10.5281/zenodo.4593739](https://doi.org/10.5281/zenodo.4593739).
 Licence: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 Add `"credit": "rodero-heart"` to a bake config that uses it.
+
+## chest.js (zanatomy): lungs, airway, heart, great vessels, diaphragm
+
+`chest.js` uses the `zanatomy` credit above (Z-Anatomy, CC BY-SA 4.0, on BodyParts3D, CC BY-SA 2.1 JP).
+Objects: superior/middle/inferior lobes of the right lung, superior/inferior lobes of the left lung,
+trachea, main/intermediate/lobar bronchi, the four heart chambers, ascending aorta, aortic arch,
+thoracic aorta, brachiocephalic trunk, common carotid and subclavian arteries, pulmonary trunk and
+pulmonary arteries, superior vena cava, brachiocephalic veins, thoracic inferior vena cava, diaphragm.
+Diaphragm, brachiocephalic trunk/veins and common carotids were extracted with
+`tools/meshes/extract_blend.py` into the asset cache's `zanatomy-chest/obj/` (the existing
+`zanatomy/obj/` was left untouched). Changes: merged into parts, organ cages subdivided and smoothed,
+decimated, baked in the same frame as `thorax.js` (centre `[0, 125.49, 0.61]` cm, so the two register).
+The flail and tension scenes deform copies of these meshes at runtime (collapse, shift, dent).
+
+Used by: `flail` and `tension` scenes (with `thorax.js`).

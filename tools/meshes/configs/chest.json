@@ -1,0 +1,44 @@
+{
+  "name": "chest",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py (diaphragm, brachiocephalic trunk/veins and common carotids into zanatomy-chest/obj)",
+  "source_root": "${ASSETS}",
+  "transform": "zanatomy",
+  "center": [0, 125.49, 0.61],
+  "default_budget": 1000,
+  "parts": {
+    "lung_right": {
+      "files": ["zanatomy/obj/Superior_lobe_of_right_lung.obj", "zanatomy/obj/Middle_lobe_of_right_lung.obj", "zanatomy/obj/Inferior_lobe_of_right_lung.obj"],
+      "budget": 3400, "subdivide": 1, "smooth": 8
+    },
+    "lung_left": {
+      "files": ["zanatomy/obj/Superior_lobe_of_left_lung.obj", "zanatomy/obj/Inferior_lobe_of_left_lung.obj"],
+      "budget": 3400, "subdivide": 1, "smooth": 8
+    },
+    "airway": {
+      "files": ["zanatomy/obj/Trachea.obj", "zanatomy/obj/Left_main_bronchus.obj", "zanatomy/obj/Right_main_bronchus.obj",
+                "zanatomy/obj/Intermediate_bronchus.r.obj", "zanatomy/obj/*_lobar_bronchus.obj"],
+      "budget": 1600
+    },
+    "heart": {
+      "files": ["zanatomy/obj/Left_atrium.obj", "zanatomy/obj/Right_atrium.obj", "zanatomy/obj/Left_ventricle.obj", "zanatomy/obj/Right_ventricle.obj"],
+      "budget": 3600, "subdivide": 1, "smooth": 6
+    },
+    "aorta": {
+      "files": ["zanatomy/obj/Ascending_aorta.obj", "zanatomy/obj/Aortic_arch.obj", "zanatomy/obj/Thoracic_aorta.obj",
+                "zanatomy-chest/obj/Brachiocephalic_trunk.obj", "zanatomy-chest/obj/*_common_carotid_artery.obj",
+                "zanatomy/obj/*_subclavian_artery.obj"],
+      "budget": 1500
+    },
+    "pulmonary_arteries": {
+      "files": ["zanatomy/obj/Pulmonary_trunk.obj", "zanatomy/obj/Left_pulmonary_artery.obj", "zanatomy/obj/Right_pulmonary_artery.obj"],
+      "budget": 700
+    },
+    "great_veins": {
+      "files": ["zanatomy/obj/Superior_vena_cava.obj", "zanatomy-chest/obj/*_brachiocephalic_vein.obj", "zanatomy/obj/Inferior_vena_cava_(thoracic_part).obj"],
+      "budget": 700
+    },
+    "diaphragm": { "files": ["zanatomy-chest/obj/Diaphragm.obj"], "budget": 3000, "smooth": 4 }
+  }
+}
