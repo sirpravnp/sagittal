@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anatomy 3D Spike</title>
+<style>
+:root{--bg:#0f141b;--panel:#171f2a;--ink:#e8edf3;--mut:#93a1b3;--acc:#5ec2ff;--line:#2a3646}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:10px 16px;border-bottom:1px solid var(--line)}
+h1{font-size:15px;margin:0 0 8px;font-weight:600}
+h1 span{color:var(--mut);font-weight:400}
+#tabs{display:flex;gap:6px;flex-wrap:wrap}
+#tabs button{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 10px;font:inherit;cursor:pointer}
+#tabs button.on{border-color:var(--acc);color:var(--acc)}
+main{display:grid;grid-template-columns:1fr 340px;height:calc(100% - 92px)}
+#stage{position:relative;min-height:320px;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lab{position:absolute;left:0;top:0;white-space:nowrap;font-size:12px;background:rgba(15,20,27,.82);border:1px solid #3a4a5e;border-radius:4px;padding:1px 6px;color:#fff}
+.lab::before{content:"";position:absolute;left:-5px;top:50%;width:5px;height:1px;background:#8aa}
+#hint{position:absolute;left:10px;bottom:8px;color:var(--mut);font-size:12px}
+aside{border-left:1px solid var(--line);background:var(--panel);overflow:auto;padding:14px}
+aside h2{font-size:16px;margin:0 0 8px}
+.ctl{margin:0 0 12px}
+.ctl label{display:block;color:var(--mut);font-size:12px;margin-bottom:3px}
+.ctl select{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px}
+.chk{display:flex;gap:8px;align-items:center;margin:0 0 8px}
+#info{font-size:13px;color:#cdd6e1;border-top:1px solid var(--line);padding-top:10px}
+#info b{color:#fff}
+#info ul{padding-left:18px;margin:6px 0}
+.note{color:var(--mut);font-size:12px;margin-top:12px}
+@media (max-width:800px){main{grid-template-columns:1fr;grid-template-rows:55% 45%;height:calc(100% - 120px)}aside{border-left:0;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Anatomy 3D <span>prototype - stylized schematic models, not to scale</span></h1>
+  <div id="tabs"></div>
+</header>
+<main>
+  <div id="stage"><canvas id="cv"></canvas><div id="labels"></div><div id="hint">drag to rotate · scroll to zoom</div></div>
+  <aside><h2 id="title"></h2><div id="controls"></div><div id="info"></div>
+  <div class="note">Stylized teaching schematics. Verify details against your reference before relying on them.</div></aside>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const D=Math.PI/180;
+const cv=document.getElementById('cv'),stage=document.getElementById('stage'),labBox=document.getElementById('labels');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+renderer.localClippingEnabled=true;
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0f141b);
+const cam=new THREE.PerspectiveCamera(40,1,.1,100);cam.position.set(0,0,9);
+scene.add(new THREE.HemisphereLight(0xffffff,0x445566,1.0));
+const dl=new THREE.DirectionalLight(0xffffff,.9);dl.position.set(3,5,7);scene.add(dl);
+const root=new THREE.Group();scene.add(root);
+
+/* ---------- helpers ---------- */
+function mat(c,o=1,x={}){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:0,transparent:o<1,opacity:o,side:THREE.DoubleSide,depthWrite:o>=.95},x));}
+function add(g,geo,m,p=[0,0,0],s=[1,1,1]){const me=new THREE.Mesh(geo,m);me.position.set(p[0],p[1],p[2]);me.scale.set(s[0],s[1],s[2]);g.add(me);return me;}
+function ell(g,c,o,p,s,x){return add(g,new THREE.SphereGeometry(1,32,24),mat(c,o,x),p,s);}
+function seg(g,a,b,r,m){a=V(...a);b=V(...b);const d=b.clone().sub(a),L=d.length();const me=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,14,1),m);me.position.copy(a).add(b).multiplyScalar(.5);me.quaternion.setFromUnitVectors(V(0,1,0),d.normalize());g.add(me);return me;}
+function tube(g,pts,r,m,n=48){const c=new THREE.CatmullRomCurve3(pts.map(p=>V(...p)));const me=new THREE.Mesh(new THREE.TubeGeometry(c,n,r,12,false),m);g.add(me);return me;}
+function arrow(g,a,b,col=0xffd23f){a=V(...a);b=V(...b);const d=b.clone().sub(a),L=d.length();const gr=new THREE.Group();const m=mat(col,1,{emissive:col,emissiveIntensity:.6});
+  const sh=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,L-.22,10),m);sh.position.y=(L-.22)/2;
+  const hd=new THREE.Mesh(new THREE.ConeGeometry(.13,.22,12),m);hd.position.y=L-.11;gr.add(sh,hd);gr.position.copy(a);gr.quaternion.setFromUnitVectors(V(0,1,0),d.normalize());g.add(gr);return gr;}
+function ring(g,p,r,col=0xffd23f,rot=[0,0,0]){const me=add(g,new THREE.TorusGeometry(r,.05,10,36),mat(col,1,{emissive:col,emissiveIntensity:.6}),p);me.rotation.set(rot[0],rot[1],rot[2]);return me;}
+function sector(r0,r1,a0,a1,depth){const s=new THREE.Shape();s.absarc(0,0,r1,a0,a1,false);s.absarc(0,0,r0,a1,a0,true);const g=new THREE.ExtrudeGeometry(s,{depth,bevelEnabled:false,curveSegments:48});g.translate(0,0,-depth/2);return g;}
+function disk(r,depth){const s=new THREE.Shape();s.absarc(0,0,r,0,Math.PI*2,false);const g=new THREE.ExtrudeGeometry(s,{depth,bevelEnabled:false,curveSegments:48});g.translate(0,0,-depth/2);return g;}
+function dot(g,p,col=0xffd23f,r=.1){return add(g,new THREE.SphereGeometry(r,16,12),mat(col,1,{emissive:col,emissiveIntensity:.7}),p);}
+
+/* ---------- scenes ---------- */
+const SC={};
+
+/* 1. Congenital heart defects */
+SC.heart={tab:'Congenital heart defects',title:'Congenital heart defects',center:[0,.3,0],zoom:9.5,rot:[-.15,.35],
+controls:[{k:'d',label:'Defect',def:'normal',opts:[['normal','Normal heart'],['asd','Atrial septal defect (ASD)'],['vsd','Ventricular septal defect (VSD)'],['pda','Patent ductus arteriosus (PDA)'],['tof','Tetralogy of Fallot'],['tga','Transposition of great arteries']]}],
+build(g,st){
+ const d=st.d,B=0x3a6fd8,R=0xd8403a,P=0x9553c9;
+ const c={RA:B,RV:B,LA:R,LV:R,AO:R,PA:B};
+ if(d==='asd'){c.RA=c.RV=c.PA=P}
+ if(d==='vsd'){c.RV=c.PA=P}
+ if(d==='pda'){c.PA=P}
+ if(d==='tof'){c.AO=P}
+ if(d==='tga'){c.AO=B;c.PA=R}
+ const rvS=d==='tof'?[.98,1.14,.85]:[.8,1,.7];
+ ell(g,c.RA,.72,[-1.1,.9,0],[.7,.8,.6]);
+ ell(g,c.LA,.72,[1.1,.9,-.4],[.7,.7,.6]);
+ ell(g,c.RV,.72,[-.4,-.7,.3],rvS);
+ ell(g,c.LV,.72,[.7,-.7,0],[.85,1.1,.7]);
+ add(g,new THREE.BoxGeometry(.06,1.6,1),mat(0xcccccc,.6),[.15,-.7,.15]);
+ add(g,new THREE.BoxGeometry(.06,1.2,.9),mat(0xcccccc,.6),[0,.9,-.2]);
+ const tail=[[1.7,2.2,-.6],[2,1,-.8],[2,-.9,-.8]];
+ let ao;
+ if(d==='tga')ao=[[-.4,-.1,.45],[-.3,.9,.6],[-.1,1.8,.3],[.8,2.5,-.3]].concat(tail);
+ else if(d==='tof')ao=[[.1,-.15,.15],[.15,.9,0],[.2,1.7,-.1],[.8,2.5,-.3]].concat(tail);
+ else ao=[[.4,-.2,-.1],[.2,.9,-.1],[.2,1.7,-.1],[.8,2.5,-.3]].concat(tail);
+ tube(g,ao,.27,mat(c.AO,.9));
+ const pr=d==='tof'?.12:.22;
+ if(d==='tga'){
+  tube(g,[[.4,-.2,-.1],[.2,.9,-.1],[.2,1.7,-.2]],pr,mat(c.PA,.9),20);
+  tube(g,[[.2,1.7,-.2],[-.6,1.95,-.2],[-1.5,2,-.2]],pr*.8,mat(c.PA,.9),20);
+  tube(g,[[.2,1.7,-.2],[.8,1.9,-.1],[1.3,1.9,0]],pr*.8,mat(c.PA,.9),20);
+ }else{
+  tube(g,[[-.4,-.1,.5],[-.3,.9,.6],[-.2,1.7,.4]],pr,mat(c.PA,.9),20);
+  tube(g,[[-.2,1.7,.4],[-.7,1.95,.1],[-1.5,2,-.1]],pr*.8,mat(c.PA,.9),20);
+  tube(g,[[-.2,1.7,.4],[.5,1.95,.3],[1.3,1.9,0]],pr*.8,mat(c.PA,.9),20);
+ }
+ const L=[{t:'Right atrium',p:[-1.6,1.4,.3]},{t:'Left atrium',p:[1.7,1.3,-.4]},{t:'Right ventricle',p:[-1.3,-1.2,.5]},{t:'Left ventricle',p:[1.5,-1.2,.2]},{t:'Aorta',p:[1.4,2.5,-.5]},{t:'Pulmonary artery',p:[-1.6,2.3,.3]}];
+ let info='';
+ if(d==='normal'){info='<ul><li>Blue = deoxygenated, red = oxygenated, purple = mixed.</li><li>Systemic return: RA → RV → pulmonary artery. Pulmonary return: LA → LV → aorta.</li><li>Left-sided pressures exceed right-sided, so a hole between the sides shunts left → right unless the right side is obstructed.</li></ul>';}
+ if(d==='asd'){ring(g,[0,.9,-.2],.3,0xffd23f,[0,Math.PI/2,0]);arrow(g,[.8,.95,-.25],[-.5,.95,-.25]);L.push({t:'ASD',p:[0,1.5,-.2]});
+  info='<ul><li><b>Left-to-right shunt</b> at atrial level (ostium secundum most common; ostium primum is associated with Down syndrome).</li><li>Right atrial/ventricular volume overload and increased pulmonary flow.</li><li>Fixed split S2; systolic ejection murmur at the left upper sternal border (extra flow across the pulmonic valve).</li><li>Paradoxical embolism is possible. Eisenmenger if the shunt reverses.</li></ul>';}
+ if(d==='vsd'){ring(g,[.15,-.4,.15],.28,0xffd23f,[0,Math.PI/2,0]);arrow(g,[.7,-.4,.1],[-.2,-.4,.2]);L.push({t:'VSD (membranous)',p:[.2,-1.7,.4]});
+  info='<ul><li>Most common congenital heart defect; membranous septum is the usual site.</li><li><b>Left-to-right shunt</b>; holosystolic murmur at the left lower sternal border (smaller defects are louder).</li><li>Large defects: pulmonary overcirculation, heart failure, then pulmonary hypertension and <b>Eisenmenger</b> (shunt reverses, cyanosis, clubbing).</li></ul>';}
+ if(d==='pda'){tube(g,[[1.75,1.9,-.65],[1.4,1.95,-.3],[1,1.93,.15]],.1,mat(0xffd23f,1,{emissive:0xffd23f,emissiveIntensity:.4}),12);arrow(g,[1.9,1.6,-.7],[1.3,1.4,-.1]);L.push({t:'Ductus (PDA)',p:[1.9,1.5,-.2]});
+  info='<ul><li>Persistent channel between the <b>descending aorta (just distal to the left subclavian)</b> and the left pulmonary artery.</li><li>Left-to-right shunt: continuous “machinery” murmur, bounding pulses, wide pulse pressure.</li><li>Associated with prematurity and maternal rubella. Closure: indomethacin/ibuprofen. If a ductus-dependent lesion exists, keep it open with prostaglandin E1.</li></ul>';}
+ if(d==='tof'){ring(g,[.15,-.4,.15],.28,0xffd23f,[0,Math.PI/2,0]);ring(g,[-.37,.2,.52],.2,0xff7a3f,[Math.PI/2,0,0]);arrow(g,[-.2,-.4,.2],[.6,-.2,.1]);L.push({t:'VSD',p:[.2,-1.7,.4]},{t:'Pulmonary stenosis',p:[-1.4,.4,.7]},{t:'RV hypertrophy',p:[-1.5,-.4,.8]},{t:'Overriding aorta',p:[.9,.3,.2]});
+  info='<ul><li>Four features: <b>pulmonary (infundibular) stenosis, RVH, overriding aorta, VSD.</b></li><li>Right-to-left shunt across the VSD → cyanosis. “Tet spells” improve with squatting (raises SVR, pushes blood toward the lungs).</li><li>Boot-shaped heart on CXR. Associated with 22q11 deletion. Classically the most common cyanotic CHD beyond infancy.</li></ul>';}
+ if(d==='tga'){ring(g,[0,.9,-.2],.3,0xffd23f,[0,Math.PI/2,0]);L.push({t:'Mixing site needed (ASD/VSD/PDA)',p:[0,1.5,-.2]});
+  info='<ul><li><b>Aorta arises from the RV; pulmonary artery from the LV</b> → two parallel circuits.</li><li>Not compatible with life without mixing (PDA, ASD or VSD). Cyanosis in the first days of life.</li><li>“Egg on a string” CXR (narrow mediastinum). Associated with maternal diabetes.</li><li>Keep the ductus open with prostaglandin E1; definitive fix is the arterial switch.</li></ul>';}
+ return{labels:L,info};
+}};
+
+/* 2. Aortic dissection */
+SC.aorta={tab:'Aortic dissection',title:'Aortic dissection',center:[1,0,0],zoom:8.5,rot:[-.1,.2],
+controls:[{k:'v',label:'Perspective',def:'ext',opts:[['ext','Aortic (external, whole aorta)'],['int','Intimal (wall layers in cross-section)']]},{k:'t',label:'Stanford type (aortic view)',def:'A',opts:[['A','Type A (involves ascending aorta)'],['B','Type B (distal to left subclavian)']]},{k:'x',label:'Wall in cross-section',def:'dis',opts:[['norm','Normal wall'],['dis','Dissection']]}],
+build(g,st){
+ const L=[];let info='';
+ if(st.v==='ext'){
+  const pts=[[0,-2,0],[0,-.5,0],[.1,.7,0],[.7,1.6,0],[1.5,1.7,0],[2.1,1,0],[2.2,-.3,0],[2.2,-2.3,0]].map(p=>V(...p));
+  const cur=new THREE.CatmullRomCurve3(pts);
+  add(g,new THREE.TubeGeometry(cur,80,.3,16,false),mat(0xd8605a,.45));
+  ell(g,0xd8605a,.5,[0,-2,0],[.5,.35,.5]);
+  [[.7,1.65,.75,2.4],[1.1,1.72,1.15,2.5],[1.45,1.74,1.55,2.45]].forEach(b=>seg(g,[b[0],b[1],0],[b[2],b[3],0],.1,mat(0xd8605a,.6)));
+  const t0=st.t==='A'?.2:.62,t1=st.t==='A'?.85:.93;
+  const sub=[];for(let i=0;i<=40;i++)sub.push(cur.getPoint(t0+(t1-t0)*i/40).add(V(0,0,.17)));
+  add(g,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(sub),80,.15,12,false),mat(0x6b0f0f,.95));
+  const tp=cur.getPoint(t0).add(V(0,0,.3));dot(g,[tp.x,tp.y,tp.z],0xffd23f,.12);
+  L.push({t:'Entry tear (intimal)',p:[tp.x-.1,tp.y,tp.z+.1]},{t:'False lumen',p:[2.5,.3,.3]},{t:'True lumen',p:[2.5,-1.2,0]},{t:'Aortic root / valve',p:[-.8,-2,0]},{t:'Arch branches',p:[1.1,2.7,0]},{t:'Descending aorta',p:[2.6,-1.9,0]});
+  info=st.t==='A'
+   ?'<ul><li><b>Stanford A</b>: involves the ascending aorta (± arch/descending). Surgical emergency.</li><li>Complications: aortic regurgitation, tamponade, coronary (usually RCA) occlusion, stroke.</li></ul>'
+   :'<ul><li><b>Stanford B</b>: distal to the left subclavian artery. Usually medical: IV beta-blocker first (impulse control), then vasodilator.</li><li>Complications: renal or mesenteric malperfusion, limb ischemia, rupture.</li></ul>';
+  info+='<ul><li>Tearing chest/back pain, BP difference between arms, widened mediastinum on CXR.</li><li>Risk: hypertension, Marfan/Ehlers-Danlos, bicuspid valve, cocaine, trauma.</li></ul>';
+ }else{
+  const dep=1.6,dis=st.x==='dis';
+  const mi=mat(0xf0c9b6,.95),mm=mat(0xb04a4a,.8),ma=mat(0xc9a27a,.85);
+  const tearA=.70,tearB=.80,flEnd=3.0;
+  if(!dis){
+   add(g,sector(.95,1,0,Math.PI*2,dep),mi);add(g,sector(1,1.35,0,Math.PI*2,dep),mm);add(g,sector(1.35,1.55,0,Math.PI*2,dep),ma);
+   add(g,disk(.93,dep),mat(0xd8403a,.35));
+   info='<ul><li>Three layers: <b>intima</b> (endothelium), <b>media</b> (elastic lamellae and smooth muscle, most of the strength), <b>adventitia</b>.</li><li>Cystic medial degeneration weakens the media (Marfan, aging, hypertension).</li></ul>';
+  }else{
+   add(g,sector(.95,1,flEnd,Math.PI*2+tearA,dep),mi);
+   add(g,sector(1,1.1,flEnd,Math.PI*2+tearA,dep),mm);
+   const flap=new THREE.Group();add(flap,sector(.95,1.1,tearB,flEnd,dep),mat(0xe9a98f,.95));flap.scale.set(.84,.84,1);g.add(flap);
+   add(g,sector(1.1,1.25,tearA,flEnd,dep),mat(0x6b0f0f,.8));
+   add(g,sector(1.1,1.25,flEnd,Math.PI*2+tearA,dep),mm);
+   add(g,sector(1.25,1.35,0,Math.PI*2,dep),mm);
+   add(g,sector(1.35,1.55,0,Math.PI*2,dep),ma);
+   add(g,disk(.78,dep),mat(0xd8403a,.35));
+   arrow(g,[.37,.34,0],[.86,.8,0]);
+   info='<ul><li>An <b>intimal tear</b> lets blood enter the media and split the layers, creating a <b>false lumen</b>.</li><li>The <b>intimal flap</b> separates true and false lumens and can occlude branch vessels (malperfusion).</li><li>Shown here as a cutaway: the wall layers from the inside out.</li></ul>';
+  }
+  const lp=(r,a)=>[r*Math.cos(a*D),r*Math.sin(a*D),dep/2];
+  L.push({t:'Intima',p:lp(.97,200)},{t:'Media',p:lp(1.2,250)},{t:'Adventitia',p:lp(1.46,300)},{t:'True lumen',p:[0,0,dep/2]});
+  if(dis)L.push({t:'Intimal tear',p:lp(1.0,43)},{t:'False lumen',p:lp(1.18,110)},{t:'Intimal flap',p:lp(.8,150)});
+ }
+ return{labels:L,info};
+}};
+
+/* 3. Flail chest */
+function ribPt(i,th){const k=Math.sin(Math.PI*(i+1)/9);const a=1.25+.3*k,b=.8+.25*k,y=1.5-i*.42;const f=Math.max(0,Math.sin(th*D));return[a*Math.cos(th*D),y-.3*f,b*Math.sin(th*D)];}
+function ribArc(i,t0,t1){const n=Math.max(4,Math.ceil((t1-t0)/10)),p=[];for(let j=0;j<=n;j++)p.push(ribPt(i,t0+(t1-t0)*j/n));return p;}
+SC.flail={tab:'Flail chest',title:'Flail chest',center:[0,0,0],zoom:8,rot:[-.15,-.5],
+controls:[{k:'ph',label:'Breathing phase',def:'anim',opts:[['anim','Animate'],['insp','Inspiration'],['exp','Expiration']]},{k:'c',label:'Show pulmonary contusion',def:'on',type:'chk'}],
+build(g,st){
+ const thorax=new THREE.Group(),flail=new THREE.Group();g.add(thorax,flail);
+ const bone=mat(0xe9dcc3,1),red=mat(0xe23b3b,1,{emissive:0x661111});
+ for(let i=0;i<8;i++){
+  const isF=i>=2&&i<=5;
+  if(!isF){tube(thorax,ribArc(i,104,436),.05,bone,40);}
+  else{
+   tube(thorax,ribArc(i,104,338),.05,bone,32);tube(thorax,ribArc(i,422,436),.05,bone,4);
+   tube(flail,ribArc(i,345,415),.05,bone,10);
+   ell(thorax,0xe23b3b,1,ribPt(i,340),[.07,.07,.07]);ell(thorax,0xe23b3b,1,ribPt(i,420),[.07,.07,.07]);
+  }
+ }
+ add(thorax,new THREE.BoxGeometry(.45,2.7,.1),mat(0xd9cdb4),[0,.05,.88]);
+ tube(thorax,[[0,1.8,-.95],[0,0,-1],[0,-1.8,-.9]],.11,mat(0xbfb59d));
+ ell(thorax,0xe99aa6,.4,[-.65,0,0],[.55,1.2,.7]);ell(thorax,0xe99aa6,.4,[.65,0,0],[.55,1.2,.7]);
+ if(st.c)ell(thorax,0xb22222,.75,[.8,.15,.35],[.3,.45,.3]);
+ const fp=ribPt(3,380);
+ const L=[{t:'Flail segment (≥3 ribs, ≥2 fractures each)',p:[fp[0]+.2,fp[1]+.5,fp[2]+.2]},{t:'Fracture sites',p:[...ribPt(2,340)].map((v,i)=>i===0?v+.25:v)},{t:'Sternum',p:[-.3,1.5,.95]}];
+ if(st.c)L.push({t:'Pulmonary contusion',p:[.9,-.5,.45]});
+ const dir=V(Math.cos(20*D),0,Math.sin(20*D));
+ const update=(t)=>{const s=st.ph==='insp'?1:st.ph==='exp'?-1:Math.sin(t*1.6);
+  thorax.scale.set(1+.05*s,1,1+.05*s);flail.position.copy(dir).multiplyScalar(-.14*s);};
+ const info='<ul><li><b>Flail chest</b>: ≥3 adjacent ribs each fractured in ≥2 places, producing a free-floating segment.</li><li><b>Paradoxical motion</b>: the segment moves inward on inspiration and outward on expiration (watch the loose ribs against the rest of the thorax).</li><li>Hypoxia is driven mainly by the underlying <b>pulmonary contusion</b> and pain-limited breathing, not the paradoxical motion itself.</li><li>Management: oxygen, analgesia (including regional blocks), judicious fluids; ventilatory support if failing; rib fixation in selected patients.</li></ul>';
+ return{labels:L,info,update};
+}};
+
+/* 4. Tension pneumothorax (coronal) */
+SC.tension={tab:'Tension pneumothorax',title:'Tension pneumothorax',center:[0,0,0],zoom:9,rot:[0,0],
+controls:[{k:'s',label:'State',def:'tension',opts:[['normal','Normal chest'],['tension','Tension pneumothorax (patient’s right)']]}],
+build(g,st){
+ const T=st.s==='tension';
+ const wall=new THREE.Shape();wall.moveTo(-2.4,-2.4);wall.bezierCurveTo(-3.1,-1,-3,1.8,-1.5,2.7);wall.lineTo(1.5,2.7);wall.bezierCurveTo(3,1.8,3.1,-1,2.4,-2.4);wall.lineTo(-2.4,-2.4);
+ const wg=new THREE.ExtrudeGeometry(wall,{depth:1.2,bevelEnabled:false});wg.translate(0,0,-.6);
+ add(g,wg,mat(0x8899aa,.1));
+ g.add(new THREE.LineSegments(new THREE.EdgesGeometry(wg,30),new THREE.LineBasicMaterial({color:0x6f8196})));
+ for(let k=0;k<6;k++){const yk=2.1-k*.7;[-1,1].forEach(s=>{const w=Math.sqrt(Math.max(.2,1-Math.pow((yk-.2)/3,2)));tube(g,[[s*.2,yk+.1,0],[s*1,yk+.3,0],[s*1.9*w,yk+.1,0],[s*2.45*w,yk-.45,0]],.04,mat(0xe9dcc3,.9),16);});}
+ const heartX=T?1.25:.35,tx=T?.55:0;
+ ell(g,0xc24a4a,.9,[heartX,-.6,0],[.85,.95,.5]);
+ tube(g,[[tx*.2,2.75,0],[tx,1.6,0],[tx*.9,1.2,0]],.12,mat(0xcfd8e3),20);
+ seg(g,[tx*.9,1.2,0],[tx*.9-.7,.7,0],.09,mat(0xcfd8e3));seg(g,[tx*.9,1.2,0],[tx*.9+.7,.7,0],.09,mat(0xcfd8e3));
+ if(!T){
+  ell(g,0xe99aa6,.5,[-1.45,.45,0],[1,1.7,.55]);ell(g,0xe99aa6,.5,[1.45,.45,0],[.95,1.65,.55]);
+  ell(g,0xb89a74,.8,[-1.45,-1.6,0],[1.25,.5,.6]);ell(g,0xb89a74,.8,[1.45,-1.75,0],[1.2,.5,.6]);
+ }else{
+  ell(g,0x9fd8f2,.22,[-1.5,.25,0],[1.15,1.95,.6],{emissive:0x226688,emissiveIntensity:.3});
+  ell(g,0xb08a92,.8,[-.9,.9,0],[.4,.6,.4]);
+  ell(g,0xe99aa6,.55,[2.0,.4,0],[.55,1.4,.5]);
+  ell(g,0xb89a74,.8,[-1.5,-2.15,0],[1.25,.22,.6]);ell(g,0xb89a74,.8,[1.45,-1.75,0],[1.2,.5,.6]);
+  arrow(g,[-.3,.2,.7],[.9,.2,.7]);
+ }
+ const L=[{t:'Trachea',p:[tx+.2,2.2,0]},{t:'Heart',p:[heartX+.2,-1.2,.5]},{t:'Left lung',p:[2.1,1.7,0]},{t:'Right hemidiaphragm',p:[-2.9,-1.9,0]}];
+ L.push(T?{t:'Collapsed right lung',p:[-.9,1.6,.4]}:{t:'Right lung',p:[-2.3,1.7,0]});
+ if(T)L.push({t:'Trapped pleural air',p:[-2.9,.6,.4]},{t:'Mediastinal shift →',p:[.3,-.1,.8]},{t:'Trachea deviated away',p:[.9,2.6,0]},{t:'Compressed left lung',p:[2.4,-.5,0]});
+ const info=T?'<ul><li>Air enters the pleural space through a <b>one-way valve</b>; intrapleural pressure rises.</li><li>Ipsilateral lung collapses; the <b>mediastinum and trachea shift away</b>; the hemidiaphragm flattens; the contralateral lung is compressed.</li><li>Kinking of the great veins reduces venous return → <b>obstructive shock</b> (hypotension, JVD, tachycardia).</li><li>Exam: absent breath sounds and hyperresonance on the affected side. <b>Clinical diagnosis: do not wait for imaging.</b></li><li>Immediate needle decompression (classically 2nd intercostal space, midclavicular line; ATLS 10th ed. uses the 5th space, anterior axillary line), then chest tube.</li></ul>'
+  :'<ul><li>Normal coronal view: trachea midline, mediastinum central, both lungs inflated, right hemidiaphragm slightly higher than left.</li><li>Switch to the tension state to compare.</li></ul>';
+ return{labels:L,info};
+}};
+
+/* 5. Aspiration sites */
+SC.asp={tab:'Aspiration sites',title:'Aspiration sites by position',center:[0,.5,0],zoom:9.5,rot:[-.1,.35],
+controls:[{k:'p',label:'Patient position when aspirating',def:'up',opts:[['up','Upright / sitting'],['sup','Supine'],['rl','Right side down (lateral decubitus)']]}],
+build(g,st){
+ const cart=mat(0xcfd8e3,.95);
+ tube(g,[[0,2.6,0],[0,1.8,0],[0,1,0]],.15,cart,10);
+ seg(g,[0,1,0],[-.3,.4,0],.16,cart);seg(g,[0,1,0],[.8,.5,0],.12,cart);
+ seg(g,[-.12,.7,0],[-1,1.3,-.2],.07,cart);seg(g,[-.3,.4,0],[-1.2,.15,.4],.07,cart);seg(g,[-.3,.4,0],[-.9,-.9,-.3],.09,cart);
+ seg(g,[.8,.5,0],[1.3,1.2,0],.08,cart);seg(g,[.8,.5,0],[1.2,-.9,-.3],.09,cart);
+ ell(g,0xe0a060,.28,[-1.35,1.3,0],[.8,.95,.7]);ell(g,0x7ac47a,.28,[-1.4,.15,.45],[.75,.5,.5]);ell(g,0x6aa0e0,.28,[-1.2,-.85,-.35],[.9,1.1,.8]);
+ ell(g,0xe0a060,.28,[1.4,1,.05],[.8,1.2,.7]);ell(g,0x6aa0e0,.28,[1.25,-.85,-.35],[.85,1.1,.8]);
+ const S={rulp:[-1.3,1.55,-.5],rlls:[-1.1,-.15,-.7],rllb:[-1,-1.45,-.6],lllb:[1.1,-1.45,-.6],rml:[-2,.2,.3],rllat:[-1.85,-1.1,-.2]};
+ const L=[{t:'Right main bronchus: wider, shorter, more vertical',p:[-1.9,.8,.9]},{t:'Left main bronchus',p:[1.5,.35,.3]},{t:'RUL',p:[-2.2,1.9,0]},{t:'RML',p:[-2.3,.5,.5]},{t:'RLL',p:[-2.1,-1.6,0]},{t:'LUL',p:[2.3,1.9,0]},{t:'LLL',p:[2.2,-1.5,0]}];
+ let sites=[],info='',grav;
+ if(st.p==='up'){sites=['rllb','lllb'];grav=[[3.3,1.5,0],[3.3,.4,0]];L.push({t:'Posterior basal segments (R > L)',p:[S.rllb[0]-.3,S.rllb[1]-.4,S.rllb[2]]});
+  info='<ul><li><b>Upright</b>: aspirate follows gravity into the <b>basal segments of the lower lobes</b>, right more than left.</li><li>Why right: the right main bronchus is wider, shorter and runs more vertically.</li></ul>';}
+ if(st.p==='sup'){sites=['rulp','rlls'];grav=[[3.3,1,.9],[3.3,1,-.3]];L.push({t:'RUL posterior segment',p:[S.rulp[0]-.2,S.rulp[1]+.35,S.rulp[2]]},{t:'RLL superior segment',p:[S.rlls[0]+1.2,S.rlls[1]-.2,S.rlls[2]]});
+  info='<ul><li><b>Supine</b>: the dependent (posterior) segments fill first: the <b>superior segment of the right lower lobe</b> and the <b>posterior segment of the right upper lobe</b>.</li><li>Rotate the model to look from the side and see how these segments lie posteriorly.</li></ul>';}
+ if(st.p==='rl'){sites=['rulp','rml','rllat'];grav=[[.3,3.2,0],[-1.7,3.2,0]];L.push({t:'RUL posterior segment',p:[S.rulp[0]-.2,S.rulp[1]+.35,S.rulp[2]]},{t:'RML lateral',p:[S.rml[0]-.3,S.rml[1]+.3,S.rml[2]]},{t:'RLL lateral basal',p:[S.rllat[0]-.3,S.rllat[1]-.3,S.rllat[2]]});
+  info='<ul><li><b>Right lateral decubitus</b>: the right lung is dependent, so aspirate favors its lateral and posterior regions.</li><li>This position is commonly taught less consistently than upright vs. supine: confirm the exact segments against your question-bank resource.</li></ul>';}
+ sites.forEach(k=>dot(g,S[k],0xffd23f,.17));
+ arrow(g,grav[0],grav[1],0xff7a3f);L.push({t:'Gravity',p:[grav[0][0]+.2,grav[0][1]+.1,grav[0][2]]});
+ return{labels:L,info};
+}};
+
+/* 6. Inguinal canal and hernias */
+SC.ing={tab:'Inguinal canal & hernias',title:'Inguinal canal & hernia anatomy',center:[-.5,-.2,0],zoom:9,rot:[-.15,.45],
+controls:[{k:'h',label:'Condition',def:'norm',opts:[['norm','Normal anatomy'],['ind','Indirect inguinal hernia'],['dir','Direct inguinal hernia'],['fem','Femoral hernia']]},{k:'eo',label:'Show external oblique aponeurosis',def:true,type:'chk'}],
+build(g,st){
+ const lig=x=>1.5-1.174*(x+2);
+ const wallPos=[-.5,-.15];
+ if(st.eo)add(g,new THREE.BoxGeometry(4.3,4.3,.03),mat(0xd98b7a,.25),[wallPos[0],wallPos[1],.3]);
+ add(g,new THREE.BoxGeometry(4.3,4.3,.03),mat(0xc96a6a,.22),[wallPos[0],wallPos[1],.15]);
+ add(g,new THREE.BoxGeometry(4.3,4.3,.03),mat(0xb85a5a,.22),[wallPos[0],wallPos[1],0]);
+ add(g,new THREE.BoxGeometry(4.3,4.3,.03),mat(0x889099,.12),[wallPos[0],wallPos[1],-.25]);
+ add(g,new THREE.BoxGeometry(.8,3.2,.12),mat(0x9b3b3b,.55),[.7,.4,.1]);
+ const lm=mat(0xf3e9b0);
+ seg(g,[-2,1.5,.28],[.3,-1.2,.28],.06,lm);
+ dot(g,[-2,1.5,.28],0xf3e9b0,.12);dot(g,[.3,-1.2,.28],0xf3e9b0,.12);
+ tube(g,[[-.8,lig(-.8),-.05],[-.3,.4,-.05],[.3,.7,-.05]],.05,mat(0xe23b3b),16);
+ const tri=new THREE.BufferGeometry();tri.setAttribute('position',new THREE.Float32BufferAttribute([-.8,lig(-.8),-.03,.3,.7,-.03,.3,-1.2,-.03],3));tri.setIndex([0,1,2]);tri.computeVertexNormals();
+ add(g,tri,mat(0xffd23f,.4,{emissive:0xffd23f,emissiveIntensity:.25}));
+ ring(g,[-1.1,.55,0],.2,0xff9f3f);ring(g,[.05,-.88,.3],.15,0xff9f3f);
+ const cord=[[-1.1,.55,0],[-.6,0,.14],[-.2,-.5,.26],[.05,-.88,.3],[.1,-1.8,.3]];
+ tube(g,cord,.08,mat(0xf0e0d0,.9),30);
+ tube(g,[[-1.15,.45,.05],[-1.2,-2.2,.05]],.07,mat(0xe23b3b),20);tube(g,[[-.85,.35,.05],[-.9,-2.2,.05]],.08,mat(0x3a6fd8),20);tube(g,[[-1.5,.5,.05],[-1.55,-2.2,.05]],.04,mat(0xf0d94a),20);
+ const L=[{t:'Deep (internal) ring',p:[-1.6,.85,0]},{t:'Superficial ring',p:[-.9,-1.3,.3]},{t:'Spermatic cord',p:[.5,-1.5,.3]},{t:'Inguinal ligament',p:[-1.6,1.3,.3]},{t:'Inferior epigastric vessels',p:[.45,.9,-.05]},{t:'Hesselbach triangle',p:[.4,-.5,-.03]},{t:'Rectus',p:[1,1.4,.1]},{t:'Femoral N / A / V',p:[-2.1,-1.7,.05]}];
+ let info='';
+ if(st.h==='norm')info='<ul><li><b>Inguinal canal</b>: runs from the deep ring (in transversalis fascia) to the superficial ring (in the external oblique aponeurosis), carrying the spermatic cord / round ligament.</li><li><b>Hesselbach triangle</b>: inferior epigastric vessels (lateral), lateral border of rectus (medial), inguinal ligament (inferior).</li><li>Femoral sheath: lateral → medial = Nerve, Artery, Vein, (empty space) Lymphatics.</li><li>Rotate to see the layers from the side; hide the external oblique to expose deeper structures.</li></ul>';
+ if(st.h==='ind'){tube(g,cord,.17,mat(0xe8b94a,.55),30);ell(g,0xe8b94a,.6,[.1,-1.9,.3],[.3,.4,.3]);L.push({t:'Indirect sac',p:[.6,-2,.3]});
+  info='<ul><li>Passes through the <b>deep ring, lateral to the inferior epigastric vessels</b>, and follows the spermatic cord in the canal; can reach the scrotum.</li><li>Cause: patent processus vaginalis (congenital). Most common hernia in both sexes.</li><li>Covered by all layers of the spermatic cord fascia. “MD’s don’t lie”: Medial = Direct, Lateral = indirect.</li></ul>';}
+ if(st.h==='dir'){ell(g,0xe8b94a,.65,[-.05,-.15,.17],[.38,.38,.35]);L.push({t:'Direct hernia',p:[.55,-.15,.35]});
+  info='<ul><li>Bulges through <b>Hesselbach triangle, medial to the inferior epigastric vessels</b>; an acquired weakness of the transversalis fascia.</li><li>Older men, heavy lifting, chronic cough/straining.</li><li>Does not follow the cord through the deep ring and rarely reaches the scrotum.</li></ul>';}
+ if(st.h==='fem'){ell(g,0xe8b94a,.65,[-.55,-.55,.1],[.3,.32,.3]);L.push({t:'Femoral hernia',p:[-.2,-1,.15]});
+  info='<ul><li>Through the femoral canal, <b>below the inguinal ligament and medial to the femoral vein</b>.</li><li>More common in women; the narrow neck gives the <b>highest risk of strangulation</b>.</li><li>Needs urgent repair.</li></ul>';}
+ return{labels:L,info};
+}};
+
+/* 7. Biliary tree */
+SC.bil={tab:'Biliary tree',title:'Biliary tree anatomy',center:[.3,-.3,0],zoom:9.5,rot:[-.1,.2],
+controls:[{k:'p',label:'Condition',def:'norm',opts:[['norm','Normal anatomy'],['gb','Cholelithiasis (gallbladder stones)'],['cbd','Choledocholithiasis / cholangitis'],['pan','Gallstone pancreatitis (ampulla)'],['mir','Mirizzi syndrome'],['cou','Courvoisier sign (pancreatic head mass)']]}],
+build(g,st){
+ const p=st.p,dil=(p==='cbd'||p==='pan'||p==='cou');
+ const bile=mat(0x8fc13a,.95),duct=mat(0x2fa84f,.95);
+ ell(g,0x8a5a3a,.3,[-1.5,1.1,-.1],[1.9,1.2,.6]);ell(g,0x8a5a3a,.3,[1,1.4,-.1],[1.1,.7,.5]);
+ ell(g,0x4f9a3a,.9,[-.9,-.4,.2],[.35,.7,.3]);ell(g,0x4f9a3a,.9,[-.7,.1,.2],[.24,.24,.24]);
+ const cdR=dil?.15:.09,chdR=p==='mir'?.05:.09;
+ tube(g,[[-1.1,1.6,0],[-.6,1.2,0],[-.2,1],[-.2,1]].map(q=>[q[0],q[1],0]),.07,duct,16);
+ tube(g,[[.8,1.4,0],[.3,1.2,0],[-.2,1,0]],.07,duct,16);
+ tube(g,[[-.2,1,0],[-.15,.8,0],[-.1,.6,0]],chdR,duct,12);
+ tube(g,[[-.7,.1,.2],[-.45,.3,.1],[-.1,.6,0]],.06,duct,12);
+ const cbd=[[-.1,.6,0],[0,-.4,0],[.4,-1,0],[.8,-1.5,0]];
+ tube(g,cbd,cdR,duct,30);
+ tube(g,[[-.3,-.6,-.1],[.2,-.8,-.1],[.9,-1.2,-.1],[.9,-2,-.1],[.2,-2.3,-.1]],.17,mat(0xe0b0a0,.6),30);
+ ell(g,0xd9a05a,.5,[.45,-1.55,-.15],[.5,.55,.3]);
+ tube(g,[[2,-1.1,-.1],[1.4,-1.35,-.1],[.8,-1.5,0]],.05,mat(0xe2d83a),20);
+ add(g,new THREE.ShapeGeometry(new THREE.Shape([new THREE.Vector2(-.1,.6),new THREE.Vector2(-.55,.3),new THREE.Vector2(-.4,.95)])),mat(0xffd23f,.45,{emissive:0xffd23f,emissiveIntensity:.25}),[0,0,.02]);
+ tube(g,[[-.4,1,.05],[-.5,.6,.1],[-.55,.3,.1]],.025,mat(0xe23b3b),12);
+ dot(g,[.8,-1.5,0],0xff7a3f,.07);
+ if(p==='gb'||p==='mir'){[[-.9,-.55],[-.85,-.3],[-.95,-.7]].forEach(q=>dot(g,[q[0],q[1],.3],0xf5e6a8,.1));}
+ if(p==='mir')dot(g,[-.7,.1,.3],0xf5e6a8,.16);
+ if(p==='cbd')dot(g,[.3,-.85,0],0xf5e6a8,.14);
+ if(p==='pan')dot(g,[.75,-1.45,.05],0xf5e6a8,.12);
+ if(p==='cou'){ell(g,0xd9a05a,.8,[.45,-1.55,-.15],[.8,.8,.45]);}
+ const L=[{t:'Liver',p:[-2.9,1.6,0]},{t:'Gallbladder',p:[-1.7,-.8,.3]},{t:'Hartmann pouch / neck',p:[-1.5,.15,.3]},{t:'Cystic duct',p:[-1.6,.65,.2]},{t:'Common hepatic duct',p:[.2,.85,0]},{t:'Common bile duct',p:[.6,-.2,0]},{t:'Right / left hepatic ducts',p:[-.9,1.7,0]},{t:'Calot triangle',p:[-.45,.9,.05]},{t:'Cystic artery',p:[-.95,.6,.1]},{t:'Duodenum',p:[1.3,-2.1,-.1]},{t:'Pancreatic head',p:[1.3,-1.1,-.1]},{t:'Ampulla of Vater',p:[1.2,-1.75,0]},{t:'Pancreatic duct',p:[2.1,-.9,-.1]}];
+ const infos={
+  norm:'<ul><li>Bile flows: hepatic ducts → common hepatic duct → (cystic duct to gallbladder) → common bile duct → ampulla of Vater (sphincter of Oddi) → duodenum.</li><li><b>Calot triangle</b>: cystic duct, common hepatic duct and inferior liver edge; contains the cystic artery. Key landmark in cholecystectomy.</li></ul>',
+  gb:'<ul><li><b>Cholelithiasis</b>: often silent; biliary colic after fatty meals (RUQ pain, 30 min to hours).</li><li>If the stone impacts the cystic duct and inflammation follows: acute cholecystitis (fever, Murphy sign, ↑WBC).</li></ul>',
+  cbd:'<ul><li><b>Choledocholithiasis</b>: duct dilates; ↑ALP, ↑direct bilirubin.</li><li>If infected: <b>cholangitis</b> with Charcot triad (fever, jaundice, RUQ pain); add shock and confusion for Reynold pentad.</li><li>Management: broad-spectrum antibiotics, urgent biliary decompression (ERCP).</li></ul>',
+  pan:'<ul><li>A stone at the <b>ampulla of Vater</b> blocks the pancreatic duct and bile duct → <b>gallstone pancreatitis</b> (the most common cause with alcohol).</li><li>Epigastric pain radiating to the back, ↑lipase; often with ↑ALT.</li></ul>',
+  mir:'<ul><li><b>Mirizzi syndrome</b>: a stone in the Hartmann pouch/cystic duct compresses the common hepatic duct (note the narrowed CHD).</li><li>Obstructive jaundice with a gallbladder source; diagnosed on imaging/ERCP.</li></ul>',
+  cou:'<ul><li><b>Courvoisier sign</b>: painless jaundice plus a palpable, non-tender gallbladder suggests malignant obstruction (e.g. pancreatic head cancer), not stones.</li><li>The mass blocks the distal common bile duct, which dilates, as does the gallbladder.</li></ul>'};
+ return{labels:L,info:infos[p]};
+}};
+
+/* 8. Fibroid types */
+SC.fib={tab:'Fibroids (FIGO)',title:'Uterine fibroids by layer',center:[0,.3,0],zoom:8.5,rot:[-.1,.1],
+controls:[{k:'sh',label:'Highlight group',def:'all',opts:[['all','All types'],['sub','Submucosal (FIGO 0-2)'],['int','Intramural (FIGO 3-4)'],['ser','Subserosal (FIGO 5-7)']]},{k:'sr',label:'Serosa',def:true,type:'chk'},{k:'my',label:'Myometrium',def:true,type:'chk'},{k:'en',label:'Endometrium / cavity',def:true,type:'chk'}],
+build(g,st){
+ const clip=[new THREE.Plane(V(0,0,-1),0)];
+ const cm=(c,o,x)=>mat(c,o,Object.assign({clippingPlanes:clip},x));
+ if(st.sr)ell(g,0xf0a0a8,.22,[0,.3,0],[1.15,1.4,.9]).material.clippingPlanes=clip;
+ if(st.my)ell(g,0xc05060,.4,[0,.3,0],[1.07,1.31,.84]).material.clippingPlanes=clip;
+ if(st.en){add(g,new THREE.SphereGeometry(1,32,24),cm(0xf2dcb8,.65),[0,.35,0],[.6,.85,.3]);}
+ add(g,new THREE.CylinderGeometry(.42,.38,.9,24,1,true),cm(0xd89aa0,.5),[0,-1.4,0]);
+ [[-1,1],[1,1]].forEach(s=>{tube(g,[[s[0]*.9,1.2,0],[s[0]*1.6,1.7,0],[s[0]*2.2,1.4,0]],.07,mat(0xe8a0a8,.9),16);ell(g,0xc9b27a,.9,[s[0]*2.35,.9,0],[.28,.2,.2]);});
+ const F=[
+  {n:'0',g:'sub',c:[.05,.55,-.05],r:.26,t:'FIGO 0: pedunculated, intracavitary',stalk:[[0,1.15,-.05],[.03,.8,-.05]]},
+  {n:'1',g:'sub',c:[.4,.6,-.05],r:.3,t:'FIGO 1: submucosal, <50% intramural'},
+  {n:'2',g:'sub',c:[-.58,0,-.05],r:.3,t:'FIGO 2: submucosal, ≥50% intramural'},
+  {n:'3',g:'int',c:[.77,-.2,-.05],r:.25,t:'FIGO 3: intramural, touches endometrium'},
+  {n:'4',g:'int',c:[-.8,.8,-.05],r:.2,t:'FIGO 4: intramural, no contact'},
+  {n:'5',g:'ser',c:[1,.1,-.05],r:.3,t:'FIGO 5: subserosal, ≥50% intramural'},
+  {n:'6',g:'ser',c:[-1.12,-.35,-.05],r:.3,t:'FIGO 6: subserosal, <50% intramural'},
+  {n:'7',g:'ser',c:[1,2.15,-.05],r:.25,t:'FIGO 7: pedunculated subserosal',stalk:[[.5,1.58,-.05],[.95,1.95,-.05]]}];
+ const L=[];
+ F.forEach(f=>{const on=st.sh==='all'||st.sh===f.g;
+  if(!on)return;
+  const col=f.g==='sub'?0xf3f0c8:f.g==='int'?0xffffff:0xf5d8e0;
+  ell(g,col,.98,f.c,[f.r,f.r,f.r]).material.clippingPlanes=clip;
+  if(f.stalk){const m=mat(0xf5d8e0);m.clippingPlanes=clip;tube(g,f.stalk.map(q=>[q[0],q[1],q[2]]),.05,m,8);}
+  L.push({t:f.t,p:[f.c[0]+(f.c[0]<0?-f.r-.1:f.r+.1),f.c[1],f.c[2]+.3]});});
+ L.push({t:'Cervix',p:[.5,-1.4,0]},{t:'Fallopian tube',p:[1.9,1.9,0]},{t:'Ovary',p:[2.7,.9,0]});
+ const infos={all:'<ul><li>FIGO classification by position relative to the endometrial cavity and serosa: <b>0-2 submucosal, 3-4 intramural, 5-7 subserosal</b> (8 = other, e.g. cervical).</li><li>The cutaway shows the layers: serosa (outer), myometrium, endometrium (lining the cavity). Toggle layers to look inside.</li></ul>',
+  sub:'<ul><li><b>Submucosal</b> fibroids distort the cavity: heavy menstrual bleeding, anemia, infertility, recurrent pregnancy loss.</li><li>Hysteroscopic resection is an option for types 0-2 (as selected).</li></ul>',
+  int:'<ul><li><b>Intramural</b> fibroids enlarge the uterus: bulk symptoms, heavy or prolonged bleeding, pain.</li><li>Type 3 touches the endometrium and can behave like a submucosal lesion.</li></ul>',
+  ser:'<ul><li><b>Subserosal</b> fibroids bulge outward: pelvic pressure, urinary frequency (bladder), constipation; less often abnormal bleeding.</li><li>A pedunculated one (FIGO 7) can <b>torse</b>, causing acute pain. Red degeneration is more common in pregnancy.</li></ul>'};
+ return{labels:L,info:infos[st.sh]};
+}};
+
+/* 9. Eye */
+SC.eye={tab:'Eye anatomy',title:'Eye anatomy (cutaway)',center:[.2,0,0],zoom:8,rot:[0,.15],
+controls:[{k:'c',label:'Condition',def:'norm',opts:[['norm','Normal anatomy'],['ac','Acute angle-closure glaucoma'],['rd','Retinal detachment'],['cra','Central retinal artery occlusion']]}],
+build(g,st){
+ const clip=[new THREE.Plane(V(0,0,-1),0)];const cm=(c,o,x)=>mat(c,o,Object.assign({clippingPlanes:clip},x));
+ const eye=new THREE.Group();eye.rotation.z=-Math.PI/2;g.add(eye);
+ const c=st.c,ac=c==='ac';
+ add(eye,new THREE.SphereGeometry(1.5,48,32,0,Math.PI*2,.55,Math.PI-.55),cm(0xf4f1ea,.9));
+ add(eye,new THREE.SphereGeometry(.85,32,16,0,Math.PI*2,0,1.04),cm(0xbfe6f5,.4),[0,.85,0]);
+ add(eye,new THREE.SphereGeometry(1.42,40,28,0,Math.PI*2,.6,Math.PI-.6),cm(0x6b2a1f,.85));
+ const retCol=c==='cra'?0xe8d8c8:0xf0903a;
+ if(c==='rd'){
+  add(eye,new THREE.SphereGeometry(1.36,40,28,0,Math.PI*2,.6,1.5),cm(retCol,.9));
+  add(eye,new THREE.SphereGeometry(1.36,40,28,0,Math.PI*2,2.55,Math.PI-2.55),cm(retCol,.9));
+  const flap=add(eye,new THREE.SphereGeometry(1.1,40,28,.9,2.4,2.1,.45),cm(retCol,.9));flap.position.y=-.1;
+  const flap2=add(eye,new THREE.SphereGeometry(1.1,40,28,3.3+.1,2.4-.2,2.1,.45),cm(retCol,.9));flap2.position.y=-.1;
+ }else add(eye,new THREE.SphereGeometry(1.36,40,28,0,Math.PI*2,.6,Math.PI-.6),cm(retCol,.85));
+ ell(eye,0xdfeaf2,.0001,[0,0,0],[.001,.001,.001]);
+ add(eye,new THREE.SphereGeometry(1,32,24),cm(0xd8f0ff,.75),[0,ac?.8:.75,0],[.55,.32,.55]);
+ const iy=ac?1.12:.93;
+ const ir=add(eye,new THREE.RingGeometry(ac?.3:.22,.78,40),cm(0x3a78b8,.95),[0,iy,0]);ir.rotation.x=-Math.PI/2;
+ add(eye,new THREE.TorusGeometry(.88,.1,10,32),cm(0xcba37a,.95),[0,.98,0]).rotation.x=Math.PI/2;
+ const tm=add(eye,new THREE.TorusGeometry(.77,.04,8,32),cm(ac?0xff3b3b:0x2fd0c0,1),[0,1.14,0]);tm.rotation.x=Math.PI/2;
+ tube(eye,[[.35,-1.4,0],[.45,-2,0],[.6,-2.8,0]],.2,mat(0xf1ede0,.95),12);
+ const fovea=c==='cra'?0xc81e1e:0x7a3a10;
+ dot(eye,[0,-1.34,0],c==='cra'?0xe02020:0xf2d04a,.17);dot(eye,[0,-1.38,0],fovea,.07);
+ dot(eye,[.35,-1.37,0],0xffffff,.12);
+ const L=[{t:'Cornea',p:[1.5,0,0]},{t:'Iris / pupil',p:[1.05,1.05,0]},{t:'Lens',p:[.8,-.6,0]},{t:'Anterior chamber',p:[1.4,.7,0]},{t:'Vitreous',p:[-.2,0,0]},{t:'Retina',p:[-1.45,1,0]},{t:'Choroid',p:[-1.7,-.8,0]},{t:'Sclera',p:[-1.9,-1.2,0]},{t:'Macula / fovea',p:[-1.5,.05,0]},{t:'Optic disc / nerve',p:[-2,.5,0]},{t:'Trabecular meshwork / canal of Schlemm',p:[.8,1.7,0]},{t:'Ciliary body',p:[.9,.55,0]}];
+ const infos={norm:'<ul><li>Light path: cornea → aqueous (anterior chamber) → pupil → lens → vitreous → retina (macula/fovea for central vision).</li><li>Aqueous is made by the ciliary body, passes through the pupil, and drains through the <b>trabecular meshwork / canal of Schlemm</b> at the iridocorneal angle.</li><li>The cutaway is oriented with the front on the right; rotate to explore.</li></ul>',
+  ac:'<ul><li><b>Acute angle-closure</b>: the peripheral iris bows forward against the trabecular meshwork (red), blocking aqueous drainage → rapid IOP rise.</li><li>Painful red eye, halos, headache, nausea/vomiting, <b>mid-dilated fixed pupil</b>, hazy cornea. An emergency.</li><li>Treat: lower IOP (acetazolamide, topical beta-blocker, alpha agonist, pilocarpine once IOP falls) then laser peripheral iridotomy. Avoid mydriatics.</li></ul>',
+  rd:'<ul><li><b>Retinal detachment</b>: fluid passes through a tear and separates the neurosensory retina from the pigment epithelium/choroid (shown lifted).</li><li>Flashes, new floaters, then a “curtain” over part of the visual field; painless.</li><li>Emergency: laser/cryo for tears; pneumatic retinopexy, scleral buckle or vitrectomy for detachment.</li></ul>',
+  cra:'<ul><li><b>Central retinal artery occlusion</b>: sudden, painless monocular vision loss.</li><li>The retina turns pale (ischemic) while the fovea stays red: <b>cherry-red spot</b>, because it is supplied by the choroid.</li><li>Embolic source (carotid, heart); consider giant cell arteritis. Ocular emergency.</li></ul>'};
+ return{labels:L,info:infos[c]};
+}};
+
+/* ---------- UI ---------- */
+const tabs=document.getElementById('tabs'),ctlBox=document.getElementById('controls'),infoBox=document.getElementById('info'),titleEl=document.getElementById('title');
+let cur=null,st={},labels=[],update=null,labEls=[];
+function showLabels(){return true}
+function render(){
+ while(root.children.length)root.remove(root.children[0]);
+ labBox.innerHTML='';labEls=[];
+ const g=new THREE.Group();root.add(g);
+ const r=cur.build(g,st);
+ g.position.set(-cur.center[0],-cur.center[1],-cur.center[2]);
+ labels=r.labels||[];update=r.update||null;
+ labels.forEach(l=>{const e=document.createElement('div');e.className='lab';e.textContent=l.t;labBox.appendChild(e);labEls.push(e);});
+ infoBox.innerHTML=r.info||'';
+}
+function openScene(k){
+ cur=SC[k];st={};
+ [...tabs.children].forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+ titleEl.textContent=cur.title;ctlBox.innerHTML='';
+ cur.controls.forEach(c=>{
+  st[c.k]=c.def;
+  const w=document.createElement('div');
+  if(c.type==='chk'){w.className='chk';const i=document.createElement('input');i.type='checkbox';i.checked=!!c.def;i.id='c_'+c.k;i.onchange=()=>{st[c.k]=i.checked;render();};const l=document.createElement('label');l.htmlFor=i.id;l.textContent=c.label;w.append(i,l);}
+  else{w.className='ctl';const l=document.createElement('label');l.textContent=c.label;const s=document.createElement('select');c.opts.forEach(o=>{const op=document.createElement('option');op.value=o[0];op.textContent=o[1];s.appendChild(op);});s.value=c.def;s.onchange=()=>{st[c.k]=s.value;render();};w.append(l,s);}
+  ctlBox.appendChild(w);});
+ root.rotation.set(cur.rot[0],cur.rot[1],0);cam.position.z=cur.zoom;
+ render();
+}
+Object.keys(SC).forEach(k=>{const b=document.createElement('button');b.textContent=SC[k].tab;b.dataset.k=k;b.onclick=()=>{openScene(k);location.hash=k;};tabs.appendChild(b);});
+
+/* ---------- interaction ---------- */
+let drag=false,px=0,py=0;
+cv.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing';});
+cv.addEventListener('pointerup',()=>{drag=false;cv.style.cursor='grab';});
+cv.addEventListener('pointermove',e=>{if(!drag)return;root.rotation.y+=(e.clientX-px)*.008;root.rotation.x=Math.max(-1.5,Math.min(1.5,root.rotation.x+(e.clientY-py)*.008));px=e.clientX;py=e.clientY;});
+cv.addEventListener('wheel',e=>{e.preventDefault();cam.position.z=Math.max(3,Math.min(16,cam.position.z*(1+e.deltaY*.001)));},{passive:false});
+
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+addEventListener('resize',resize);
+
+const clock=new THREE.Clock();
+function frame(){
+ requestAnimationFrame(frame);
+ const t=clock.getElapsedTime();
+ if(update)update(t);
+ root.updateMatrixWorld(true);
+ const w=stage.clientWidth,h=stage.clientHeight;
+ labels.forEach((l,i)=>{const v=root.localToWorld(V(l.p[0]-cur.center[0],l.p[1]-cur.center[1],l.p[2]-cur.center[2]));v.project(cam);
+  const e=labEls[i];e.style.transform=`translate(${(v.x*.5+.5)*w+8}px,${(-v.y*.5+.5)*h}px) translateY(-50%)`;e.style.display=v.z>1?'none':'block';});
+ renderer.render(scene,cam);
+}
+resize();openScene(location.hash.slice(1) in SC?location.hash.slice(1):'heart');frame();
+</script>
+</body>
+</html>
