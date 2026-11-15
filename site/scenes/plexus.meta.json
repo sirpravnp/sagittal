@@ -1,0 +1,55 @@
+{
+  "id": "plexus",
+  "title": "Brachial plexus and its injuries",
+  "topic": "Orthopedics",
+  "variantControl": "v",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal plexus"
+    },
+    {
+      "key": "erb",
+      "label": "Erb palsy (upper trunk, C5-C6)"
+    },
+    {
+      "key": "klumpke",
+      "label": "Klumpke palsy (lower trunk, C8-T1)"
+    },
+    {
+      "key": "lt",
+      "label": "Long thoracic nerve injury"
+    },
+    {
+      "key": "rad",
+      "label": "Radial nerve: midshaft humerus fracture"
+    }
+  ],
+  "claims": [
+    "The brachial plexus is formed by the anterior rami of C5-T1 and is organised as roots, trunks, divisions, cords and terminal branches.",
+    "C5+C6 form the upper trunk, C7 continues as the middle trunk, and C8+T1 form the lower trunk.",
+    "Each trunk splits behind the clavicle into an anterior and a posterior division.",
+    "The lateral cord (C5-C7) comes from the anterior divisions of the upper and middle trunks, the medial cord (C8-T1) from the anterior division of the lower trunk, and the posterior cord (C5-T1) from all three posterior divisions.",
+    "Cords are named for their position around the second part of the axillary artery, behind pectoralis minor.",
+    "Lateral cord gives the musculocutaneous nerve and the lateral root of the median nerve; medial cord gives the ulnar nerve and the medial root of the median nerve; posterior cord gives the axillary and radial nerves.",
+    "The long thoracic nerve (C5-C7) arises from the roots and supplies serratus anterior; the suprascapular nerve arises from the upper trunk.",
+    "Erb palsy is an upper trunk (C5-C6) injury from excessive lateral neck flexion away from the shoulder (e.g. shoulder dystocia, falls on the shoulder).",
+    "Erb palsy loses deltoid and supraspinatus (abduction), infraspinatus and teres minor (lateral rotation) and biceps (flexion, supination), giving the waiter's tip posture: arm adducted, medially rotated, elbow extended, forearm pronated, wrist flexed.",
+    "Klumpke palsy is a lower trunk (C8-T1) injury from traction on an abducted arm (e.g. grabbing a branch while falling, breech delivery with arm overhead).",
+    "Klumpke palsy paralyses the intrinsic hand muscles, giving a total claw hand (MCP extension, IP flexion).",
+    "A T1 root avulsion in Klumpke palsy can interrupt preganglionic sympathetic fibres to the cervicothoracic (stellate) ganglion, causing Horner syndrome (ptosis, miosis, anhidrosis).",
+    "Long thoracic nerve injury (e.g. axillary node dissection, mastectomy, stab wounds) paralyses serratus anterior: winged scapula (the medial border lifts off the chest wall, worse on pushing against a wall) and difficulty abducting the arm above horizontal.",
+    "A midshaft humerus fracture can injure the radial nerve in the radial (spiral) groove, giving wrist drop (loss of wrist and finger extension) and loss of sensation over the dorsal first web space.",
+    "In radial nerve injury at the spiral groove, triceps is usually spared because its branches arise proximal to the groove.",
+    "A surgical neck fracture of the humerus or an anterior shoulder dislocation endangers the axillary nerve (deltoid, teres minor, regimental badge sensation)."
+  ],
+  "sources": [
+    "StatPearls (NCBI Bookshelf): Anatomy, Shoulder and Upper Limb, Brachial Plexus",
+    "StatPearls (NCBI Bookshelf): Erb Palsy",
+    "StatPearls (NCBI Bookshelf): Klumpke Palsy",
+    "StatPearls (NCBI Bookshelf): Anatomy, Thorax, Long Thoracic Nerve",
+    "StatPearls (NCBI Bookshelf): Radial Nerve Injury",
+    "Z-Anatomy, the libre 3D atlas of anatomy (CC BY-SA 4.0), based on BodyParts3D (DBCLS, CC BY-SA 2.1 JP). https://github.com/Z-Anatomy/Models-of-human-anatomy"
+  ],
+  "status": "unreviewed"
+}

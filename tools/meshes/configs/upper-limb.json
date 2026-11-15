@@ -1,0 +1,22 @@
+{
+  "name": "upper-limb",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), right shoulder girdle, cervical/upper thoracic spine, ribs 1-8 and neck/shoulder muscles, extracted with tools/meshes/extract_blend.py into sagittal-assets-cache/zanatomy-limb/obj. The brachial plexus nerves are drawn in site/scenes/plexus.js as tubes along Z-Anatomy's own nerve centre lines, so they are not baked here.",
+  "source_root": "${ASSETS}/zanatomy-limb/obj",
+  "transform": "zanatomy",
+  "center": "none",
+  "default_budget": 1500,
+  "parts": {
+    "spine": { "files": ["Vertebra_C[3-7].obj", "Vertebra_T[1-8].obj"], "budget": 6000 },
+    "rib1": { "files": ["First_rib.r.obj"], "budget": 1100 },
+    "ribs": { "files": ["Second_rib.r.obj", "Third_rib.r.obj", "Fourth_rib.r.obj", "Fifth_rib.r.obj", "Sixth_rib.r.obj", "Seventh_rib.r.obj", "Eighth_rib.r.obj"], "budget": 4800 },
+    "manubrium": { "files": ["Manubrium_of_sternum.obj"], "budget": 500 },
+    "clavicle": { "files": ["Clavicle.r.obj"], "budget": 1200 },
+    "scapula": { "files": ["Scapula.r.obj"], "budget": 3400 },
+    "humerus": { "files": ["Humerus.r.obj"], "budget": 2600 },
+    "scalenus_anterior": { "files": ["Scalenus_anterior_muscle.r.obj"], "budget": 700, "smooth": 2 },
+    "scalenus_medius": { "files": ["Scalenus_medius_muscle.r.obj"], "budget": 800, "smooth": 2 },
+    "serratus_anterior": { "files": ["Serratus_anterior_muscle.r.obj"], "budget": 3000 }
+  }
+}
