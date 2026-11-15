@@ -65,3 +65,29 @@ test('impossible fit still returns positions clamped inside bounds', () => {
   const pos = layoutLabels(anchors, bounds);
   assertInside(rects(anchors, pos), bounds);
 });
+
+test('labels never cover an obstacle (anchor dot) when there is room', () => {
+  const bounds = { w: 400, h: 300 };
+  const dot = { x: 96, y: 96, w: 9, h: 9 };
+  const anchors = [{ x: 90, y: 92, w: 60, h: 16 }];
+  const pos = layoutLabels(anchors, bounds, [dot]);
+  const r = rects(anchors, pos)[0];
+  assert.ok(!overlap(r, dot), 'label covers the obstacle');
+  assertInside([r], bounds);
+});
+
+test('a label flips to the other side of its dot when the preferred side is taken', () => {
+  const bounds = { w: 300, h: 300 };
+  // a full-height label occupies the space right of the second anchor's dot (at x 200)
+  const anchors = [{ x: 216, y: 0, w: 80, h: 300 }, { x: 216, y: 100, w: 60, h: 16, lx: 124 }];
+  const pos = layoutLabels(anchors, bounds, [{ x: 196, y: 104, w: 9, h: 9 }]);
+  const rs = rects(anchors, pos);
+  assertNoOverlap(rs);
+  assert.ok(pos[1].x + 60 <= 196, 'label moved to the left of its dot');
+  assert.equal(pos[1].y, 100);
+});
+
+test('obstacles are optional and do not change the default result', () => {
+  const anchors = [{ x: 50, y: 60, w: 40, h: 12 }];
+  assert.deepEqual(JSON.parse(JSON.stringify(layoutLabels(anchors, { w: 400, h: 300 }, []))), [{ x: 50, y: 60 }]);
+});

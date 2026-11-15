@@ -6,6 +6,9 @@ const readJson = (n) => JSON.parse(readFileSync(new URL(n, dir), 'utf8'));
 const ids = readJson('index.json');
 
 const WIDTHS = [1200, 375];
+// Longest allowed leader line (px): a label further than this from its anchor reads as floating.
+const MAX_LEADER = 90;
+const MAX_LEADER_NARROW = 140;
 
 for (const id of ids) {
   const meta = readJson(`${id}.meta.json`);
@@ -22,10 +25,15 @@ for (const id of ids) {
         await page.goto(`viewer.html?scene=${id}&${meta.variantControl}=${key}`);
         await page.waitForFunction(() => window.viewer && window.viewer.debug().labelRects.length > 0);
         await page.waitForTimeout(100);
-        const { rects, cw, ch, nonBlank } = await page.evaluate(() => {
+        const { rects, leaders, lines, dots, cw, ch, nonBlank } = await page.evaluate(() => {
           const c = document.querySelector('canvas');
           const d = window.viewer.debug();
-          return { rects: d.labelRects, cw: c.clientWidth, ch: c.clientHeight, nonBlank: d.nonBlank };
+          const svg = document.querySelector('#labels svg.kit-leaders');
+          return {
+            rects: d.labelRects, leaders: d.leaders, cw: c.clientWidth, ch: c.clientHeight, nonBlank: d.nonBlank,
+            lines: svg ? [...svg.querySelectorAll('line.kit-leader')].filter((l) => l.parentNode.style.display !== 'none').length : 0,
+            dots: svg ? [...svg.querySelectorAll('circle.kit-anchor')].filter((l) => l.parentNode.style.display !== 'none').length : 0,
+          };
         });
         const tag = `${id}/${key}@${width}`;
         expect(nonBlank, tag).toBe(true);
@@ -36,6 +44,23 @@ for (const id of ids) {
           expect(r.x + r.w, tag).toBeLessThanOrEqual(cw + 0.5);
           expect(r.y + r.h, tag).toBeLessThanOrEqual(ch + 0.5);
         }
+        // Every label has an anchor dot on the stage and a leader line that ends on its chip,
+        // and its anchor is on a visible surface (or the scene marks it as deliberately behind).
+        expect(leaders.length, tag).toBe(rects.length);
+        expect(lines, tag).toBe(rects.length);
+        expect(dots, tag).toBe(rects.length);
+        leaders.forEach((l, i) => {
+          expect(l, `${tag}: label ${i} anchor is off-stage`).not.toBeNull();
+          const lt = `${tag} "${l.text}"`;
+          for (const [x, y] of [[l.ax, l.ay], [l.x2, l.y2]]) {
+            expect(x, lt).toBeGreaterThanOrEqual(0); expect(x, lt).toBeLessThanOrEqual(cw + 0.5);
+            expect(y, lt).toBeGreaterThanOrEqual(0); expect(y, lt).toBeLessThanOrEqual(ch + 0.5);
+          }
+          const r = rects[i];
+          expect(l.x2 >= r.x - 0.5 && l.x2 <= r.x + r.w + 0.5 && l.y2 >= r.y - 0.5 && l.y2 <= r.y + r.h + 0.5, `${lt}: leader ends on its label`).toBe(true);
+          expect(l.len, `${lt}: label is close to its anchor`).toBeLessThanOrEqual(width < 600 ? MAX_LEADER_NARROW : MAX_LEADER);
+          if (!l.behind) expect(l.occluded, `${lt}: anchor is hidden behind another structure`).toBe(false);
+        });
         for (let i = 0; i < rects.length; i++) {
           for (let j = i + 1; j < rects.length; j++) {
             const a = rects[i], b = rects[j];

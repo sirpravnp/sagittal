@@ -3,7 +3,12 @@
 (function () {
   var THREE = window.THREE;
   var BG_RGB = [0x0f, 0x14, 0x1b]; // #0f141b, the clear colour, written to the framebuffer as-is
-  var LABEL_OFFSET_X = 8;
+  // Labels sit LABEL_GAP px beside an anchor dot and are joined to it by a leader line.
+  var LABEL_GAP = 16, DOT_R = 3.5;
+  // Occlusion test (see occlusion() below): surfaces at least this opaque hide what is behind them,
+  // and an anchor this close (world units) behind the first surface still counts as on it.
+  var OCC_MIN_OPACITY = 0.7, OCC_TOL = 0.3, SURF_TOL = 0.04;
+  var SVGNS = 'http://www.w3.org/2000/svg';
   // Modern colour workflow: hex colours are sRGB, lighting runs in linear space, output is sRGB.
   if (THREE.ColorManagement) THREE.ColorManagement.legacyMode = false;
   var FALLBACK_TEXT = '3D is not available in this browser (WebGL could not start). The notes and claims for this scene are still shown.';
@@ -268,6 +273,8 @@
 
     var cur = null, st = {}, labels = [], labEls = [], labSizes = [], update = null;
     var labelsOn = true, rects = [], running = false;
+    var leadSvg = null, leadEls = [], leads = [], occ = [], anchorIdx = [], onPts = [], occDirty = true, occMeshes = null, dragging = false;
+    var raycaster = new THREE.Raycaster(), tmpDir = new THREE.Vector3();
     var clock = new THREE.Clock();
     var tmp = new THREE.Vector3();
 
@@ -299,11 +306,36 @@
       var r = cur.build(g, st) || {};
       g.position.set(-cur.center[0], -cur.center[1], -cur.center[2]);
       labels = r.labels || []; update = r.update || null;
+      // Leader lines and anchor dots: one SVG under the label chips. Inline styles, so the same
+      // markup works in the viewer, the card renderer and the Anki 3D template (no page CSS needed).
+      leadSvg = document.createElementNS(SVGNS, 'svg');
+      leadSvg.setAttribute('class', 'kit-leaders');
+      leadSvg.setAttribute('aria-hidden', 'true');
+      leadSvg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none';
+      labelsEl.appendChild(leadSvg);
+      leadEls = [];
       labels.forEach(function (l) {
+        var lg = document.createElementNS(SVGNS, 'g');
+        var halo = document.createElementNS(SVGNS, 'line');
+        halo.setAttribute('stroke', 'rgba(15,20,27,0.75)'); halo.setAttribute('stroke-width', '3.5'); halo.setAttribute('stroke-linecap', 'round');
+        var ln = document.createElementNS(SVGNS, 'line');
+        ln.setAttribute('class', 'kit-leader');
+        ln.setAttribute('stroke', '#f2f5fa'); ln.setAttribute('stroke-width', '1.4'); ln.setAttribute('stroke-linecap', 'round');
+        var dt = document.createElementNS(SVGNS, 'circle');
+        dt.setAttribute('class', 'kit-anchor');
+        dt.setAttribute('r', String(DOT_R)); dt.setAttribute('fill', '#f2f5fa');
+        dt.setAttribute('stroke', 'rgba(15,20,27,0.9)'); dt.setAttribute('stroke-width', '1.5');
+        lg.appendChild(halo); lg.appendChild(ln); lg.appendChild(dt);
+        leadSvg.appendChild(lg);
+        leadEls.push({ g: lg, halo: halo, line: ln, dot: dt });
         var e = document.createElement('div'); e.className = 'lab'; e.textContent = l.t;
         labelsEl.appendChild(e); labEls.push(e);
       });
       labSizes = labEls.map(function () { return null; });
+      occ = labels.map(function () { return false; });
+      anchorIdx = labels.map(function () { return 0; });
+      onPts = labels.map(function () { return null; });
+      occDirty = true; occMeshes = null;
       if (infoEl) infoEl.innerHTML = r.info || '';
       if (renderer) frame(true);
     }
@@ -332,28 +364,190 @@
       });
     }
 
+    // A label is { t, p, alt?, on?, side?, behind? }.
+    // alt: further anchor points on the same structure (scene coordinates, like p); when p is hidden
+    //   in the current view the first visible one is used.
+    // on: the mesh (or meshes) the label names; the dot goes on the visible surface of that mesh,
+    //   at the vertex nearest to p that the camera sees (p itself may be inside, e.g. a centre line).
+    //   alt is ignored when on is given.
+    // side: 'left' puts the chip left of its dot (default right).
+    // behind: the anchor is deliberately hidden (a structure drawn x-ray style); drawn dashed.
+    function anchorPoint(i) {
+      var l = labels[i], k = anchorIdx[i] || 0;
+      if (k < 0 && onPts[i]) return onPts[i];
+      return k > 0 && l.alt && l.alt[k - 1] ? l.alt[k - 1] : l.p;
+    }
+    function labelWorld(p, out) {
+      out.set(p[0] - cur.center[0], p[1] - cur.center[1], p[2] - cur.center[2]);
+      return root.localToWorld(out);
+    }
+
+    // Surfaces that can hide an anchor: visible, mostly opaque, depth-tested meshes.
+    function occluders() {
+      var list = [];
+      root.traverseVisible(function (o) {
+        if (!o.isMesh || !o.geometry) return;
+        var ms = Array.isArray(o.material) ? o.material : [o.material];
+        var m = ms[0];
+        if (!m || m.visible === false || m.depthTest === false || m.colorWrite === false) return;
+        if (m.transparent && m.opacity < OCC_MIN_OPACITY) return;
+        list.push(o);
+      });
+      return list;
+    }
+
+    function clippedAway(hit) {
+      var m = hit.object.material;
+      m = Array.isArray(m) ? m[0] : m;
+      var planes = m && m.clippingPlanes;
+      if (!planes || !planes.length) return false;
+      for (var i = 0; i < planes.length; i++) if (planes[i].distanceToPoint(hit.point) < 0) return true;
+      return false;
+    }
+
+    // An anchor is hidden when the first opaque surface on the ray from the camera belongs to an
+    // object that the ray has already left again before reaching the anchor (the anchor is not on
+    // or inside that object) and that surface lies more than OCC_TOL in front of the anchor.
+    // Cost: one raycast per label, run only when the view settles (not while dragging).
+    function occlusion() {
+      if (!occMeshes) occMeshes = occluders();
+      root.updateMatrixWorld(true);
+      var camPos = cam.position;
+      // Count both faces (entry and exit) whatever side the material renders, so parity works.
+      var sides = occMeshes.map(function (o) { var m = Array.isArray(o.material) ? o.material[0] : o.material; var sd = m.side; m.side = THREE.DoubleSide; return [m, sd]; });
+      try { return occlusionRays(camPos); } finally { sides.forEach(function (ms) { ms[0].side = ms[1]; }); }
+    }
+    function hiddenPoint(p, camPos) {
+      labelWorld(p, tmp);
+      var dist = tmp.distanceTo(camPos);
+      if (dist <= OCC_TOL) return false;
+      tmpDir.copy(tmp).sub(camPos).normalize();
+      raycaster.set(camPos, tmpDir);
+      raycaster.near = 0; raycaster.far = dist + OCC_TOL;
+      var hits = raycaster.intersectObjects(occMeshes, false).filter(function (hh) { return !clippedAway(hh); });
+      if (!hits.length || hits[0].distance >= dist - OCC_TOL) return false;
+      var first = hits[0].object, n = 0;
+      for (var i = 0; i < hits.length && hits[i].distance < dist; i++) if (hits[i].object === first) n++;
+      return n % 2 === 0; // even: the ray entered and left the first object before the anchor
+    }
+    // A point on a mesh surface is visible when it is itself the first opaque hit from the camera.
+    function surfaceVisible(p, camPos) {
+      labelWorld(p, tmp);
+      var dist = tmp.distanceTo(camPos);
+      tmpDir.copy(tmp).sub(camPos).normalize();
+      raycaster.set(camPos, tmpDir);
+      raycaster.near = 0; raycaster.far = dist + OCC_TOL;
+      var hits = raycaster.intersectObjects(occMeshes, false).filter(function (hh) { return !clippedAway(hh); });
+      return !hits.length || hits[0].distance >= dist - SURF_TOL;
+    }
+    var ON_SAMPLES = 400, ON_TRIES = 48, vtx = new THREE.Vector3();
+    // Vertices of the label's `on` mesh(es) in label coordinates, nearest to p first.
+    function onCandidates(l) {
+      var objs = [], out = [], c = cur.center;
+      (Array.isArray(l.on) ? l.on : [l.on]).forEach(function (o) {
+        if (o) o.traverseVisible(function (m) { if (m.isMesh) objs.push(m); }); // a mesh, or every mesh in a group
+      });
+      var camPos = cam.position, nm = new THREE.Matrix3(), nv = new THREE.Vector3(), wv = new THREE.Vector3();
+      objs.forEach(function (o) {
+        if (!o.geometry || !o.geometry.attributes.position) return;
+        o.updateWorldMatrix(true, false);
+        nm.getNormalMatrix(o.matrixWorld);
+        var pos = o.geometry.attributes.position, nrm = o.geometry.attributes.normal;
+        var mt = Array.isArray(o.material) ? o.material[0] : o.material, planes = (mt && mt.clippingPlanes) || [];
+        // sample through the index when there is one: only vertices of drawn triangles
+        var ix = o.geometry.index, cnt = ix ? ix.count : pos.count;
+        var step = Math.max(1, Math.floor(cnt / ON_SAMPLES));
+        for (var jj = 0; jj < cnt; jj += step) {
+          var j = ix ? ix.getX(jj) : jj;
+          vtx.fromBufferAttribute(pos, j); o.localToWorld(vtx);
+          var cut = false;
+          for (var q = 0; q < planes.length; q++) if (planes[q].distanceToPoint(vtx) < 0) cut = true;
+          if (cut) continue; // clipped away: not drawn
+          wv.copy(vtx).project(cam);
+          if (wv.x < -0.94 || wv.x > 0.94 || wv.y < -0.94 || wv.y > 0.94 || wv.z > 1) continue; // off the stage
+          if (nrm) { // only points that face the camera (not grazing silhouettes)
+            nv.fromBufferAttribute(nrm, j).applyMatrix3(nm).normalize();
+            wv.copy(camPos).sub(vtx).normalize();
+            var f = nv.dot(wv);
+            if (Math.abs(f) < 0.2) continue; // abs: double-sided parts may have inward normals
+          }
+          root.worldToLocal(vtx);
+          out.push([vtx.x + c[0], vtx.y + c[1], vtx.z + c[2]]);
+        }
+      });
+      var d2 = function (q) { return (q[0] - l.p[0]) * (q[0] - l.p[0]) + (q[1] - l.p[1]) * (q[1] - l.p[1]) + (q[2] - l.p[2]) * (q[2] - l.p[2]); };
+      out.sort(function (a, b) { return d2(a) - d2(b); });
+      // the nearest ON_TRIES / 2, then an even spread over the rest (the visible stretch may be far)
+      var head = out.slice(0, ON_TRIES / 2), rest = out.slice(ON_TRIES / 2), k = Math.max(1, rest.length / (ON_TRIES / 2));
+      for (var r = 0; r < rest.length; r += k) head.push(rest[Math.floor(r)]);
+      return head;
+    }
+    // Sets anchorIdx (0 = p, k = alt[k-1], -1 = onPts[i]) to the first visible candidate;
+    // returns hidden flags.
+    function occlusionRays(camPos) {
+      return labels.map(function (l, i) {
+        var cands = l.on ? [] : [l.p].concat(l.alt || []);
+        for (var k = 0; k < cands.length; k++) {
+          if (!hiddenPoint(cands[k], camPos)) { anchorIdx[i] = k; return false; }
+        }
+        if (l.on) {
+          var on = onCandidates(l);
+          // try the nearest vertices first, then a spread of farther ones
+          for (var t = 0; t < on.length; t++) {
+            if (surfaceVisible(on[t], camPos)) { anchorIdx[i] = -1; onPts[i] = on[t]; return false; }
+          }
+        }
+        anchorIdx[i] = 0;
+        return true;
+      });
+    }
+
     function placeLabels() {
-      rects = [];
+      rects = []; leads = [];
       if (!labelsOn || !labEls.length) return;
       var s = size();
-      var anchors = [], idx = [];
+      var anchors = [], idx = [], dots = [], obst = [];
       root.updateMatrixWorld(true);
+      if (occDirty && !dragging) {
+        try { occ = occlusion(); } catch (err) { occ = labels.map(function () { return false; }); }
+        occDirty = false;
+      }
       labels.forEach(function (l, i) {
-        tmp.set(l.p[0] - cur.center[0], l.p[1] - cur.center[1], l.p[2] - cur.center[2]);
-        root.localToWorld(tmp); tmp.project(cam);
-        var e = labEls[i];
-        if (tmp.z > 1) { e.style.display = 'none'; return; }
-        e.style.display = 'block';
+        labelWorld(anchorPoint(i), tmp); tmp.project(cam);
+        var e = labEls[i], le = leadEls[i];
+        var dx = (tmp.x * 0.5 + 0.5) * s.w, dy = (-tmp.y * 0.5 + 0.5) * s.h;
+        var inStage = dx >= 0 && dy >= 0 && dx <= s.w && dy <= s.h;
+        // behind the camera, or off the stage (e.g. a narrow phone): a label with nothing to point
+        // at is hidden rather than pinned to the edge
+        if (tmp.z > 1 || !inStage) { e.style.display = 'none'; le.g.style.display = 'none'; return; }
+        e.style.display = 'block'; le.g.style.display = '';
         if (!labSizes[i]) labSizes[i] = { w: e.offsetWidth, h: e.offsetHeight };
         var sz = labSizes[i];
-        anchors.push({ x: (tmp.x * 0.5 + 0.5) * s.w + LABEL_OFFSET_X, y: (-tmp.y * 0.5 + 0.5) * s.h - sz.h / 2, w: sz.w, h: sz.h });
+        var rx = dx + LABEL_GAP, lx = dx - LABEL_GAP - sz.w, left = l.side === 'left';
+        anchors.push({ x: left ? lx : rx, lx: left ? rx : lx, y: dy - sz.h / 2, w: sz.w, h: sz.h });
+        dots.push({ x: dx, y: dy });
+        obst.push({ x: dx - DOT_R - 1, y: dy - DOT_R - 1, w: 2 * DOT_R + 2, h: 2 * DOT_R + 2 });
         idx.push(i);
       });
-      var pos = window.KitLabels.layoutLabels(anchors, { w: s.w, h: s.h });
+      var pos = window.KitLabels.layoutLabels(anchors, { w: s.w, h: s.h }, obst);
       pos.forEach(function (p, k) {
-        var e = labEls[idx[k]];
+        var i = idx[k], e = labEls[i], le = leadEls[i], a = anchors[k], d = dots[k];
         e.style.transform = 'translate(' + p.x.toFixed(1) + 'px,' + p.y.toFixed(1) + 'px)';
-        rects.push({ x: p.x, y: p.y, w: anchors[k].w, h: anchors[k].h });
+        var hidden = !!occ[i];
+        e.style.opacity = hidden ? '0.7' : '';
+        e.style.borderStyle = hidden ? 'dashed' : '';
+        rects.push({ x: p.x, y: p.y, w: a.w, h: a.h });
+        // leader: from the anchor dot to the nearest point of the label chip
+        var ex = Math.max(p.x, Math.min(d.x, p.x + a.w)), ey = Math.max(p.y, Math.min(d.y, p.y + a.h));
+        [le.halo, le.line].forEach(function (ln) {
+          ln.setAttribute('x1', d.x.toFixed(1)); ln.setAttribute('y1', d.y.toFixed(1));
+          ln.setAttribute('x2', ex.toFixed(1)); ln.setAttribute('y2', ey.toFixed(1));
+        });
+        le.line.setAttribute('stroke-dasharray', hidden ? '3 3' : '');
+        le.dot.setAttribute('cx', d.x.toFixed(1)); le.dot.setAttribute('cy', d.y.toFixed(1));
+        le.dot.setAttribute('fill', hidden ? 'rgba(15,20,27,0.9)' : '#f2f5fa');
+        le.dot.setAttribute('stroke', hidden ? '#f2f5fa' : 'rgba(15,20,27,0.9)');
+        leads.push({ ax: d.x, ay: d.y, x2: ex, y2: ey, len: Math.hypot(ex - d.x, ey - d.y), occluded: hidden, label: i });
       });
     }
 
@@ -367,11 +561,11 @@
     }
 
     if (renderer) {
-      if (window.ResizeObserver) new ResizeObserver(function () { resize(); if (cur) frame(true); }).observe(canvas);
+      if (window.ResizeObserver) new ResizeObserver(function () { resize(); occDirty = true; if (cur) frame(true); }).observe(canvas);
       window.addEventListener('resize', resize);
 
       // Orbit (one pointer) and pinch / wheel zoom.
-      var pts = {}, pinch0 = 0, zoom0 = 0;
+      var pts = {}, pinch0 = 0, zoom0 = 0, wheelT = 0;
       function clampZoom(z) { return Math.max(3, Math.min(16, z)); }
       function count() { return Object.keys(pts).length; }
       function pinchDist() {
@@ -383,10 +577,11 @@
         try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
         if (count() === 2) { pinch0 = pinchDist(); zoom0 = cam.position.z; }
         canvas.classList.add('dragging');
+        dragging = true;
       });
       function up(e) {
         delete pts[e.pointerId];
-        if (!count()) canvas.classList.remove('dragging');
+        if (!count()) { canvas.classList.remove('dragging'); dragging = false; occDirty = true; }
       }
       canvas.addEventListener('pointerup', up);
       canvas.addEventListener('pointercancel', up);
@@ -404,6 +599,8 @@
       canvas.addEventListener('wheel', function (e) {
         e.preventDefault();
         cam.position.z = clampZoom(cam.position.z * (1 + e.deltaY * 0.001));
+        clearTimeout(wheelT);
+        wheelT = setTimeout(function () { occDirty = true; }, 150);
       }, { passive: false });
     }
 
@@ -414,6 +611,7 @@
       st = initialState(def, state);
       root.rotation.set(def.rot[0], def.rot[1], 0);
       cam.position.z = def.zoom;
+      occDirty = true;
       buildControls();
       resize();
       rebuild();
@@ -449,9 +647,33 @@
       debug: function () {
         return {
           labelRects: rects.map(function (r) { return { x: r.x, y: r.y, w: r.w, h: r.h }; }),
+          // per placed label (same order as labelRects): anchor dot, leader end on the chip, length,
+          // and whether the anchor is hidden behind another surface; null when the anchor is off-stage
+          leaders: leads.map(function (d) { return d && { ax: d.ax, ay: d.ay, x2: d.x2, y2: d.y2, len: d.len, occluded: d.occluded, text: labels[d.label].t, behind: !!labels[d.label].behind }; }),
           // computed lazily: rendering + readPixels is costly on software GL
           get nonBlank() { return nonBlank(); },
           rot: [root.rotation.x, root.rotation.y],
+          // Authoring aid: the surfaces under stage pixel (x, y), nearest first (up to 4, including
+          // see-through ones). Each: mesh name, opacity, the hit in that mesh's own frame (e.g. mesh cm
+          // for a baked part) and in scene label coordinates (what a label's p takes). The first entry
+          // with opaque: true is what hides anchors behind it.
+          pick: function (x, y) {
+            if (!cur) return [];
+            var s = size(), list = [];
+            root.updateMatrixWorld(true);
+            root.traverseVisible(function (o) { if (o.isMesh && o.geometry) list.push(o); });
+            var occl = occluders();
+            raycaster.setFromCamera(new THREE.Vector2(x / s.w * 2 - 1, -(y / s.h) * 2 + 1), cam);
+            raycaster.near = 0; raycaster.far = Infinity;
+            var r2 = function (v) { return [v.x, v.y, v.z].map(function (n) { return Math.round(n * 100) / 100; }); };
+            return raycaster.intersectObjects(list, false).filter(function (hh) { return !clippedAway(hh); }).slice(0, 4).map(function (hit) {
+              var m = Array.isArray(hit.object.material) ? hit.object.material[0] : hit.object.material;
+              var sc = root.worldToLocal(hit.point.clone()).add(new THREE.Vector3(cur.center[0], cur.center[1], cur.center[2]));
+              return { object: hit.object.name || hit.object.type, tissue: m.userData.tissue || null,
+                color: m.color ? '#' + m.color.getHexString() : null, opacity: m.opacity, opaque: occl.indexOf(hit.object) >= 0,
+                local: r2(hit.object.worldToLocal(hit.point.clone())), scene: r2(sc) };
+            });
+          },
         };
       },
     };
