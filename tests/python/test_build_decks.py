@@ -212,7 +212,7 @@ def test_3d_template_safe():
 def test_3d_model_name_and_id():
     m = build_decks.make_model_3d()
     assert m.name == "Anatomy 3D (experimental)"
-    assert m.model_id == build_decks.stable_id("sagittal-model-3d-v1")
+    assert m.model_id == build_decks.stable_id("sagittal-model-3d-v2")
     assert [f["name"] for f in m.fields] == ["Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Credit"]
 
 

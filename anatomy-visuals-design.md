@@ -1,5 +1,7 @@
 # Anatomy Visuals for Medical Students: Design
 
+> Historical 2026-11-14 design, superseded by `docs/superpowers/specs/2026-11-15-sagittal-text-to-image-design.md`, which removed the unreviewed badge.
+
 Date: 2026-11-14. Status: draft for approval.
 
 ## Intent and why

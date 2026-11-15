@@ -97,7 +97,7 @@ def slugify(topic: str) -> str:
 
 def make_model() -> genanki.Model:
     return genanki.Model(
-        stable_id("sagittal-model-v1"),
+        stable_id("sagittal-model-v2"),
         MODEL_NAME,
         fields=[{"name": n} for n in ("Title", "Front", "Back", "Claims", "Credit")],
         templates=[{
@@ -127,7 +127,7 @@ CSS_3D = CSS + """
 def make_model_3d() -> genanki.Model:
     fields = ("Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Credit")
     return genanki.Model(
-        stable_id("sagittal-model-3d-v1"),
+        stable_id("sagittal-model-3d-v2"),
         MODEL_3D_NAME,
         fields=[{"name": n} for n in fields],
         templates=[{

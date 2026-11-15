@@ -62,7 +62,7 @@ test('unknown scene shows the gallery with "Scene not found"', async ({ page }) 
   expect(errors).toEqual([]);
 });
 
-test('gallery lists scenes with title and badge', async ({ page }) => {
+test('gallery lists scenes with title and link', async ({ page }) => {
   const errors = watchErrors(page);
   await page.goto('index.html');
   const card = page.locator('.card', { hasText: heartMeta.title });

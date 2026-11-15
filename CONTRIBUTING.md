@@ -1,6 +1,6 @@
 # Contributing to sagittal
 
-sagittal is educational only. Every scene is unreviewed until a qualified reviewer signs it off.
+sagittal is educational only and is not clinical advice.
 
 ## Setup
 
@@ -22,9 +22,7 @@ Meta fields (validated by `lib/validateMeta.mjs`; see `tests/` for the exact rul
 - `title`, `topic`: topic groups scenes into one Anki deck.
 - `variantControl` and `variants` (`key`, `label`): the control that switches views; one card is rendered per variant.
 - `claims`: the factual statements the scene teaches, one per line.
-- `sources`: references for the claims (may be empty while unreviewed).
-- `status`: `unreviewed` for new scenes.
-- `reviewer` and `reviewedOn`: set only by a reviewer (see below).
+- `sources`: references for the claims (may be empty).
 
 Run the checks before opening a pull request:
 
@@ -32,16 +30,6 @@ Run the checks before opening a pull request:
     npm run test:py     # deck builder tests
     npm run e2e         # browser tests
     npm run cards && npm run decks   # optional: build cards and decks locally
-
-## Reviewing a scene
-
-A reviewer checks every claim against a cited source, then edits the meta file:
-
-1. Add the references to `sources`.
-2. Set `status` to `reviewed`.
-3. Set `reviewer` (name or handle) and `reviewedOn` (`YYYY-MM-DD`).
-
-Until then the "Unreviewed: verify against your textbook" badge stays on the scene and its cards. Do not set `reviewed` without a real review.
 
 ## Medical corrections
 
