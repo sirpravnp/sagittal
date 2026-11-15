@@ -63,7 +63,8 @@
     ]
    ],
    "radius_cm": 0.8,
-   "from": "carina"
+   "from": "carina",
+   "parent": null
   },
   "left_main_bronchus": {
    "name": "Left main bronchus",
@@ -165,7 +166,8 @@
     ]
    ],
    "radius_cm": 0.763,
-   "from": "carina"
+   "from": "carina",
+   "parent": null
   },
   "right_superior_lobar_bronchus": {
    "name": "Right superior lobar bronchus",
@@ -207,7 +209,8 @@
     ]
    ],
    "radius_cm": 0.575,
-   "from": "right_superior_lobar_bronchus_origin"
+   "from": "right_superior_lobar_bronchus_origin",
+   "parent": "right_main_bronchus"
   },
   "intermediate_bronchus": {
    "name": "Intermediate bronchus (right)",
@@ -279,7 +282,8 @@
     ]
    ],
    "radius_cm": 0.725,
-   "from": "intermediate_bronchus_start"
+   "from": "intermediate_bronchus_start",
+   "parent": "right_main_bronchus"
   },
   "right_middle_lobar_bronchus": {
    "name": "Middle lobar bronchus (right)",
@@ -336,7 +340,8 @@
     ]
    ],
    "radius_cm": 0.525,
-   "from": "right_middle_lobar_bronchus_origin"
+   "from": "right_middle_lobar_bronchus_origin",
+   "parent": "intermediate_bronchus"
   },
   "right_inferior_lobar_bronchus": {
    "name": "Right inferior lobar bronchus",
@@ -458,7 +463,8 @@
     ]
    ],
    "radius_cm": 0.577,
-   "from": "right_inferior_lobar_bronchus_origin"
+   "from": "right_inferior_lobar_bronchus_origin",
+   "parent": "intermediate_bronchus"
   },
   "left_superior_lobar_bronchus": {
    "name": "Left superior lobar bronchus",
@@ -530,7 +536,8 @@
     ]
    ],
    "radius_cm": 0.6,
-   "from": "left_superior_lobar_bronchus_origin"
+   "from": "left_superior_lobar_bronchus_origin",
+   "parent": "left_main_bronchus"
   },
   "lingular_bronchus": {
    "name": "Second branch of the left superior lobar bronchus curve (towards the lingula; unnamed in source)",
@@ -602,7 +609,8 @@
     ]
    ],
    "radius_cm": 0.387,
-   "from": "lingular_bronchus_origin"
+   "from": "lingular_bronchus_origin",
+   "parent": "left_superior_lobar_bronchus"
   },
   "left_inferior_lobar_bronchus": {
    "name": "Left inferior lobar bronchus",
@@ -689,7 +697,8 @@
     ]
    ],
    "radius_cm": 0.543,
-   "from": "left_inferior_lobar_bronchus_origin"
+   "from": "left_inferior_lobar_bronchus_origin",
+   "parent": "left_main_bronchus"
   }
  },
  "landmarks": {

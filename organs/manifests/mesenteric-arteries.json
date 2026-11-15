@@ -398,7 +398,8 @@
     ]
    ],
    "radius_cm": 0.204,
-   "from": "superior_mesenteric_artery_origin"
+   "from": "superior_mesenteric_artery_origin",
+   "parent": "abdominal_aorta"
   },
   "sma_branch_1": {
    "name": "Branch 1 of the superior mesenteric artery curve (unnamed in source)",
@@ -435,7 +436,8 @@
     ]
    ],
    "radius_cm": 0.052,
-   "from": "sma_branch_1_origin"
+   "from": "sma_branch_1_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "sma_branch_2": {
    "name": "Branch 2 of the superior mesenteric artery curve (unnamed in source)",
@@ -472,7 +474,8 @@
     ]
    ],
    "radius_cm": 0.052,
-   "from": "sma_branch_2_origin"
+   "from": "sma_branch_2_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "sma_branch_3": {
    "name": "Branch 3 of the superior mesenteric artery curve (unnamed in source)",
@@ -544,7 +547,8 @@
     ]
    ],
    "radius_cm": 0.07,
-   "from": "sma_branch_3_origin"
+   "from": "sma_branch_3_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "sma_branch_4": {
    "name": "Branch 4 of the superior mesenteric artery curve (unnamed in source; runs to the left)",
@@ -696,7 +700,8 @@
     ]
    ],
    "radius_cm": 0.11,
-   "from": "sma_branch_4_origin"
+   "from": "sma_branch_4_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "sma_branch_5": {
    "name": "Branch 5 of the superior mesenteric artery curve (unnamed in source)",
@@ -733,7 +738,8 @@
     ]
    ],
    "radius_cm": 0.055,
-   "from": "sma_branch_5_origin"
+   "from": "sma_branch_5_origin",
+   "parent": "sma_branch_4"
   },
   "sma_branch_6": {
    "name": "Branch 6 of the superior mesenteric artery curve (unnamed in source)",
@@ -825,7 +831,8 @@
     ]
    ],
    "radius_cm": 0.082,
-   "from": "sma_branch_6_origin"
+   "from": "sma_branch_6_origin",
+   "parent": "sma_branch_4"
   },
   "sma_branch_7": {
    "name": "Branch 7 of the superior mesenteric artery curve (unnamed in source)",
@@ -847,7 +854,8 @@
     ]
    ],
    "radius_cm": 0.02,
-   "from": "sma_branch_7_origin"
+   "from": "sma_branch_7_origin",
+   "parent": "sma_branch_6"
   },
   "inferior_pancreaticoduodenal_artery": {
    "name": "Inferior pancreaticoduodenal artery",
@@ -884,7 +892,8 @@
     ]
    ],
    "radius_cm": 0.095,
-   "from": "inferior_pancreaticoduodenal_artery_origin"
+   "from": "inferior_pancreaticoduodenal_artery_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "ileocolic_artery": {
    "name": "Ileocolic artery",
@@ -956,7 +965,8 @@
     ]
    ],
    "radius_cm": 0.162,
-   "from": "ileocolic_artery_origin"
+   "from": "ileocolic_artery_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "right_colic_artery": {
    "name": "Right colic artery",
@@ -1133,7 +1143,8 @@
     ]
    ],
    "radius_cm": 0.132,
-   "from": "right_colic_artery_origin"
+   "from": "right_colic_artery_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "right_colic_artery_branch": {
    "name": "Branch of the right colic artery (unnamed in source)",
@@ -1210,7 +1221,8 @@
     ]
    ],
    "radius_cm": 0.1,
-   "from": "right_colic_artery_branch_origin"
+   "from": "right_colic_artery_branch_origin",
+   "parent": "right_colic_artery"
   },
   "middle_colic_artery": {
    "name": "Middle colic artery",
@@ -1387,7 +1399,8 @@
     ]
    ],
    "radius_cm": 0.1,
-   "from": "middle_colic_artery_origin"
+   "from": "middle_colic_artery_origin",
+   "parent": "superior_mesenteric_artery"
   },
   "middle_colic_artery_branch": {
    "name": "Branch of the middle colic artery (unnamed in source)",
@@ -1449,7 +1462,8 @@
     ]
    ],
    "radius_cm": 0.1,
-   "from": "middle_colic_artery_branch_origin"
+   "from": "middle_colic_artery_branch_origin",
+   "parent": "middle_colic_artery"
   },
   "inferior_mesenteric_artery": {
    "name": "Inferior mesenteric artery",
@@ -1606,7 +1620,8 @@
     ]
    ],
    "radius_cm": 0.15,
-   "from": "inferior_mesenteric_artery_origin"
+   "from": "inferior_mesenteric_artery_origin",
+   "parent": "abdominal_aorta"
   },
   "left_colic_artery": {
    "name": "Left colic artery",
@@ -1658,7 +1673,8 @@
     ]
    ],
    "radius_cm": 0.142,
-   "from": "left_colic_artery_origin"
+   "from": "left_colic_artery_origin",
+   "parent": "inferior_mesenteric_artery"
   },
   "sigmoid_artery_1": {
    "name": "Sigmoid artery (curve 1 of the source's 'Sigmoid arteries')",
@@ -1895,7 +1911,8 @@
     ]
    ],
    "radius_cm": 0.085,
-   "from": "sigmoid_artery_1_origin"
+   "from": "sigmoid_artery_1_origin",
+   "parent": "inferior_mesenteric_artery"
   },
   "sigmoid_artery_2": {
    "name": "Sigmoid artery (curve 2 of the source's 'Sigmoid arteries')",
@@ -2047,7 +2064,8 @@
     ]
    ],
    "radius_cm": 0.086,
-   "from": "sigmoid_artery_2_origin"
+   "from": "sigmoid_artery_2_origin",
+   "parent": "sigmoid_artery_1"
   },
   "sigmoid_artery_3": {
    "name": "Sigmoid artery (curve 3 of the source's 'Sigmoid arteries')",
@@ -2114,7 +2132,8 @@
     ]
    ],
    "radius_cm": 0.07,
-   "from": "sigmoid_artery_3_origin"
+   "from": "sigmoid_artery_3_origin",
+   "parent": "sigmoid_artery_2"
   },
   "sigmoid_artery_4": {
    "name": "Sigmoid artery (curve 4 of the source's 'Sigmoid arteries')",
@@ -2261,7 +2280,8 @@
     ]
    ],
    "radius_cm": 0.083,
-   "from": "sigmoid_artery_4_origin"
+   "from": "sigmoid_artery_4_origin",
+   "parent": "sigmoid_artery_2"
   },
   "sigmoid_artery_5": {
    "name": "Sigmoid artery (curve 5 of the source's 'Sigmoid arteries')",
@@ -2323,7 +2343,8 @@
     ]
    ],
    "radius_cm": 0.07,
-   "from": "sigmoid_artery_5_origin"
+   "from": "sigmoid_artery_5_origin",
+   "parent": "sigmoid_artery_2"
   },
   "superior_rectal_artery": {
    "name": "Superior rectal artery (Z-Anatomy: superior anorectal artery)",
@@ -2620,7 +2641,8 @@
     ]
    ],
    "radius_cm": 0.09,
-   "from": "superior_rectal_artery_origin"
+   "from": "superior_rectal_artery_origin",
+   "parent": "inferior_mesenteric_artery"
   }
  },
  "landmarks": {

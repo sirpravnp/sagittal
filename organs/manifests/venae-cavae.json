@@ -168,7 +168,8 @@
     ]
    ],
    "radius_cm": 0.863,
-   "from": "ivc_origin"
+   "from": "ivc_origin",
+   "parent": null
   },
   "inferior_vena_cava_thoracic": {
    "name": "Inferior vena cava, thoracic part",
@@ -300,7 +301,8 @@
     ]
    ],
    "radius_cm": 0.969,
-   "from": "inferior_vena_cava_thoracic_start"
+   "from": "inferior_vena_cava_thoracic_start",
+   "parent": "inferior_vena_cava_abdominal"
   },
   "superior_vena_cava": {
    "name": "Superior vena cava",
@@ -362,7 +364,8 @@
     ]
    ],
    "radius_cm": 1.15,
-   "from": "svc_formation"
+   "from": "svc_formation",
+   "parent": null
   },
   "left_brachiocephalic_vein": {
    "name": "Left brachiocephalic vein",
@@ -454,7 +457,8 @@
     ]
    ],
    "radius_cm": 0.735,
-   "from": "left_brachiocephalic_vein_junction"
+   "from": "left_brachiocephalic_vein_junction",
+   "parent": "superior_vena_cava"
   },
   "right_brachiocephalic_vein": {
    "name": "Right brachiocephalic vein",
@@ -526,7 +530,8 @@
     ]
    ],
    "radius_cm": 0.763,
-   "from": "right_brachiocephalic_vein_junction"
+   "from": "right_brachiocephalic_vein_junction",
+   "parent": "superior_vena_cava"
   },
   "hepatic_vein_1": {
    "name": "Hepatic vein 1 (unnamed in source)",
@@ -568,7 +573,8 @@
     ]
    ],
    "radius_cm": 0.35,
-   "from": "hepatic_vein_1_junction"
+   "from": "hepatic_vein_1_junction",
+   "parent": "inferior_vena_cava_thoracic"
   },
   "hepatic_vein_2": {
    "name": "Hepatic vein 2 (unnamed in source)",
@@ -610,7 +616,8 @@
     ]
    ],
    "radius_cm": 0.35,
-   "from": "hepatic_vein_2_junction"
+   "from": "hepatic_vein_2_junction",
+   "parent": "inferior_vena_cava_thoracic"
   },
   "left_renal_vein": {
    "name": "Left renal vein",
@@ -722,7 +729,8 @@
     ]
    ],
    "radius_cm": 0.356,
-   "from": "left_renal_vein_junction"
+   "from": "left_renal_vein_junction",
+   "parent": "inferior_vena_cava_abdominal"
   },
   "right_renal_vein": {
    "name": "Right renal vein",
@@ -779,7 +787,8 @@
     ]
    ],
    "radius_cm": 0.385,
-   "from": "right_renal_vein_junction"
+   "from": "right_renal_vein_junction",
+   "parent": "inferior_vena_cava_abdominal"
   },
   "left_common_iliac_vein": {
    "name": "Left common iliac vein",
@@ -881,7 +890,8 @@
     ]
    ],
    "radius_cm": 0.702,
-   "from": "left_common_iliac_vein_junction"
+   "from": "left_common_iliac_vein_junction",
+   "parent": "inferior_vena_cava_abdominal"
   },
   "right_common_iliac_vein": {
    "name": "Right common iliac vein",
@@ -948,7 +958,8 @@
     ]
    ],
    "radius_cm": 0.75,
-   "from": "right_common_iliac_vein_junction"
+   "from": "right_common_iliac_vein_junction",
+   "parent": "inferior_vena_cava_abdominal"
   },
   "left_external_iliac_vein": {
    "name": "Left external iliac vein",
@@ -1080,7 +1091,8 @@
     ]
    ],
    "radius_cm": 0.587,
-   "from": "left_external_iliac_vein_junction"
+   "from": "left_external_iliac_vein_junction",
+   "parent": "left_common_iliac_vein"
   },
   "right_external_iliac_vein": {
    "name": "Right external iliac vein",
@@ -1212,7 +1224,8 @@
     ]
    ],
    "radius_cm": 0.587,
-   "from": "right_external_iliac_vein_junction"
+   "from": "right_external_iliac_vein_junction",
+   "parent": "right_common_iliac_vein"
   },
   "left_internal_iliac_vein": {
    "name": "Left internal iliac vein",
@@ -1284,7 +1297,8 @@
     ]
    ],
    "radius_cm": 0.415,
-   "from": "left_internal_iliac_vein_junction"
+   "from": "left_internal_iliac_vein_junction",
+   "parent": "left_common_iliac_vein"
   },
   "right_internal_iliac_vein": {
    "name": "Right internal iliac vein",
@@ -1356,7 +1370,8 @@
     ]
    ],
    "radius_cm": 0.415,
-   "from": "right_internal_iliac_vein_junction"
+   "from": "right_internal_iliac_vein_junction",
+   "parent": "right_common_iliac_vein"
   }
  },
  "landmarks": {

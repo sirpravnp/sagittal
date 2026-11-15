@@ -93,7 +93,8 @@
     ]
    ],
    "radius_cm": 0.4,
-   "from": "coeliac_trunk_origin"
+   "from": "coeliac_trunk_origin",
+   "parent": "abdominal_aorta"
   },
   "common_hepatic_artery": {
    "name": "Common hepatic artery",
@@ -165,7 +166,8 @@
     ]
    ],
    "radius_cm": 0.252,
-   "from": "common_hepatic_artery_origin"
+   "from": "common_hepatic_artery_origin",
+   "parent": "coeliac_trunk"
   },
   "left_gastric_artery": {
    "name": "Left gastric artery",
@@ -242,7 +244,8 @@
     ]
    ],
    "radius_cm": 0.104,
-   "from": "left_gastric_artery_origin"
+   "from": "left_gastric_artery_origin",
+   "parent": "coeliac_trunk"
   },
   "left_gastric_artery_branch": {
    "name": "Branch of the left gastric artery (unnamed in source)",
@@ -269,7 +272,8 @@
     ]
    ],
    "radius_cm": 0.035,
-   "from": "left_gastric_artery_branch_origin"
+   "from": "left_gastric_artery_branch_origin",
+   "parent": "left_gastric_artery"
   },
   "splenic_artery": {
    "name": "Splenic artery",
@@ -471,7 +475,8 @@
     ]
    ],
    "radius_cm": 0.147,
-   "from": "splenic_artery_origin"
+   "from": "splenic_artery_origin",
+   "parent": "coeliac_trunk"
   },
   "splenic_artery_hilar_branch_1": {
    "name": "Hilar branch 1 of the splenic artery (unnamed in source)",
@@ -518,7 +523,8 @@
     ]
    ],
    "radius_cm": 0.068,
-   "from": "splenic_artery_hilar_branch_1_origin"
+   "from": "splenic_artery_hilar_branch_1_origin",
+   "parent": "splenic_artery"
   },
   "splenic_artery_hilar_branch_2": {
    "name": "Hilar branch 2 of the splenic artery (unnamed in source)",
@@ -560,7 +566,8 @@
     ]
    ],
    "radius_cm": 0.061,
-   "from": "splenic_artery_hilar_branch_2_origin"
+   "from": "splenic_artery_hilar_branch_2_origin",
+   "parent": "splenic_artery_hilar_branch_1"
   },
   "splenic_artery_hilar_branch_3": {
    "name": "Hilar branch 3 of the splenic artery (unnamed in source)",
@@ -592,7 +599,8 @@
     ]
    ],
    "radius_cm": 0.051,
-   "from": "splenic_artery_hilar_branch_3_origin"
+   "from": "splenic_artery_hilar_branch_3_origin",
+   "parent": "splenic_artery_hilar_branch_1"
   },
   "splenic_artery_hilar_branch_4": {
    "name": "Hilar branch 4 of the splenic artery (unnamed in source)",
@@ -619,7 +627,8 @@
     ]
    ],
    "radius_cm": 0.049,
-   "from": "splenic_artery_hilar_branch_4_origin"
+   "from": "splenic_artery_hilar_branch_4_origin",
+   "parent": "splenic_artery_hilar_branch_1"
   },
   "splenic_artery_hilar_branch_5": {
    "name": "Hilar branch 5 of the splenic artery (unnamed in source)",
@@ -651,7 +660,8 @@
     ]
    ],
    "radius_cm": 0.064,
-   "from": "splenic_artery_hilar_branch_5_origin"
+   "from": "splenic_artery_hilar_branch_5_origin",
+   "parent": "splenic_artery"
   },
   "splenic_artery_hilar_branch_6": {
    "name": "Hilar branch 6 of the splenic artery (unnamed in source)",
@@ -688,7 +698,8 @@
     ]
    ],
    "radius_cm": 0.064,
-   "from": "splenic_artery_hilar_branch_6_origin"
+   "from": "splenic_artery_hilar_branch_6_origin",
+   "parent": "splenic_artery"
   },
   "proper_hepatic_artery": {
    "name": "Proper hepatic artery (source curve continues into the right lobe; no left hepatic branch in source)",
@@ -930,7 +941,8 @@
     ]
    ],
    "radius_cm": 0.106,
-   "from": "proper_hepatic_artery_origin"
+   "from": "proper_hepatic_artery_origin",
+   "parent": "common_hepatic_artery"
   },
   "proper_hepatic_artery_branch_1": {
    "name": "Branch 1 of the proper hepatic artery curve (unnamed in source)",
@@ -972,7 +984,8 @@
     ]
    ],
    "radius_cm": 0.055,
-   "from": "proper_hepatic_artery_branch_1_origin"
+   "from": "proper_hepatic_artery_branch_1_origin",
+   "parent": "proper_hepatic_artery"
   },
   "proper_hepatic_artery_branch_2": {
    "name": "Branch 2 of the proper hepatic artery curve (unnamed in source)",
@@ -994,7 +1007,8 @@
     ]
    ],
    "radius_cm": 0.035,
-   "from": "proper_hepatic_artery_branch_2_origin"
+   "from": "proper_hepatic_artery_branch_2_origin",
+   "parent": "proper_hepatic_artery"
   },
   "gastroduodenal_artery": {
    "name": "Gastroduodenal artery",
@@ -1076,7 +1090,8 @@
     ]
    ],
    "radius_cm": 0.079,
-   "from": "gastroduodenal_artery_origin"
+   "from": "gastroduodenal_artery_origin",
+   "parent": "common_hepatic_artery"
   }
  },
  "landmarks": {

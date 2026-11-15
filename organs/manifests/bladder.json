@@ -283,7 +283,8 @@
     ]
    ],
    "radius_cm": 0.123,
-   "from": "urethra_internal_end"
+   "from": "urethra_internal_end",
+   "parent": null
   }
  },
  "landmarks": {

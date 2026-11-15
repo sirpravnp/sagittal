@@ -37,7 +37,7 @@ Organs from other sources were mapped into this frame by similarity transforms
 {"schema": "sagittal-organ/0", "id": "gallbladder", "name": "Gallbladder and bile duct",
  "system": "Hepatobiliary", "mesh": "gallbladder", "credit": "zanatomy",
  "parts": [{"id": "gallbladder", "name": "Gallbladder", "tissue": "gallbladder"}],
- "centerlines": {"bile_duct": {"name": "...", "points": [[x,y,z], ...], "radius_cm": 0.1, "from": "bile_duct_upper_end"}},
+ "centerlines": {"bile_duct": {"name": "...", "points": [[x,y,z], ...], "radius_cm": 0.1, "from": "bile_duct_upper_end", "parent": null}},
  "landmarks": {"gallbladder_neck": {"name": "...", "p": [x,y,z], "derived": "baked 'gallbladder' vertex nearest landmark ..."}}}
 ```
 
@@ -50,6 +50,12 @@ Organs from other sources were mapped into this frame by similarity transforms
   runs **from its parent**: its first point is the end nearest the parent's centre line, and `from`
   names the landmark at that point (`<id>_origin` for arteries, ducts and airways, `<id>_junction` for
   veins, `<id>_start` for a segment continuing the previous one). Root lines name a landmark or null.
+  `parent` is the id of the centre line this one branches from (or drains into), or null for a root
+  line; ids are unique across the library, so it may name a line in another organ (the coeliac
+  trunk's parent is `abdominal_aorta`). It is the curated parent from `tools/organs/organs.json`
+  where that names one, else the nearest centre line of the same system to the first point
+  (within 1.5 cm, ignoring lines that start at the same point); `tools/organs/parents.mjs` writes it
+  and prints the table. The figure validator refuses to remove a line while a child still hangs off it.
   Splines of a multi-spline source object that the source does not name are called
   "... (unnamed in source)": do not give them a textbook name.
 - `landmarks`: ids are unique across the whole library (a variant may route from any organ's landmark).
@@ -130,6 +136,8 @@ S=$SAGITTAL_ASSETS/ct-totalseg/raw/s1304/segmentations
 .venv/bin/python tools/organs/register.py
 # 4. bake configs (tools/meshes/configs/organ-<id>.json), meshes, manifests, index
 .venv/bin/python tools/organs/build.py
+# 5. centre-line parents (writes "parent" into the manifests), then the runtime bundle
+node tools/organs/parents.mjs && npm run organs
 npm test && npm run test:py
 ```
 

@@ -528,7 +528,8 @@
     ]
    ],
    "radius_cm": 0.15,
-   "from": null
+   "from": null,
+   "parent": null
   },
   "right_ductus_deferens": {
    "name": "Right ductus deferens (source curve, end to end)",
@@ -1015,7 +1016,8 @@
     ]
    ],
    "radius_cm": 0.15,
-   "from": null
+   "from": null,
+   "parent": null
   },
   "left_ejaculatory_duct": {
    "name": "Left ejaculatory duct",
@@ -1072,7 +1074,8 @@
     ]
    ],
    "radius_cm": 0.08,
-   "from": null
+   "from": null,
+   "parent": null
   },
   "right_ejaculatory_duct": {
    "name": "Right ejaculatory duct",
@@ -1129,7 +1132,8 @@
     ]
    ],
    "radius_cm": 0.08,
-   "from": null
+   "from": null,
+   "parent": null
   }
  },
  "landmarks": {

@@ -323,6 +323,83 @@ test('validate does not modify the spec it is given', () => {
   assert.equal(JSON.stringify(s), before);
 });
 
+/* ---------- review fixes ---------- */
+
+test('a variant waypoint on a moved structure uses its moved geometry', () => {
+  const s = cystic();
+  s.variant.edits.push({ op: 'branch', id: 'x', name: 'Branch off the moved duct', tissue: 'bile-duct', radius_cm: 0.05,
+    from: { on: 'cystic_duct', t: 1 }, to: { landmark: 'liver/right_lobe_hilum' } });
+  const r = run(s);
+  assert.deepEqual(r.errors, []);
+  close(r.resolved.variant.edits[1].from.p, [-3, 90, 5]);   // the moved insertion, not [-3,96,5]
+  // library line moved: variant geometry is carried too, first point replaced
+  const e = example();
+  e.variant.edits.push({ op: 'move_insertion', structure: 'coeliac/left_hepatic_artery', to: { on: 'sma/sma', t: 0.5 } },
+    { op: 'branch', id: 'y', name: 'Branch', tissue: 'vessel-artery', radius_cm: 0.05,
+      from: { on: 'coeliac/left_hepatic_artery', t: 0 }, to: { landmark: 'liver/left_lobe_hilum' } });
+  const q = run(e);
+  assert.deepEqual(q.errors, []);
+  assert.deepEqual(q.resolved.variant.edits[2].points, [[0, 88, 0], [-2, 99, 3]]);
+  close(q.resolved.variant.edits[3].from.p, [0, 88, 0]);
+  // the base view keeps the normal geometry
+  close(run(cystic()).resolved.base[0].points[1], [-3, 96, 5]);
+});
+
+test('move ordering, repeated moves and base structures on changed lines', () => {
+  const later = cystic();
+  later.variant.edits.unshift({ op: 'branch', id: 'x', name: 'Early branch', tissue: 'bile-duct', radius_cm: 0.05,
+    from: { on: 'cystic_duct', t: 1 }, to: { landmark: 'liver/right_lobe_hilum' } });
+  only(later, 'variant.edits[0].from: "cystic_duct" is moved by a later edit (variant.edits[1]); move it first');
+
+  const twice = cystic();
+  twice.variant.edits.push({ op: 'move_insertion', structure: 'cystic_duct', to: { on: 'biliary/bile_duct', t: 0.3 } });
+  only(twice, 'variant.edits[1].structure: "cystic_duct" is already moved');
+
+  const via = cystic();
+  via.base[0].via = [{ on: 'coeliac/right_hepatic_artery', t: 0.5 }];
+  via.organs.push({ id: 'coeliac' });
+  via.variant.edits.push({ op: 'remove', structure: 'coeliac/right_hepatic_artery' });
+  only(via, 'base[0].via[0]: "coeliac/right_hepatic_artery" is removed in the variant view; a base structure cannot pass through it');
+
+  const onMoved = cystic();
+  onMoved.base.push({ op: 'branch', id: 'cystic_branch', name: 'Branch', tissue: 'bile-duct', radius_cm: 0.05,
+    from: { on: 'cystic_duct', t: 0.5 }, to: { landmark: 'liver/right_lobe_hilum' } });
+  only(onMoved, 'base[1].from: "cystic_duct" is moved in the variant view; a base structure cannot sit on it');
+
+  const movedAndRemoved = cystic();
+  movedAndRemoved.variant.edits.push({ op: 'remove', structure: 'cystic_duct' });
+  only(movedAndRemoved, 'variant.edits[0].structure: "cystic_duct" is removed in the variant view');
+});
+
+test('invalid removes do not count as removals', () => {
+  const s = example();
+  s.variant.edits.push({ op: 'remove', structure: 'portal/portal_vein' },
+    { op: 'branch', id: 'z', name: 'Branch', tissue: 'vessel-artery', radius_cm: 0.05,
+      from: { on: 'portal/portal_vein', t: 0.5 }, to: { landmark: 'liver/left_lobe_hilum' } });
+  only(s, 'variant.edits[2].structure: organ "portal" is not in organs');
+});
+
+test('raw coordinates as a structure or label target give one error', () => {
+  const s = example(); s.variant.edits[0].structure = [1, 2, 3];
+  only(s, 'variant.edits[0].structure: raw coordinates are not allowed; use a landmark, a centre-line point or an offset');
+  const l = example(); l.labels[0].on = [1, 2, 3];
+  only(l, 'labels[0].on: raw coordinates are not allowed; use a landmark, a centre-line point or an offset');
+});
+
+test('refs that are not a list', () => {
+  const s = example(); s.claims[0].refs = 'hepatic-artery-variants';
+  only(s, 'claims[0].refs: must be a list of reference ids');
+});
+
+test('move_insertion of a rejected route still checks its target', () => {
+  const s = cystic(); s.base[0].op = 'teleport';
+  s.variant.edits[0].to = { on: 'biliary/bile_duct', t: 7 };
+  assert.deepEqual(run(s).errors, [
+    'base[0].op: only route and branch are allowed in base (got "teleport")',
+    'variant.edits[0].to: t must be a number from 0 to 1 (got 7)',
+  ]);
+});
+
 /* ---------- real organ bundle ---------- */
 
 test('real organs: cystic duct from the gallbladder neck to the bile duct, moved low', () => {
@@ -351,6 +428,12 @@ test('real organs: cystic duct from the gallbladder neck to the bile duct, moved
     'variant.edits[0]: coeliac-trunk/proper_hepatic_artery branches from coeliac-trunk/common_hepatic_artery; reroute or remove coeliac-trunk/proper_hepatic_artery too',
     'variant.edits[0]: coeliac-trunk/gastroduodenal_artery branches from coeliac-trunk/common_hepatic_artery; reroute or remove coeliac-trunk/gastroduodenal_artery too',
   ]);
+  // removing the aortic arch is refused for each of its branches and its continuation
+  const arch = norm(spec);
+  arch.organs.push({ id: 'aorta' });
+  arch.variant.edits = [{ op: 'remove', structure: 'aorta/aortic_arch' }];
+  assert.deepEqual(run(arch, real).errors, ['thoracic_aorta', 'brachiocephalic_trunk', 'left_common_carotid_artery', 'left_subclavian_artery']
+    .map((x) => `variant.edits[0]: aorta/${x} branches from aorta/aortic_arch; reroute or remove aorta/${x} too`));
 });
 
 test('docs/spec.md worked examples validate against the real organs', () => {

@@ -308,7 +308,8 @@
     ]
    ],
    "radius_cm": 0.043,
-   "from": "pancreatic_duct_tail_end"
+   "from": "pancreatic_duct_tail_end",
+   "parent": null
   },
   "accessory_pancreatic_duct": {
    "name": "Accessory pancreatic duct (duodenal end first; in the source it does not reach the main duct, nearest gap 1.8 cm)",
@@ -420,7 +421,8 @@
     ]
    ],
    "radius_cm": 0.056,
-   "from": "accessory_pancreatic_duct_duodenal_end"
+   "from": "accessory_pancreatic_duct_duodenal_end",
+   "parent": null
   }
  },
  "landmarks": {

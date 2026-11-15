@@ -188,7 +188,8 @@
     ]
    ],
    "radius_cm": 0.104,
-   "from": "bile_duct_upper_end"
+   "from": "bile_duct_upper_end",
+   "parent": null
   }
  },
  "landmarks": {

@@ -28,7 +28,8 @@
     ]
    ],
    "radius_cm": 0.3,
-   "from": "portal_confluence"
+   "from": "portal_confluence",
+   "parent": null
   }
  },
  "landmarks": {

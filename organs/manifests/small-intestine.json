@@ -948,7 +948,8 @@
     ]
    ],
    "radius_cm": 0.823,
-   "from": "small_intestine_duodenal_end"
+   "from": "small_intestine_duodenal_end",
+   "parent": null
   }
  },
  "landmarks": {

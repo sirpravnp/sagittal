@@ -28,7 +28,8 @@
     ]
    ],
    "radius_cm": 0.3,
-   "from": "sma_origin"
+   "from": "sma_origin",
+   "parent": "abdominal_aorta"
   }
  },
  "landmarks": {

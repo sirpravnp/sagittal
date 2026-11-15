@@ -139,7 +139,8 @@ variant.edits[0]: coeliac-trunk/proper_hepatic_artery branches from coeliac-trun
 ```
 
 Fix it by removing the child too, or by moving its insertion onto the new parent with
-`move_insertion` (worked example 2). A library line's parent is the line its first point lies on.
+`move_insertion` (worked example 2). A library line's parent is its manifest `parent` field (listed
+in `reference/organs.md`); your own structures depend on the lines their `from`/`to` ends sit on.
 
 ### `move_insertion` (variant only)
 
@@ -154,6 +155,10 @@ no offset (it may be a different line: that is how you reroute a branch onto a n
 - For your own structure, the insertion is its `to` end if `to` was `{"on", "t"}`, otherwise its
   `from` end if that was `{"on", "t"}`. A structure with neither end on a line has no insertion
   to move.
+- In the variant view the structure keeps its course and only its insertion point changes (the
+  first stretch is redrawn straight from the new point). A structure can be moved once.
+- Edits apply in order: a later variant waypoint `on` a moved structure sits on its moved course,
+  and a waypoint `on` it *before* the move is an error ("move it first").
 
 ### `duplicate` (variant only)
 
@@ -174,6 +179,10 @@ common hepatic duct, the right and left hepatic ducts, named right and left hepa
 structure in `base`, completed from landmarks and centre lines: it is drawn in both views. Then
 the variant edits it like any other structure, by its id: `move_insertion` to make the cystic
 duct insert low, `remove` to take it away.
+
+A `base` structure is drawn the same in both views, so it may not sit on (`on`) a line the
+variant moves, nor pass (`via`) through a line the variant removes; an end on a removed line is
+refused like any other branch.
 
 Put only the **variation** in `variant.edits`. Everything in `variant.edits` appears only in the
 variant view; everything removed there still shows in the normal view.
@@ -202,8 +211,8 @@ built through (`resolved.provenance`).
 {"text": "The cystic duct may join the bile duct low, near the duodenum.", "refs": ["statpearls-biliary-ducts"]}
 ```
 
-Each claim is one short fact (at most 300 characters) shown in the info panel, with at least one
-reference id from `organs/references.json`. Unknown ids are refused: never invent a source. If no
+Each claim is one short fact (at most 300 characters) shown in the info panel, with `refs`: a
+list of at least one reference id from `organs/references.json`. Unknown ids are refused: never invent a source. If no
 listed reference supports a fact, leave the fact out.
 
 ## `view`

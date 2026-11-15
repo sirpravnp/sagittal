@@ -30,10 +30,6 @@
   var VIEWS = ['normal', 'variant'];
   var ID_RE = /^[a-z][a-z0-9_]*$/;
   var COLOR_RE = /^#[0-9a-fA-F]{6}$/;
-  // A library centre line branches from another when its first point lies within this distance of
-  // the other's line (same body system, and not at the other's own first point, which would make
-  // them siblings from a shared origin).
-  var PARENT_TOL_CM = 0.75;
 
   var MSG = {
     raw: 'raw coordinates are not allowed; use a landmark, a centre-line point or an offset',
@@ -43,6 +39,7 @@
     views: 'must be a non-empty list of "normal" and "variant"',
     rot: 'must be two numbers [x, y] in radians',
     noRefs: 'a claim needs at least one reference',
+    refsList: 'must be a list of reference ids',
   };
 
   var KEYS = {
@@ -88,18 +85,6 @@
       target -= lens[i];
     }
     return points[points.length - 1].slice();
-  }
-
-  function segDist(p, a, b) {
-    var ab = sub(b, a), ap = sub(p, a), L = ab[0] * ab[0] + ab[1] * ab[1] + ab[2] * ab[2];
-    var t = L > 0 ? (ap[0] * ab[0] + ap[1] * ab[1] + ap[2] * ab[2]) / L : 0;
-    t = Math.max(0, Math.min(1, t));
-    return dist(p, [a[0] + ab[0] * t, a[1] + ab[1] * t, a[2] + ab[2] * t]);
-  }
-  function lineDist(p, points) {
-    var best = Infinity;
-    for (var i = 0; i + 1 < points.length; i++) best = Math.min(best, segDist(p, points[i], points[i + 1]));
-    return points.length === 1 ? dist(p, points[0]) : best;
   }
 
   /* ---------- the validator ---------- */
@@ -173,7 +158,12 @@
 
     var listed = Object.create(null);   // organ ids in spec.organs
     var routes = Object.create(null);   // route id -> { name, tissue, radius_cm, points, ends, view }
-    var removed = Object.create(null);  // structure ref -> true (every remove edit, for order-free checks)
+    var removed = Object.create(null);  // structure ref -> true, for every valid remove edit
+    var moved = Object.create(null);    // structure ref -> { end, on, index, path } for every valid move_insertion
+    var variantLines = Object.create(null); // structure ref -> its points in the variant view, once moved
+    // Every waypoint `on` a line, checked once all removes and moves are known (so edit order does
+    // not hide a removal): { path, on, ctx: { view: 'base'|'variant', index, role } }.
+    var usages = [];
     var provenance = [];
 
     // 2. Top level.
@@ -206,11 +196,7 @@
       }
     });
 
-    // Removals are collected up front so "is removed" checks do not depend on edit order.
-    var editList = isObj(R.variant) && Array.isArray(R.variant.edits) ? R.variant.edits : [];
-    editList.forEach(function (e) { if (isObj(e) && e.op === 'remove' && typeof e.structure === 'string') removed[e.structure] = true; });
-
-    // Waypoints. ctx.variant: refuse `on` a structure removed in the variant view.
+    // Waypoints. ctx = { view: 'base'|'variant', index, role: 'from'|'via'|'to' }.
     // Returns the resolved waypoint ({...wp, p}) or null.
     function waypoint(wp, path, ctx) {
       if (isRaw(wp)) { err(path, MSG.raw); return null; }
@@ -224,10 +210,10 @@
         if (lm.error) err(path, /^unknown organ/.test(lm.error) ? lm.error : 'unknown landmark ' + show(wp.landmark));
         else p = lm.lm.p.slice();
       } else {
-        var line = typeof wp.on === 'string' ? lineOf(wp.on) : { error: 'unknown centre line ' + show(wp.on) };
+        var line = typeof wp.on === 'string' ? lineOf(wp.on, ctx) : { error: 'unknown centre line ' + show(wp.on) };
         if (line.error) { err(path, line.error); ok = false; }
         if (!(isNum(wp.t) && wp.t >= 0 && wp.t <= 1)) { err(path, 't must be a number from 0 to 1 (got ' + show(wp.t) + ')'); ok = false; }
-        if (ctx.variant && typeof wp.on === 'string' && removed[wp.on]) { err(path, q(wp.on) + ' is removed in the variant view'); ok = false; }
+        if (!line.error) usages.push({ path: path, on: wp.on, ctx: ctx });
         if (ok && line.points) p = pointAt(line.points, wp.t);
       }
       if (has(wp, 'offset')) {
@@ -247,8 +233,10 @@
       return out;
     }
     // A line a waypoint can sit on: a library centre line or an earlier route. { points } or { error };
-    // points is null for a route that itself failed (already reported).
-    function lineOf(ref) {
+    // points is null for a route that itself failed (already reported). In the variant view a line
+    // whose insertion was moved by an earlier edit is used with its moved geometry.
+    function lineOf(ref, ctx) {
+      if (ctx && ctx.view === 'variant' && variantLines[ref]) return { points: variantLines[ref] };
       if (!split(ref)) return has(routes, ref) ? { points: routes[ref].points } : { error: 'unknown structure ' + q(ref) };
       var r = libRef(ref, ['centerline']);
       if (r.error) return { error: /^unknown organ/.test(r.error) ? r.error : 'unknown centre line ' + q(ref) };
@@ -262,10 +250,10 @@
     }
 
     // route / branch / duplicate. Returns the resolved edit or null.
-    function routeOp(e, path, view) {
+    function routeOp(e, path, view, index) {
       var op = e.op;
       checkKeys(e, path, op === 'duplicate' ? KEYS.duplicate : KEYS.route);
-      var ctx = { variant: view === 'variant' };
+      function ctx(role) { return { view: view, index: index, role: role }; }
       var ok = true, src = null, tissue = e.tissue, radius = e.radius_cm;
 
       if (typeof e.id !== 'string' || !ID_RE.test(e.id)) { err(key(path, 'id'), 'must match [a-z][a-z0-9_]* (got ' + show(e.id) + ')'); ok = false; }
@@ -278,7 +266,7 @@
           src = { ref: e.structure, tissue: routes[e.structure].tissue, radius_cm: routes[e.structure].radius_cm };
         } else {
           var lr = typeof e.structure === 'string' ? libRef(e.structure, ['centerline']) : { error: 'unknown structure ' + show(e.structure) };
-          if (lr.error) { err(key(path, 'structure'), lr.error); ok = false; }
+          if (lr.error) { if (!isRaw(e.structure)) err(key(path, 'structure'), lr.error); ok = false; }
           else src = { ref: e.structure, tissue: lr.part ? lr.part.tissue : undefined, radius_cm: lr.cl.radius_cm };
         }
         if (src && !has(e, 'tissue')) tissue = src.tissue;
@@ -297,16 +285,16 @@
         if (isRaw(e.from)) err(key(path, 'from'), MSG.raw); else err(key(path, 'from'), MSG.branchFrom);
         ok = false;
       } else {
-        from = waypoint(e.from, key(path, 'from'), ctx);
+        from = waypoint(e.from, key(path, 'from'), ctx('from'));
         if (!from) ok = false;
       }
       var via = [];
       if (has(e, 'via')) {
         var vl = list(e.via, key(path, 'via'), LIMITS.via, false);
         if (!vl) ok = false;
-        else vl.forEach(function (w, j) { var r = waypoint(w, idx(key(path, 'via'), j), ctx); if (!r) ok = false; via.push(r); });
+        else vl.forEach(function (w, j) { var r = waypoint(w, idx(key(path, 'via'), j), ctx('via')); if (!r) ok = false; via.push(r); });
       }
-      var to = waypoint(e.to, key(path, 'to'), ctx);
+      var to = waypoint(e.to, key(path, 'to'), ctx('to'));
       if (!to) ok = false;
 
       var points = ok ? [from.p].concat(via.map(function (w) { return w.p; }), [to.p]) : null;
@@ -337,6 +325,7 @@
     }
     // Structure that a remove / move_insertion / label may name. Returns { route } | { lib } | null.
     function structure(ref, path, kinds) {
+      if (isRaw(ref)) return null;   // already reported by the raw-coordinate scan
       if (typeof ref !== 'string') { err(path, 'unknown structure ' + show(ref)); return null; }
       if (!split(ref)) {
         if (has(routes, ref)) return { route: routes[ref] };
@@ -365,15 +354,13 @@
           placeholder(e, 'base');
           return;
         }
-        var r = routeOp(e, p, 'base');
+        var r = routeOp(e, p, 'base', i);
         if (r) R.base[i] = r;
       });
     }
 
     // 5. Variant edits.
     var removeEdits = [];                  // [{ path, ref }]
-    var removedSeen = Object.create(null);
-    var moved = Object.create(null);       // structure ref -> new target line ref
     if (!isObj(R.variant)) err('variant', 'must be an object');
     else {
       checkKeys(R.variant, 'variant', KEYS.variant);
@@ -391,85 +378,88 @@
           checkKeys(e, p, KEYS.remove);
           var s = structure(e.structure, key(p, 'structure'), ['centerline', 'part']);
           if (!s) return;
-          if (removedSeen[e.structure]) { err(key(p, 'structure'), q(e.structure) + ' is already removed'); return; }
-          removedSeen[e.structure] = true;
+          if (removed[e.structure]) { err(key(p, 'structure'), q(e.structure) + ' is already removed'); return; }
+          removed[e.structure] = true;
           removeEdits.push({ path: p, ref: e.structure });
           provenance.push({ structure: e.structure, name: nameOf(e.structure), op: 'remove', view: 'variant', via: [], on: [] });
         } else if (e.op === 'move_insertion') {
           checkKeys(e, p, KEYS.move_insertion);
           var m = structure(e.structure, key(p, 'structure'), ['centerline']);
-          var end = null;
-          if (m && m.route && m.route.rejected) return;
-          if (m && m.route) {
+          var end = null, base = null;
+          if (m && m.route && !m.route.rejected) {
             end = m.route.ends.to ? 'to' : m.route.ends.from ? 'from' : null;
             if (!end) err(key(p, 'structure'), q(e.structure) + ' has no insertion on a centre line to move');
-          } else if (m) end = 'start';
+            base = m.route.points;
+          } else if (m && m.lib) { end = 'start'; base = m.lib.cl.points; }
+          if (m && has(moved, e.structure)) { err(key(p, 'structure'), q(e.structure) + ' is already moved'); end = null; }
           var to = null;
           if (!(isObj(e.to) && has(e.to, 'on') && !has(e.to, 'landmark') && !has(e.to, 'offset'))) {
             err(key(p, 'to'), isRaw(e.to) ? MSG.raw : MSG.insertion);
           } else if (e.to.on === e.structure) {
             err(key(p, 'to'), 'a structure cannot insert into itself');
-          } else to = waypoint(e.to, key(p, 'to'), { variant: true });
+          } else to = waypoint(e.to, key(p, 'to'), { view: 'variant', index: i, role: 'to' });
           if (!end || !to) return;
-          moved[e.structure] = { end: end, on: to.on };
+          moved[e.structure] = { end: end, on: to.on, index: i, path: key(p, 'structure') };
           var out = JSON.parse(JSON.stringify(e));
           out.to = to; out.end = end;
-          if (m.route && m.route.points) {
-            out.points = m.route.points.map(function (pt) { return pt.slice(); });
+          // Variant-view geometry: the same line with its insertion point replaced by the new one
+          // (a route's `to` or `from` end, a library line's first point).
+          if (base) {
+            out.points = base.map(function (pt) { return pt.slice(); });
             out.points[end === 'to' ? out.points.length - 1 : 0] = to.p.slice();
+            variantLines[e.structure] = out.points;
           }
           R.variant.edits[i] = out;
           provenance.push({ structure: e.structure, name: nameOf(e.structure), op: 'move_insertion', view: 'variant', via: [], on: [to.on] });
         } else {
-          var r = routeOp(e, p, 'variant');
+          var r = routeOp(e, p, 'variant', i);
           if (r) R.variant.edits[i] = r;
         }
       });
     }
 
-    // 6. Removing a structure that others still branch from.
-    if (removeEdits.length) {
-      var parentCache = Object.create(null);
-      var parentOf = function (organId, clId) {
-        var ref = organId + '/' + clId;
-        if (ref in parentCache) return parentCache[ref];
-        var m = manifests[organId], start = m.centerlines[clId].points[0], best = null, bestD = PARENT_TOL_CM;
-        for (var o2 in manifests) {
-          if (!has(manifests, o2) || manifests[o2].system !== m.system) continue;
-          var cls = manifests[o2].centerlines || {};
-          for (var c2 in cls) {
-            if (!has(cls, c2) || (o2 === organId && c2 === clId)) continue;
-            var pts = cls[c2].points;
-            if (dist(start, pts[0]) < PARENT_TOL_CM) continue;   // sibling from the same origin
-            var d = lineDist(start, pts);
-            if (d <= bestD) { bestD = d; best = o2 + '/' + c2; }
-          }
-        }
-        return (parentCache[ref] = best);
-      };
-      removeEdits.forEach(function (rm) {
-        var children = [];
+    // 6. Lines used by waypoints, now that every remove and move is known.
+    usages.forEach(function (u) {
+      var mv = has(moved, u.on) ? moved[u.on] : null;
+      if (u.ctx.view === 'variant') {
+        if (removed[u.on]) err(u.path, q(u.on) + ' is removed in the variant view');
+        else if (mv && mv.index > u.ctx.index) err(u.path, q(u.on) + ' is moved by a later edit (variant.edits[' + mv.index + ']); move it first');
+      } else {
+        // A base structure is drawn in both views, so it cannot depend on a line the variant changes.
+        // (A base end on a removed line is reported by the remove, below.)
+        if (removed[u.on] && u.ctx.role === 'via') err(u.path, q(u.on) + ' is removed in the variant view; a base structure cannot pass through it');
+        if (mv) err(u.path, q(u.on) + ' is moved in the variant view; a base structure cannot sit on it');
+      }
+    });
+    for (var mref in moved) if (removed[mref]) err(moved[mref].path, q(mref) + ' is removed in the variant view');
+
+    // 7. Removing a structure that others still branch from: library lines whose manifest `parent`
+    // is the removed line, and base structures with an end on it.
+    removeEdits.forEach(function (rm) {
+      var children = [], s = split(rm.ref);
+      var isLine = s && has(manifests, s.organ) && has(manifests[s.organ].centerlines, s.id);
+      if (isLine) {
         Object.keys(listed).forEach(function (organId) {
           var cls = manifests[organId].centerlines || {};
           for (var c in cls) {
-            if (!has(cls, c) || parentOf(organId, c) !== rm.ref) continue;
+            if (!has(cls, c) || cls[c].parent !== s.id) continue;
             var ref = organId + '/' + c, mv = moved[ref];
             if (!(mv && mv.end === 'start' && mv.on !== rm.ref)) children.push(ref);
           }
         });
-        for (var id in routes) {
-          if (routes[id].view !== 'base') continue;
-          var ends = { from: routes[id].ends.from, to: routes[id].ends.to }, mv = moved[id];
-          if (mv) ends[mv.end] = mv.on;
-          if (ends.from === rm.ref || ends.to === rm.ref) children.push(id);
-        }
-        children.forEach(function (x) {
-          if (!removed[x]) err(rm.path, x + ' branches from ' + rm.ref + '; reroute or remove ' + x + ' too');
-        });
+      }
+      for (var id in routes) {
+        if (routes[id].view !== 'base') continue;
+        var ends = { from: routes[id].ends.from, to: routes[id].ends.to }, mv = moved[id];
+        if (mv) ends[mv.end] = mv.on;
+        if (ends.from === rm.ref || ends.to === rm.ref) children.push(id);
+      }
+      children.forEach(function (x) {
+        if (!removed[x]) err(rm.path, x + ' branches from ' + rm.ref + '; reroute or remove ' + x + ' too');
       });
-    }
+    });
 
-    // 7. Labels.
+    // 8. Labels.
     var labelList = has(R, 'labels') ? (list(R.labels, 'labels', LIMITS.labels, false) || []) : [];
     labelList.forEach(function (l, i) {
       var p = idx('labels', i);
@@ -493,20 +483,21 @@
     });
     if (!has(R, 'labels')) R.labels = [];
 
-    // 8. Claims.
+    // 9. Claims.
     var claimList = list(R.claims, 'claims', LIMITS.claims, true) || [];
     claimList.forEach(function (c, i) {
       var p = idx('claims', i);
       if (!isObj(c)) { err(p, 'must be an object'); return; }
       checkKeys(c, p, KEYS.claim);
       str(c.text, key(p, 'text'), LIMITS.claim);
+      if (has(c, 'refs') && !Array.isArray(c.refs)) { err(key(p, 'refs'), MSG.refsList); return; }
       if (!Array.isArray(c.refs) || !c.refs.length) { err(key(p, 'refs'), MSG.noRefs); return; }
       c.refs.forEach(function (r, j) {
         if (typeof r !== 'string' || !has(references, r)) err(idx(key(p, 'refs'), j), 'unknown reference ' + show(r));
       });
     });
 
-    // 9. View.
+    // 10. View.
     if (has(R, 'view')) {
       if (!isObj(R.view)) err('view', 'must be an object');
       else {

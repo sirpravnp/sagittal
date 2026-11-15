@@ -67,6 +67,36 @@ test('every credit heading exists in site/meshes/CREDITS.md', () => {
   }
 });
 
+test('centre-line parents: null or a line of the same system whose path passes within 1.5 cm of the first point', () => {
+  const lines = new Map();
+  for (const [, m] of manifests) for (const [k, c] of Object.entries(m.centerlines)) lines.set(k, { m, c });
+  const segDist = (p, a, b) => {
+    const ab = b.map((v, i) => v - a[i]), L = ab.reduce((s, v) => s + v * v, 0);
+    const t = L > 0 ? Math.max(0, Math.min(1, p.reduce((s, v, i) => s + (v - a[i]) * ab[i], 0) / L)) : 0;
+    return Math.hypot(...p.map((v, i) => v - (a[i] + ab[i] * t)));
+  };
+  for (const [k, { m, c }] of lines) {
+    if (c.parent === null) continue;
+    const par = lines.get(c.parent);
+    assert.ok(par, `${k}: parent "${c.parent}" is not a centre line`);
+    assert.notEqual(c.parent, k, `${k}: is its own parent`);
+    assert.equal(par.m.system, m.system, `${k}: parent ${c.parent} is in another system`);
+    let d = Infinity;
+    for (let i = 0; i + 1 < par.c.points.length; i++) d = Math.min(d, segDist(c.points[0], par.c.points[i], par.c.points[i + 1]));
+    assert.ok(d <= 1.5, `${k}: first point is ${d.toFixed(2)} cm from parent ${c.parent}`);
+  }
+  // spot checks
+  const P = (k) => lines.get(k).c.parent;
+  assert.equal(P('left_common_carotid_artery'), 'aortic_arch');
+  assert.equal(P('brachiocephalic_trunk'), 'aortic_arch');
+  assert.equal(P('proper_hepatic_artery'), 'common_hepatic_artery');
+  assert.equal(P('gastroduodenal_artery'), 'common_hepatic_artery');
+  assert.equal(P('coeliac_trunk'), 'abdominal_aorta');
+  assert.equal(P('inferior_mesenteric_vein'), 'splenic_vein');
+  assert.equal(P('portal_vein'), null);
+  assert.equal(P('bile_duct'), null);
+});
+
 test('centre lines have at least 2 points, a radius and a valid from; landmarks have a derived note', () => {
   const allLandmarks = new Set();
   for (const [, m] of manifests) for (const k of Object.keys(m.landmarks)) {
@@ -79,7 +109,7 @@ test('centre lines have at least 2 points, a radius and a valid from; landmarks 
       const tag = `${f}: centre line ${k}`;
       assert.ok(!allLines.has(k), `${tag} is defined twice`);
       allLines.add(k);
-      assert.deepEqual(Object.keys(c).sort(), ['from', 'name', 'points', 'radius_cm'], tag);
+      assert.deepEqual(Object.keys(c).sort(), ['from', 'name', 'parent', 'points', 'radius_cm'], tag);
       assert.ok(nonEmpty(c.name), tag);
       assert.ok(Array.isArray(c.points) && c.points.length >= 2, `${tag}: needs >= 2 points`);
       assert.ok(c.points.every(isPoint), `${tag}: points must be [x,y,z] numbers`);

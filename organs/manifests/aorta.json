@@ -123,7 +123,8 @@
     ]
    ],
    "radius_cm": 1.474,
-   "from": "aortic_root_start"
+   "from": "aortic_root_start",
+   "parent": null
   },
   "aortic_arch": {
    "name": "Arch of aorta",
@@ -255,7 +256,8 @@
     ]
    ],
    "radius_cm": 1.25,
-   "from": "aortic_arch_start"
+   "from": "aortic_arch_start",
+   "parent": "ascending_aorta"
   },
   "thoracic_aorta": {
    "name": "Descending thoracic aorta",
@@ -447,7 +449,8 @@
     ]
    ],
    "radius_cm": 1.025,
-   "from": "thoracic_aorta_start"
+   "from": "thoracic_aorta_start",
+   "parent": "aortic_arch"
   },
   "abdominal_aorta": {
    "name": "Abdominal aorta",
@@ -719,7 +722,8 @@
     ]
    ],
    "radius_cm": 0.904,
-   "from": "abdominal_aorta_start"
+   "from": "abdominal_aorta_start",
+   "parent": "thoracic_aorta"
   },
   "brachiocephalic_trunk": {
    "name": "Brachiocephalic trunk",
@@ -786,7 +790,8 @@
     ]
    ],
    "radius_cm": 0.574,
-   "from": "brachiocephalic_trunk_origin"
+   "from": "brachiocephalic_trunk_origin",
+   "parent": "aortic_arch"
   },
   "right_common_carotid_artery": {
    "name": "Right common carotid artery",
@@ -908,7 +913,8 @@
     ]
    ],
    "radius_cm": 0.434,
-   "from": "right_common_carotid_artery_origin"
+   "from": "right_common_carotid_artery_origin",
+   "parent": "brachiocephalic_trunk"
   },
   "right_subclavian_artery": {
    "name": "Right subclavian artery",
@@ -1015,7 +1021,8 @@
     ]
    ],
    "radius_cm": 0.285,
-   "from": "right_subclavian_artery_origin"
+   "from": "right_subclavian_artery_origin",
+   "parent": "brachiocephalic_trunk"
   },
   "left_common_carotid_artery": {
    "name": "Left common carotid artery",
@@ -1177,7 +1184,8 @@
     ]
    ],
    "radius_cm": 0.4,
-   "from": "left_common_carotid_artery_origin"
+   "from": "left_common_carotid_artery_origin",
+   "parent": "aortic_arch"
   },
   "left_subclavian_artery": {
    "name": "Left subclavian artery",
@@ -1309,7 +1317,8 @@
     ]
    ],
    "radius_cm": 0.276,
-   "from": "left_subclavian_artery_origin"
+   "from": "left_subclavian_artery_origin",
+   "parent": "aortic_arch"
   },
   "right_renal_artery": {
    "name": "Right renal artery",
@@ -1391,7 +1400,8 @@
     ]
    ],
    "radius_cm": 0.443,
-   "from": "right_renal_artery_origin"
+   "from": "right_renal_artery_origin",
+   "parent": "abdominal_aorta"
   },
   "left_renal_artery": {
    "name": "Left renal artery",
@@ -1438,7 +1448,8 @@
     ]
    ],
    "radius_cm": 0.425,
-   "from": "left_renal_artery_origin"
+   "from": "left_renal_artery_origin",
+   "parent": "abdominal_aorta"
   },
   "right_common_iliac_artery": {
    "name": "Right common iliac artery",
@@ -1545,7 +1556,8 @@
     ]
    ],
    "radius_cm": 0.678,
-   "from": "right_common_iliac_artery_origin"
+   "from": "right_common_iliac_artery_origin",
+   "parent": "abdominal_aorta"
   },
   "left_common_iliac_artery": {
    "name": "Left common iliac artery",
@@ -1617,7 +1629,8 @@
     ]
    ],
    "radius_cm": 0.75,
-   "from": "left_common_iliac_artery_origin"
+   "from": "left_common_iliac_artery_origin",
+   "parent": "abdominal_aorta"
   },
   "right_external_iliac_artery": {
    "name": "Right external iliac artery",
@@ -1779,7 +1792,8 @@
     ]
    ],
    "radius_cm": 0.552,
-   "from": "right_external_iliac_artery_origin"
+   "from": "right_external_iliac_artery_origin",
+   "parent": "right_common_iliac_artery"
   },
   "left_external_iliac_artery": {
    "name": "Left external iliac artery",
@@ -1941,7 +1955,8 @@
     ]
    ],
    "radius_cm": 0.552,
-   "from": "left_external_iliac_artery_origin"
+   "from": "left_external_iliac_artery_origin",
+   "parent": "left_common_iliac_artery"
   },
   "right_internal_iliac_artery": {
    "name": "Right internal iliac artery",
@@ -2028,7 +2043,8 @@
     ]
    ],
    "radius_cm": 0.402,
-   "from": "right_internal_iliac_artery_origin"
+   "from": "right_internal_iliac_artery_origin",
+   "parent": "right_common_iliac_artery"
   },
   "left_internal_iliac_artery": {
    "name": "Left internal iliac artery",
@@ -2115,7 +2131,8 @@
     ]
    ],
    "radius_cm": 0.402,
-   "from": "left_internal_iliac_artery_origin"
+   "from": "left_internal_iliac_artery_origin",
+   "parent": "left_common_iliac_artery"
   }
  },
  "landmarks": {

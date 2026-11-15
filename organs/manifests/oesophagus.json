@@ -413,7 +413,8 @@
     ]
    ],
    "radius_cm": 0.754,
-   "from": "oesophagus_upper_end"
+   "from": "oesophagus_upper_end",
+   "parent": null
   }
  },
  "landmarks": {

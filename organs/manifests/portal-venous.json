@@ -108,7 +108,8 @@
     ]
    ],
    "radius_cm": 0.275,
-   "from": "portal_confluence"
+   "from": "portal_confluence",
+   "parent": null
   },
   "splenic_vein": {
    "name": "Splenic vein",
@@ -335,7 +336,8 @@
     ]
    ],
    "radius_cm": 0.145,
-   "from": "portal_confluence"
+   "from": "portal_confluence",
+   "parent": null
   },
   "superior_mesenteric_vein": {
    "name": "Superior mesenteric vein",
@@ -797,7 +799,8 @@
     ]
    ],
    "radius_cm": 0.173,
-   "from": "portal_confluence"
+   "from": "portal_confluence",
+   "parent": null
   },
   "inferior_mesenteric_vein": {
    "name": "Inferior mesenteric vein",
@@ -1054,7 +1057,8 @@
     ]
    ],
    "radius_cm": 0.149,
-   "from": "inferior_mesenteric_vein_junction"
+   "from": "inferior_mesenteric_vein_junction",
+   "parent": "splenic_vein"
   },
   "splenic_vein_hilar_tributary_1": {
    "name": "Hilar tributary 1 of the splenic vein (unnamed in source)",
@@ -1101,7 +1105,8 @@
     ]
    ],
    "radius_cm": 0.065,
-   "from": "splenic_vein_hilar_tributary_1_junction"
+   "from": "splenic_vein_hilar_tributary_1_junction",
+   "parent": "splenic_vein"
   },
   "splenic_vein_hilar_tributary_2": {
    "name": "Hilar tributary 2 of the splenic vein (unnamed in source)",
@@ -1148,7 +1153,8 @@
     ]
    ],
    "radius_cm": 0.062,
-   "from": "splenic_vein_hilar_tributary_2_junction"
+   "from": "splenic_vein_hilar_tributary_2_junction",
+   "parent": "splenic_vein"
   },
   "splenic_vein_hilar_tributary_3": {
    "name": "Hilar tributary 3 of the splenic vein (unnamed in source)",
@@ -1180,7 +1186,8 @@
     ]
    ],
    "radius_cm": 0.051,
-   "from": "splenic_vein_hilar_tributary_3_junction"
+   "from": "splenic_vein_hilar_tributary_3_junction",
+   "parent": "splenic_vein_hilar_tributary_1"
   },
   "splenic_vein_hilar_tributary_4": {
    "name": "Hilar tributary 4 of the splenic vein (unnamed in source)",
@@ -1207,7 +1214,8 @@
     ]
    ],
    "radius_cm": 0.046,
-   "from": "splenic_vein_hilar_tributary_4_junction"
+   "from": "splenic_vein_hilar_tributary_4_junction",
+   "parent": "splenic_vein_hilar_tributary_1"
   },
   "splenic_vein_hilar_tributary_5": {
    "name": "Hilar tributary 5 of the splenic vein (unnamed in source)",
@@ -1239,7 +1247,8 @@
     ]
    ],
    "radius_cm": 0.053,
-   "from": "splenic_vein_hilar_tributary_5_junction"
+   "from": "splenic_vein_hilar_tributary_5_junction",
+   "parent": "splenic_vein"
   },
   "splenic_vein_hilar_tributary_6": {
    "name": "Hilar tributary 6 of the splenic vein (unnamed in source)",
@@ -1271,7 +1280,8 @@
     ]
    ],
    "radius_cm": 0.057,
-   "from": "splenic_vein_hilar_tributary_6_junction"
+   "from": "splenic_vein_hilar_tributary_6_junction",
+   "parent": "splenic_vein"
   }
  },
  "landmarks": {
