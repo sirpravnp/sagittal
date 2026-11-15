@@ -1,0 +1,56 @@
+{
+  "heart": {
+    "file": "heart.webp",
+    "variant": "asd",
+    "width": 1440,
+    "height": 1080
+  },
+  "aorta": {
+    "file": "aorta.webp",
+    "variant": "ext",
+    "width": 1440,
+    "height": 1080
+  },
+  "flail": {
+    "file": "flail.webp",
+    "variant": "insp",
+    "width": 1440,
+    "height": 1080
+  },
+  "tension": {
+    "file": "tension.webp",
+    "variant": "tension",
+    "width": 1440,
+    "height": 1080
+  },
+  "asp": {
+    "file": "asp.webp",
+    "variant": "up",
+    "width": 1440,
+    "height": 1080
+  },
+  "ing": {
+    "file": "ing.webp",
+    "variant": "ind",
+    "width": 1440,
+    "height": 1080
+  },
+  "bil": {
+    "file": "bil.webp",
+    "variant": "gb",
+    "width": 1440,
+    "height": 1080
+  },
+  "fib": {
+    "file": "fib.webp",
+    "variant": "all",
+    "width": 1440,
+    "height": 1080
+  },
+  "eye": {
+    "file": "eye.webp",
+    "variant": "ac",
+    "width": 1440,
+    "height": 1080
+  }
+}

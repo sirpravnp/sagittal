@@ -1,8 +1,11 @@
-# sagittal
+# Sagittal
 
-sagittal is an open-source static website of interactive three.js anatomy
-visuals for medical students. Phase 1 is a premade library of scenes served as
-plain static files, with no server.
+Medical image generation: Sagittal is an open-source static website of labelled,
+interactive three.js anatomy figures for medical students, with Anki decks built
+from the same scenes. Phase 1 is a premade library of scenes served as plain
+static files, with no server.
+
+![Fig. 4, tension pneumothorax: the scene's plate image](site/thumbs/tension.webp)
 
 **Review status:** every visual is currently marked "Unreviewed: verify
 against your textbook". Do not treat any scene as authoritative.
@@ -28,6 +31,11 @@ decks there), so they 404 when serving `site/` locally.
     npm run cards       # PNGs into build/cards (needs Google Chrome locally)
     npm run decks       # 2D decks into build/decks/sagittal-<topic>.apkg
     npm run decks:3d    # experimental 3D decks, sagittal-<topic>-3d.apkg
+    npm run thumbs      # plate images for the landing page into site/thumbs/ (committed)
+
+Re-run `npm run thumbs` after adding or changing a scene (or `node tools/render_thumbs.mjs <id>`
+for one). A scene without a thumbnail still shows on the landing page as a plain text plate,
+and CI re-renders all thumbnails before deploying.
 
 Decks are downloadable from the live site and attached to GitHub Releases for
 `v*` tags.

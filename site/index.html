@@ -3,27 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>sagittal: interactive anatomy</title>
+<meta name="color-scheme" content="light dark">
+<title>Sagittal: medical image generation</title>
+<meta name="description" content="Open-source, labelled 3D anatomy figures for medical students, with Anki decks. Unreviewed: verify against your textbook.">
+<!-- Optional: the GitHub repository URL, e.g. https://github.com/OWNER/sagittal. Left empty, it is
+     worked out from an OWNER.github.io/REPO address; the GitHub links are hidden if neither is known. -->
+<meta name="sagittal-repo" content="">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 </head>
-<body class="gallery-page">
-<header class="top">
-  <span class="brand">sagittal</span>
-  <h1>Interactive anatomy scenes</h1>
-</header>
-<main class="page">
-  <p class="lede">Stylized 3D teaching schematics. Rotate, zoom and switch variants.</p>
-  <div id="gallery"></div>
-  <section id="decks" hidden>
-    <h2>Download Anki decks</h2>
-    <p class="lede">One deck per topic. The 3D decks are experimental (see the README). Links work on the deployed site; locally they 404 until the decks are built.</p>
-    <ul id="deck-list" class="cards"></ul>
-  </section>
-</main>
-<script src="vendor/three.min.js"></script>
-<script src="kit/labels.js"></script>
-<script src="kit/kit.js"></script>
+<body class="index-page">
+<a class="skip" href="#plates">Skip to the plates</a>
+<div class="wrap">
+  <header class="masthead">
+    <h1>Sagittal</h1>
+    <p class="desc">Medical image generation</p>
+    <p class="intro">Sagittal draws labelled anatomy figures in your browser from 3D models: rotate them, zoom in, and switch between normal anatomy and the pathology. Every view is also rendered into an Anki deck, with the structures unlabelled on the front of each card and labelled on the back. The project is open source and no figure has been reviewed yet, so check what you learn here against your textbook.</p>
+  </header>
+
+  <main>
+    <section class="sec" id="plates" aria-labelledby="plates-h" tabindex="-1">
+      <h2 id="plates-h">Plates</h2>
+      <div class="sec-body">
+        <p class="sec-note" id="plates-note">Select a plate to open the scene.</p>
+        <div id="gallery"></div>
+      </div>
+    </section>
+
+    <section class="sec" id="decks" aria-labelledby="decks-h" hidden>
+      <h2 id="decks-h">Anki decks</h2>
+      <div class="sec-body">
+        <p class="sec-note">One deck per topic. Import the <code>.apkg</code> file in Anki with File, Import. The standard decks use still images and work in every Anki client. The 3D decks run the scene inside the card and have only been tried on Anki desktop.</p>
+        <ul id="deck-list" class="decks"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <h2 class="visually-hidden">About this site</h2>
+    <p>Code under the MIT licence. Scene text and claims under CC BY-SA 4.0. Anatomical meshes keep the licence of their source; see the <a href="meshes/CREDITS.md">model credits</a>.</p>
+    <ul class="foot-links">
+      <li data-repo-link=""><a href="#">Source on GitHub</a></li>
+      <li data-repo-link="blob/main/CONTRIBUTING.md"><a href="#">Contributing a scene</a></li>
+      <li data-repo-link="issues/new?template=medical-correction.md"><a href="#">Report a medical error</a></li>
+    </ul>
+    <p>For learning only. Not clinical advice.</p>
+  </footer>
+</div>
 <script src="app.js"></script>
 <script>SagittalApp.initGallery();</script>
 </body>

@@ -6,16 +6,16 @@ import { writeFile } from 'node:fs/promises';
 import { join, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const GL_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
+export const GL_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
 const WIDTH = 800;
 const HEIGHT = 600;
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json', '.css': 'text/css', '.png': 'image/png',
-  '.svg': 'image/svg+xml', '.txt': 'text/plain',
+  '.svg': 'image/svg+xml', '.txt': 'text/plain', '.webp': 'image/webp', '.md': 'text/plain; charset=utf-8',
 };
 
-function serve(root) {
+export function serve(root) {
   const base = resolve(root);
   const server = createServer((req, res) => {
     const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
