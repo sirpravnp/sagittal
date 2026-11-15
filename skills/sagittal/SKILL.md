@@ -133,7 +133,8 @@ library, tell the student what is missing (step 3) instead of showing it.
 
 ### 7. Hand it over
 
-Open it for the student (`S figure <spec> --open`, or open the HTML) and reply with the file path
+Open the HTML for the student (`open <file>` on macOS, `xdg-open` on Linux; or build the final
+version with `S figure <spec> --open`) and reply with the file path
 and one line on what it shows, e.g. *"`sagittal-figures/replaced-right-hepatic-artery.html`: the
 right hepatic artery arises from the SMA and runs behind the portal vein to the right lobe; switch
 Normal/Variant in the dropdown."* Add a sentence on the clinical point only if it is in a claim.
