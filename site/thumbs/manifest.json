@@ -52,5 +52,47 @@
     "variant": "ac",
     "width": 1440,
     "height": 1080
+  },
+  "cor": {
+    "file": "cor.webp",
+    "variant": "lad",
+    "width": 1440,
+    "height": 1080
+  },
+  "plexus": {
+    "file": "plexus.webp",
+    "variant": "erb",
+    "width": 1440,
+    "height": 1080
+  },
+  "knee": {
+    "file": "knee.webp",
+    "variant": "triad",
+    "width": 1440,
+    "height": 1080
+  },
+  "cow": {
+    "file": "cow.webp",
+    "variant": "acom",
+    "width": 1440,
+    "height": 1080
+  },
+  "bleed": {
+    "file": "bleed.webp",
+    "variant": "epi",
+    "width": 1440,
+    "height": 1080
+  },
+  "portal": {
+    "file": "portal.webp",
+    "variant": "eso",
+    "width": 1440,
+    "height": 1080
+  },
+  "thyroid": {
+    "file": "thyroid.webp",
+    "variant": "rln",
+    "width": 1440,
+    "height": 1080
   }
 }
