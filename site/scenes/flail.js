@@ -169,13 +169,15 @@
       var flailText = st.ph === 'insp' ? 'Flail segment: sucked inward (paradoxical)'
         : st.ph === 'exp' ? 'Flail segment: pushed outward (paradoxical)'
         : 'Flail segment (paradoxical motion)';
-      var site = C.sites.filter(function (s) { return s.fr === 0; }).sort(function (a, b) { return b.p[1] - a.p[1]; })[1] || C.sites[0];
+      // a haematoma on the anterior fracture line (the lateral line is half hidden in this view)
+      var site = C.sites.filter(function (s) { return s.fr === 1; }).sort(function (a, b) { return b.p[1] - a.p[1]; })[1] || C.sites[0];
       var L = [
         { t: flailText, p: P([C.centre[0] + out.x * 3, C.centre[1] + 2, C.centre[2] + out.z * 3]) },
-        { t: 'Fracture sites', p: P([site.p[0] + 0.8, site.p[1], site.p[2] - 0.5]) },
-        { t: 'Sternum', p: P([0, 13, 9.5]) },
+        { t: 'Fracture sites', p: P([site.p[0], site.p[1], site.p[2] - Z0]) }, // on a haematoma (sites sit in `inner`, shifted by -Z0)
+        { t: 'Sternum', p: P([1.6, 10.5, 7.6]) },
       ];
-      if (st.c) L.push({ t: 'Pulmonary contusion', p: P([bruise[0] + out.x * 1.5, bruise[1] - 6.5, bruise[2] + out.z * 1.5 + 1]) });
+      // on the bruised lung where it shows between the ribs below the segment
+      if (st.c) L.push({ t: 'Pulmonary contusion', p: P([12.3, -0.5, 4.7]) });
 
       var update = function (t) {
         var s = st.ph === 'insp' ? 1 : st.ph === 'exp' ? -1 : Math.sin(t * 1.6);

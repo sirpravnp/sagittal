@@ -22,7 +22,7 @@ each variant visibly shows its own finding, and nothing looks like a toy.
 In the repo root (paths below are relative to it):
 
 - `docs/meshes.md`: mesh format, frame, bake config keys, `Kit.meshPart`/`Kit.tissue`, licence rule.
-- `site/kit/kit.js` (474 lines): the whole rendering API. Cheat sheet: `reference/kit-api.md`.
+- `site/kit/kit.js`: the whole rendering API. Cheat sheet: `reference/kit-api.md`.
 - Two finished scenes as models: `site/scenes/bil.js` + `bil.meta.json` (Z-Anatomy organs,
   ducts drawn along a real centre line, stones and masses as overlays) and `site/scenes/heart.js`
   + `heart.meta.json` (CT-derived heart, per-variant view angle, deformed copies of baked parts).
@@ -101,6 +101,15 @@ bboxes, sampled centre lines), never by eye in scene units.
 - Unclear licence = do not use; note it in the cache's `INVENTORY.md` section of your report.
 - Every baked mesh has `credit` = a `## <heading>` in `site/meshes/CREDITS.md`. Append a section:
   source, authors, URL/DOI, licence, exactly what you changed, which scene uses it.
+- Credit the works a source itself adapted. Z-Anatomy's `License.txt` lists models it "used as
+  reference/included and adapted", among them the University of Dundee CAHID "Cranial Nerves and
+  Foramina" (CC BY 4.0) and "Brainder"; if you use Z-Anatomy cranial nerves (curve objects) or
+  brain parts, credit those too (see the `willis` section of CREDITS).
+- Coordinates you copy from a source into a scene file (sampled centre lines, landmarks) keep the
+  source's licence: say so in the scene header and add a CREDITS entry for them.
+- The card credit line comes from `site/meshes/credits.json`: a scene's sources are its meshes'
+  `credit` ids plus `extra` entries. Add a source there (and a `scene:<id>` extra for embedded
+  centre lines from another source) so the viewer and the Anki cards credit it.
 - Downloads go under `../sagittal-assets-cache/<source>/`, never into the repo; keep the total
   under 1 GB and record URL, size and licence in your report.
 
@@ -153,7 +162,16 @@ did: tapered tubes, editable clones, section caps, per-frame clip planes) and sa
 - Every structure the finding depends on gets a label naming it as a textbook would
   ("Proximal pole of scaphoid", not "bone 2"). Each lesion variant adds a label for its finding.
 - Anchor each label on a surface that is visible in that variant's view, in scene units
-  (transform through the model group's matrix if you rotated it).
+  (transform through the model group's matrix if you rotated it). The kit draws an anchor dot
+  and a leader line from it to the label, and raycasts each anchor from the camera: an anchor
+  hidden behind another opaque surface gets a hollow dot and a dashed leader, and the e2e test
+  fails. Give the label `on: <the structure's mesh>` so the kit puts the dot on its visible
+  surface, move the anchor onto the visible stretch, or drop the label in that view. Only a structure deliberately drawn x-ray style (depthTest off, e.g. a septal defect
+  seen through the heart) may set `behind: true` on its label.
+- To find a visible anchor, open the variant in the viewer and call
+  `viewer.debug().pick(x, y)` with a stage pixel: it returns the mesh under it and the point in
+  that mesh's frame and in label coordinates. `viewer.debug().leaders` lists every label's
+  dot, leader length and whether it is hidden.
 - About 8 to 14 labels; the layout engine must place them without overlap and inside the
   canvas at 1200 px and at 375 px (e2e checks both). Fewer, better labels beat a crowded card.
 - `info` (HTML per variant) and `meta.claims` say the same facts; claims are short, exact,
@@ -174,6 +192,10 @@ run `npm run cards` first if `build/cards/` is empty). Judge with the rubric in
 anterior, lateral or sectional view), check sidedness, relations and proportions, and that the
 front card alone shows the finding. Iterate (view angle, opacity, overlay size, labels) until it
 passes. Expect several rounds; the existing scenes each took many.
+
+Then render the landing-page plate for the scene and commit it with the scene:
+`node tools/render_thumbs.mjs <id>` (writes `site/thumbs/<id>.webp` and updates
+`site/thumbs/manifest.json`; without it the landing page shows a text plate until CI deploys).
 
 ## 9. Performance (software GL is the floor)
 
@@ -208,7 +230,8 @@ do not commit the copy.
 - [ ] Each baked file ≤ 400 KB, scene total ≤ 800 KB; organs smoothed; `center` pinned if coordinates are hard-coded.
 - [ ] Frame correct: patient's left is +x (screen right in anterior view), superior +y, anterior +z. Sidedness checked on the card.
 - [ ] Meta passes validation; variant keys/labels equal the control's `opts`; id appended to `index.json`; `status: "unreviewed"`.
-- [ ] Every variant's front card shows its finding without labels; back card labels name the structures, no overlap.
+- [ ] Every variant's front card shows its finding without labels; back card labels name the structures, no overlap, every leader dot on the named structure and none hidden.
+- [ ] `site/thumbs/<id>.webp` and `manifest.json` rendered and committed.
 - [ ] Cards compared against the reference cards and atlas anatomy; honest verdict per variant written down.
 - [ ] `npm test`, `npm run test:py`, e2e for the scene (and full e2e once) pass.
 - [ ] Report lists sources, downloads, sizes, card paths, and every anatomical uncertainty.

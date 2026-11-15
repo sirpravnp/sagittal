@@ -128,7 +128,7 @@
       var L = [
         { t: 'Deep (internal) ring', p: P(-1.5, 0.3, 1.5) }, { t: 'Superficial ring', p: P(2.5, -3.5, 1.8) },
         { t: 'Spermatic cord', p: P(3.05, -7.5, 1.05) }, { t: 'Inguinal ligament', p: P(-4.5, 2.4, 1.4) },
-        { t: 'Inferior epigastric vessels', p: P(0.9, 4.0, 1.3) }, { t: 'Hesselbach triangle', p: P(0.7, -1.2, 1.6) },
+        { t: 'Inferior epigastric vessels', p: P(0.9, 4.0, 1.3) }, { t: 'Hesselbach triangle', p: P(0.25, 0.3, 1.62) }, // upper triangle: stays clear of a direct sac
         { t: 'Rectus', p: P(3.2, 5.5, 3) }, { t: 'Femoral N / A / V', p: P(-1.3, -5.5, 0.3) },
       ];
       var info = '<ul><li><b>Inguinal canal</b>: runs from the deep ring (in transversalis fascia) to the superficial ring (in the external oblique aponeurosis), carrying the spermatic cord / round ligament.</li><li><b>Hesselbach triangle</b>: inferior epigastric vessels (lateral), lateral border of rectus (medial), inguinal ligament (inferior).</li><li>Femoral triangle, lateral → medial: Nerve, Artery, Vein, (empty space) Lymphatics. The femoral sheath holds the artery, vein and femoral canal; the nerve lies outside it.</li><li>Anterior oblique view of the right groin; hide the external oblique to see the canal contents more clearly.</li></ul>';

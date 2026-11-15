@@ -86,11 +86,12 @@
       }
     }
     geo.computeVertexNormals();
-    parent.add(new THREE.Mesh(geo, m));
+    var me = new THREE.Mesh(geo, m); parent.add(me);
     [[0, r0], [1, r1]].forEach(function (e) {
       var cap = new THREE.Mesh(new THREE.SphereGeometry(e[1], 12, 8), m);
       cap.position.copy(curve.getPointAt(e[0])); parent.add(cap);
     });
+    curve.mesh = me; // labels anchor on the tube's visible surface
     return curve;
   }
 
@@ -181,11 +182,11 @@
       var hot = 0x3de0ff; // injury markers: cyan stands out against arteries and nerves
 
       // --- real Z-Anatomy structures ---
-      Kit.meshPart(b, 'thyroid', 'thyroid_cartilage', T('cartilage'));
+      var thyC = Kit.meshPart(b, 'thyroid', 'thyroid_cartilage', T('cartilage'));
       Kit.meshPart(b, 'thyroid', 'cricoid', T('cartilage'));
       Kit.meshPart(b, 'thyroid', 'trachea', T('cartilage', { color: 0xb3c4c6 }));
       Kit.meshPart(b, 'thyroid', 'hyoid', T('bone'));
-      Kit.meshPart(b, 'thyroid', 'cricothyroid', v === 'sln'
+      var crico = Kit.meshPart(b, 'thyroid', 'cricothyroid', v === 'sln'
         ? T('muscle', { color: 0x8a6a8f, emissive: 0x5a1a6a, emissiveIntensity: 0.45 }) : T('muscle'));
       ['aorta', 'brachiocephalic_trunk', 'subclavians', 'external_carotids', 'thyrocervical'].forEach(function (k) {
         Kit.meshPart(b, 'thyroid', k, T('vessel-artery'));
@@ -211,9 +212,11 @@
       });
 
       // --- thyroid gland and parathyroids (procedural, moulded on the real airway and carotids) ---
-      var glandM = T('liver', { color: 0xb35a48, roughness: 0.5, opacity: v === 'norm' ? 0.82 : v === 'para' ? 0.42 : 0.26, depthWrite: false });
+      // normal: translucent enough that the parathyroids on the back of the lobes show through
+      var glandM = T('liver', { color: 0xb35a48, roughness: 0.5, opacity: v === 'norm' ? 0.6 : v === 'para' ? 0.42 : 0.26, depthWrite: false });
       var lobeL = lobeGeo(1), lobeR = lobeGeo(-1);
-      b.add(new THREE.Mesh(lobeL, glandM), new THREE.Mesh(lobeR, glandM), new THREE.Mesh(isthmusGeo(), glandM));
+      var gland = [new THREE.Mesh(lobeL, glandM), new THREE.Mesh(lobeR, glandM), new THREE.Mesh(isthmusGeo(), glandM)];
+      b.add(gland[0], gland[1], gland[2]);
       var para = v === 'para'
         ? T('liver', { color: 0x4b3a4f, roughness: 0.7, emissive: 0x200a28, emissiveIntensity: 0.3 })
         : T('fat', { color: 0xc99a3c, emissive: 0x3a2405, emissiveIntensity: 0.25 });
@@ -232,14 +235,14 @@
       var nerve = T('nerve', { color: 0xffe27a, emissive: 0xb08a20, emissiveIntensity: 0.7 });
       var dead = T('nerve', { color: 0x6f6a5c, roughness: 0.7 });
       var nr = 0.13, br = 0.12;
-      vtube(b, VAG_L, nr, nr, nerve); vtube(b, VAG_R, nr, nr, nerve);
+      var vagL = vtube(b, VAG_L, nr, nr, nerve).mesh, vagR = vtube(b, VAG_R, nr, nr, nerve).mesh;
       if (v === 'rln') {
         // left RLN divided where it crosses the inferior thyroid artery: distal stump dead
         var hk = split(RLN_L, 8);
         vtube(b, hk[0], br, br, nerve); vtube(b, hk[1], br, br, dead);
         mark(b, RLN_L[8], 0.5, hot);
       } else vtube(b, RLN_L, br, br, nerve);
-      vtube(b, RLN_R, br, br, nerve);
+      var rlnR = vtube(b, RLN_R, br, br, nerve).mesh;
       vtube(b, SLN, 0.075, 0.07, nerve); vtube(b, SLN_INT, 0.06, 0.05, nerve);
       if (v === 'sln') {
         var hs = split(SLN_EXT, 2);
@@ -252,14 +255,14 @@
       // --- labels (each lists the variants it appears in) ---
       var A = 'norm rln sln para';
       var L = [
-        { t: 'Thyroid gland', p: P(2.5, 3.6, 1.6), in: A },
+        { t: 'Thyroid gland', p: P(2.5, 3.6, 1.6), on: gland, in: A },
         { t: 'Trachea', p: P(0.9, -1.0, 0.9), in: A },
-        { t: 'Thyroid cartilage', p: P(1.9, 7.4, 1.8), in: 'norm sln' },
-        { t: v === 'sln' ? 'Cricothyroid paralysed: loss of high pitch' : 'Cricothyroid muscle', p: P(1.35, 4.5, 1.6), in: 'norm sln' },
-        { t: 'Left vagus nerve', p: P(3.35, -3.2, 0.4), in: A },
-        { t: 'Right vagus nerve', p: P(-2.3, 1.5, 0.55), in: 'norm rln para' },
+        { t: 'Thyroid cartilage', p: P(1.9, 7.4, 1.8), on: thyC, in: 'norm sln' },
+        { t: v === 'sln' ? 'Cricothyroid paralysed: loss of high pitch' : 'Cricothyroid muscle', p: P(1.35, 4.5, 1.6), on: crico, in: 'norm sln' },
+        { t: 'Left vagus nerve', p: P(3.35, -3.2, 0.4), on: vagL, in: A },
+        { t: 'Right vagus nerve', p: P(-2.3, 1.5, 0.55), on: vagR, in: 'norm rln para' },
         { t: 'Left recurrent laryngeal n. (under arch)', p: P(2.6, -6.65, -1.05), in: 'norm rln' },
-        { t: 'Right recurrent laryngeal n. (under subclavian)', p: P(-2.62, -0.95, 0.4), in: 'norm rln' },
+        { t: 'Right recurrent laryngeal n. (under subclavian)', p: P(-2.62, -0.95, 0.4), on: rlnR, in: 'norm rln' },
         { t: 'Superior thyroid artery', p: P(2.5, 6.55, 1.38), in: 'norm sln' },
         { t: 'Inferior thyroid artery', p: P(4.0, 3.3, -0.2), in: 'norm rln para' },
         { t: 'Aortic arch', p: P(1.0, -3.0, 1.6), in: A },
@@ -272,7 +275,7 @@
         { t: v === 'para' ? 'Superior parathyroid (devascularised)' : 'Parathyroid glands', p: P(PTH[0][0] + 0.3, PTH[0][1], PTH[0][2]), in: 'norm para' },
         { t: 'Inferior parathyroid (devascularised)', p: P(PTH[1][0] + 0.3, PTH[1][1], PTH[1][2]), in: 'para' },
       ].filter(function (l) { return l.in.split(' ').indexOf(v) >= 0; })
-        .map(function (l) { return { t: l.t, p: l.p }; });
+        .map(function (l) { return { t: l.t, p: l.p, on: l.on, side: l.side, behind: l.behind }; });
 
       var infos = {
         norm: '<ul><li><b>Recurrent laryngeal nerves</b> (vagus): the left hooks under the <b>aortic arch</b> beside the ligamentum arteriosum, the right under the <b>right subclavian artery</b>; both climb in the tracheo-oesophageal groove and enter the larynx behind the cricothyroid joint. They supply every intrinsic laryngeal muscle except cricothyroid.</li><li>The <b>inferior thyroid artery</b> (thyrocervical trunk) crosses the RLN near the lower pole; the <b>external branch of the superior laryngeal nerve</b> runs with the <b>superior thyroid artery</b> (first branch of the external carotid) to the upper pole and supplies <b>cricothyroid</b>.</li><li>Four <b>parathyroids</b> on the back of the lobes (superior near the cricothyroid junction, inferior near the lower pole), mostly supplied by the inferior thyroid artery.</li></ul>',

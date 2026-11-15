@@ -123,7 +123,7 @@
       // combination costs a shader compile, which is slow on software GL.
       function T(kind, o) { return Kit.tissue(kind, Object.assign({ sheen: 0, clearcoat: 0.3, side: THREE.FrontSide }, o || {})); }
       var VIEW = { // [x tilt, y turn] of the heart for each variant
-        norm: [-0.35, 0.2], lad: [0.12, -0.1], lcx: [0.1, -1.5], rca: [-1.22, -0.22],
+        norm: [0.3, -0.3], lad: [0.12, -0.1], lcx: [0.1, -1.5], rca: [-0.95, 0.35],
       }[v];
       var H = new THREE.Group(); H.scale.setScalar(S); H.rotation.set(VIEW[0], VIEW[1], 0, 'YXZ'); g.add(H);
       // centre the heart (cm) so every view orbits the ventricles
@@ -174,7 +174,7 @@
       // ---- great vessels (orientation) ----
       var aoM = T('vessel-artery', { color: 0xc4574a }), paM = T('vessel-artery', { color: 0x8a6fb0 }), vM = T('vessel-vein');
       vtube(H, AO_ASC, 1.75, 1.05, aoM, 18, true);
-      vtube(H, PT, 1.3, 1.1, paM, 16);
+      vtube(H, PT, 1.3, 1.1, paM, 16, true);
       vtube(H, LPA, 0.85, 0.7, paM, 12, true);
       vtube(H, RPA, 0.85, 0.7, paM, 12, true);
       vtube(H, SVC, 1.0, 1.0, vM, 14, true);
@@ -183,14 +183,14 @@
       // ---- coronary arteries ----
       var art = T('vessel-artery', { color: 0xf03a2a, clearcoat: 0.6, emissive: 0x5a0a04 });
       var dead = T('vessel-artery', { color: 0x3a2230, roughness: 0.6 });
+      var tubes = {}; // branch -> its tube meshes (label anchors go on their visible surface)
       function branch(k) {
         var c = CL[k], pts = c.p, r0 = c.r[0] * VIS, r1 = Math.max(0.035, c.r[1]) * VIS;
         var down = bad && sys(k) === bad;
         if (down && occ[0] === k) { // split at the occlusion: patent proximal stump, dark distal vessel
           var i = occ[1], L = pts.length - 1, rm = r0 + (r1 - r0) * i / L;
-          vtube(H, pts.slice(0, i + 1), r0, rm, art);
-          vtube(H, pts.slice(i), rm, r1, dead);
-        } else vtube(H, pts, r0, r1, down ? dead : art);
+          tubes[k] = [vtube(H, pts.slice(0, i + 1), r0, rm, art), vtube(H, pts.slice(i), rm, r1, dead)];
+        } else tubes[k] = [vtube(H, pts, r0, r1, down ? dead : art)];
       }
       Object.keys(CL).forEach(branch);
       // SA nodal branch: from the proximal RCA, back over the right atrium to the SVC-RA junction (sinus node)
@@ -202,10 +202,10 @@
       vtube(H, SAN, 0.08 * VIS, 0.05 * VIS, rDown ? dead : art);
       vtube(H, AVN, 0.07 * VIS, 0.05 * VIS, rDown ? dead : art);
 
-      var hl = 0xffd23f;
+      var hl = 0xffd23f, th = null;
       if (occ) { // thrombus and marker ring at the occlusion
         var cp = CL[occ[0]].p, a = cp[occ[1] - 1], b = cp[occ[1] + 1];
-        var th = new THREE.Mesh(new THREE.SphereGeometry(0.34, 14, 10), T('vessel-artery', { color: 0x2a0606, roughness: 0.7 }));
+        th = new THREE.Mesh(new THREE.SphereGeometry(0.34, 14, 10), T('vessel-artery', { color: 0x2a0606, roughness: 0.7 }));
         th.position.copy(V3(occP)); th.scale.set(1, 1, 1.5); th.lookAt(V3(b)); H.add(th);
         var rg = Kit.helpers.ring(g, P(occP), 0.2, hl);
         rg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), V3(b).sub(V3(a)).normalize().transformDirection(H.matrix));
@@ -214,46 +214,50 @@
 
       var L = [], info = '';
       function lab(t, p) { L.push({ t: t, p: P(p) }); }
+      // label on a coronary branch near centre-line point i: the dot goes on the visible surface of
+      // that branch's tube nearest to point i (e.g. the circumflex where it leaves the LAA shadow)
+      function labv(t, k, i) { L.push({ t: t, p: P(CL[k].p[i]), on: tubes[k] }); }
       if (v === 'norm') {
-        lab('Left main', CL.lm.p[3]);
-        lab('LAD (anterior interventricular)', CL.lad.p[13]);
-        lab('Diagonal', CL.d2.p[7]);
-        lab('Circumflex (LCx)', CL.lcx.p[5]);
-        lab('RCA (right AV groove)', CL.rca.p[9]);
-        lab('Acute marginal', CL.rca1.p[5]);
-        lab('PDA (from RCA = right-dominant)', CL.pda.p[8]);
-        info = '<ul><li><b>Left main</b> → <b>LAD</b> (anterior interventricular groove: diagonals to the anterolateral LV, septal perforators to the anterior 2/3 of the septum, apex) and <b>circumflex</b> (left AV groove: obtuse marginals to the lateral wall).</li>' +
+        labv('Left main', 'lm', 3);
+        labv('LAD (anterior interventricular)', 'lad', 13);
+        labv('Diagonal', 'd2', 7);
+        labv('Circumflex (LCx)', 'lcx', 5);
+        // seen from above and the left (cranial LAO-like): the left main and circumflex origin show; the
+        // PDA and acute marginal are on the inferior surface (labelled in the RCA view)
+        labv('RCA (right AV groove → PDA: right-dominant)', 'rca', 9);
+        info = '<ul><li>View: from the front, above and slightly left, so the left main and the circumflex origin show between the pulmonary trunk and the left atrial appendage.</li>' +
+          '<li><b>Left main</b> → <b>LAD</b> (anterior interventricular groove: diagonals to the anterolateral LV, septal perforators to the anterior 2/3 of the septum, apex) and <b>circumflex</b> (left AV groove: obtuse marginals to the lateral wall).</li>' +
           '<li><b>RCA</b> runs in the right AV groove: SA nodal branch (~60%), acute marginal to the RV free wall, then at the crux the AV nodal branch and, in right dominance, the <b>PDA</b> (inferior wall, posterior 1/3 of the septum).</li>' +
           '<li><b>Dominance</b> = which artery gives the PDA: right ~70-80%, left (LCx) ~10%, co-dominant the rest.</li></ul>';
       } else if (v === 'lad') {
-        lab('Proximal LAD occlusion', CL.lad.p[3]);
+        L.push({ t: 'Proximal LAD occlusion', p: P(CL.lad.p[3]), on: [th] });
         lab('Anterior wall + apex', [4.6, -2.6, 3.1]);
-        lab('Anterior septum (septal perforators)', CL.lad.p[17]);
-        lab('Diagonal (no flow)', CL.d2.p[8]);
-        lab('Circumflex (patent)', CL.lcx.p[7]);
-        lab('RCA (patent)', CL.rca.p[7]);
+        labv('Anterior septum (septal perforators)', 'lad', 17);
+        labv('Diagonal (no flow)', 'd2', 8);
+        // (the patent circumflex runs behind the left atrial appendage in this view: not labelled here)
+        labv('RCA (patent)', 'rca', 7);
         info = '<ul><li><b>Anterior / anteroseptal STEMI: ST elevation V1-V4</b> (V1-V2 septal, V3-V4 anterior; add I, aVL, V5-V6 if diagonals are involved: anterolateral).</li>' +
           '<li>The LAD is the most commonly occluded coronary artery and supplies the anterior LV, apex and anterior 2/3 of the septum.</li>' +
           '<li>Proximal LAD occlusion can cause new RBBB / LAFB (septal conduction tissue), cardiogenic shock, LV apical aneurysm and mural thrombus.</li>' +
           '<li>Treatment: emergent PCI (first medical contact to device ≤ 90 min) or fibrinolysis if PCI is not available within 120 min.</li></ul>';
       } else if (v === 'lcx') {
-        lab('Circumflex occlusion', CL.lcx.p[3]);
+        L.push({ t: 'Circumflex occlusion', p: P(CL.lcx.p[3]), on: [th] });
         lab('Lateral wall', [6.4, -1.4, 1.0]);
-        lab('Obtuse marginal (no flow)', CL.lcx.p[22]);
-        lab('LAD (patent)', CL.lad.p[12]);
+        labv('Obtuse marginal (no flow)', 'lcx', 22);
+        labv('LAD (patent)', 'lad', 12);
         lab('Left atrium', [1.6, 3.4, -2.6]);
         info = '<ul><li><b>Lateral STEMI: ST elevation I, aVL, V5-V6.</b></li>' +
           '<li>The circumflex runs in the left AV groove and supplies the lateral (and, via posterolateral branches, posterior) LV.</li>' +
           '<li>Often electrically quiet: a posterior extension shows as <b>ST depression V1-V3</b> with tall R waves; confirm with V7-V9.</li>' +
           '<li>The anterolateral papillary muscle has a dual supply (LAD diagonals + LCx marginals), so it rarely ruptures.</li></ul>';
       } else if (v === 'rca') {
-        lab('Proximal RCA occlusion', CL.rca.p[2]);
+        L.push({ t: 'Proximal RCA occlusion', p: P(CL.rca.p[2]), on: [th] });
         lab('Inferior wall', [2.2, -5.2, -1.2]);
         lab('RV infarct', [-2.4, -4.1, 2.6]);
-        lab('PDA (no flow)', CL.pda.p[9]);
-        lab('AV nodal branch (crux)', crux);
-        lab('RCA (no flow)', CL.rca.p[30]);
-        info = '<ul><li><b>Inferior STEMI: ST elevation II, III, aVF</b> (III > II suggests RCA rather than LCx); reciprocal ST depression in I and aVL.</li>' +
+        labv('PDA (no flow)', 'pda', 9);
+        labv('RCA (no flow)', 'rca', 30);
+        info = '<ul><li>View: from the front and below: the RCA from its origin at the aortic root down the right AV groove, the RV free wall facing you and the inferior (diaphragmatic) wall along the bottom.</li>' +
+          '<li><b>Inferior STEMI: ST elevation II, III, aVF</b> (III > II suggests RCA rather than LCx); reciprocal ST depression in I and aVL.</li>' +
           '<li><b>RV infarct</b> (proximal RCA, before the RV branches): ST elevation in V4R, hypotension, raised JVP, clear lungs. Preload dependent: give fluids, avoid nitrates.</li>' +
           '<li><b>Bradycardia and heart block:</b> the AV nodal artery comes from the RCA in ~80-90% (right dominance), the SA nodal artery in ~60%. Inferior MI AV block is usually at the AV node and often transient (atropine; pacing if unstable).</li>' +
           '<li>The posteromedial papillary muscle has a single supply (PDA), so it can rupture 3-5 days after an inferior MI → acute mitral regurgitation.</li></ul>';

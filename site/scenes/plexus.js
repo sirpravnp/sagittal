@@ -47,6 +47,7 @@
   }
   function curveOf(pts) { return new THREE.CatmullRomCurve3(pts.map(V3), false, 'centripetal'); }
   // Swept tube along cm points between curve parameters t0..t1, rounded ends.
+  var DRAWN = null; // per build: centre-line array -> tube meshes drawn along it (label anchors)
   function nerve(parent, pts, r, m, t0, t1) {
     t0 = t0 || 0; t1 = t1 === undefined ? 1 : t1;
     var c = curveOf(pts), n = Math.max(8, Math.round(c.getLength() * (t1 - t0) * 2.2));
@@ -58,6 +59,7 @@
     [sp[0], sp[sp.length - 1]].forEach(function (p) {
       var s = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 8), m); s.position.copy(p); s.renderOrder = ro; parent.add(s);
     });
+    if (DRAWN) { var dl = DRAWN.get(pts) || []; dl.push(tb); DRAWN.set(pts, dl); }
     return c;
   }
   function at(pts, t) { var p = curveOf(pts).getPointAt(t); return [p.x, p.y, p.z]; }
@@ -243,6 +245,7 @@
     ] }],
     build: function (g, st) {
       var v = st.v, les = LESION[v] || null;
+      DRAWN = new Map();
       SCRATCH = T('bone');
       // main view: whole frame for the normal plexus, left 2/3 when a posed-limb inset is shown
       var SM = v === 'norm' ? 0.3 : v === 'rad' ? 0.19 : 0.21;
@@ -263,7 +266,7 @@
       // ---- skeleton and muscles ----
       var bone = T('bone', { color: 0xa99a7e });
       Kit.meshPart(body, 'upper-limb', 'spine', bone);
-      Kit.meshPart(body, 'upper-limb', 'rib1', T('bone', { color: 0xd8c39a }));
+      var rib1 = Kit.meshPart(body, 'upper-limb', 'rib1', T('bone', { color: 0xd8c39a }));
       Kit.meshPart(body, 'upper-limb', 'ribs', T('bone', { color: 0xa99a7e, opacity: v === 'rad' ? 0.18 : 0.45, depthWrite: false }));
       Kit.meshPart(body, 'upper-limb', 'clavicle', T('bone', { opacity: 0.3, depthWrite: false }));
       var scap = joint(body, [-16.5, 133.0, -5.5]);
@@ -309,6 +312,8 @@
         ball.position.set(lp[0], lp[1], lp[2]); body.add(ball);
         var core = new THREE.Mesh(new THREE.SphereGeometry(RAD[les.at[0]] * 1.25, 16, 12), hl);
         core.position.copy(ball.position); body.add(core);
+        // drawn through whatever lies in front (the lower trunk runs behind the subclavian artery)
+        [ball, core].forEach(function (o) { o.material.depthTest = false; o.material.transparent = true; o.renderOrder = 10; });
       }
       if (v === 'klumpke') { // Horner: T1 preganglionic sympathetic fibres reach the stellate (cervicothoracic) ganglion
         nerve(body, CL.symp.map(function (p) { return [p[0] - 1.0, p[1], p[2]]; }), 0.12, T('nerve', { color: 0xc9b8e8 }));
@@ -322,15 +327,23 @@
       // ---- labels ----
       var L = [];
       function lab(t, p) { L.push({ t: t, p: Pa(p) }); }
+      // label on a nerve or vessel near fraction f of its course: the dot goes on the visible surface
+      // of the tube drawn along it (the kit picks the visible point nearest to f, e.g. clear of the artery)
+      function labc(t, pts, f) {
+        var key = pts;
+        Object.keys(CL).forEach(function (k) { if (CL[k] === pts && W[k]) key = W[k]; }); // roots: drawn exploded
+        var on = DRAWN.get(key);
+        L.push(on ? { t: t, p: Pa(at(pts, f)), on: on } : { t: t, p: Pa(at(pts, f)) });
+      }
       if (v === 'norm') {
-        lab('C5', at(CL.C5, 0.15)); lab('C6', at(CL.C6, 0.12)); lab('C7', at(CL.C7, 0.1)); lab('C8', at(CL.C8, 0.1)); lab('T1', at(CL.T1, 0.12));
-        lab('Upper trunk', at(W.ut, 0.45)); lab('Middle trunk', at(W.mt, 0.5)); lab('Lower trunk', at(W.lt, 0.5));
-        lab('Divisions (behind clavicle)', at(W.ad_m, 0.4));
-        lab('Lateral cord', at(W.lc, 0.6)); lab('Posterior cord', at(W.pc, 0.6)); lab('Medial cord', at(W.mc, 0.6));
-        lab('Musculocutaneous n.', at(W.mcn, 0.35)); lab('Axillary n.', at(W.ax, 0.8)); lab('Radial n.', at(W.rad, 0.32));
-        lab('Median n.', at(W.med, 0.07)); lab('Ulnar n.', at(W.uln, 0.12));
-        lab('Long thoracic n.', at(W.ltn, 0.55)); lab('Suprascapular n.', at(W.ss, 0.5));
-        lab('Axillary artery', at(CL.axa, 0.5)); lab('First rib', [-4.0, 140.2, 2.0]); lab('Clavicle', [-13.5, 141.6, 2.5]);
+        labc('C5', CL.C5, 0.15); labc('C6', CL.C6, 0.12); labc('C7', CL.C7, 0.1); labc('C8', CL.C8, 0.1); labc('T1', CL.T1, 0.12);
+        labc('Upper trunk', W.ut, 0.45); labc('Middle trunk', W.mt, 0.5); labc('Lower trunk', W.lt, 0.5);
+        labc('Divisions (behind clavicle)', W.ad_m, 0.4);
+        labc('Lateral cord', W.lc, 0.6); labc('Posterior cord', W.pc, 0.6); labc('Medial cord', W.mc, 0.6);
+        labc('Musculocutaneous n.', W.mcn, 0.35); labc('Axillary n.', W.ax, 0.8); labc('Radial n.', W.rad, 0.32);
+        labc('Median n.', W.med, 0.07); labc('Ulnar n.', W.uln, 0.12);
+        labc('Long thoracic n.', W.ltn, 0.55); labc('Suprascapular n.', W.ss, 0.5);
+        labc('Axillary artery', CL.axa, 0.5); L.push({ t: 'First rib', p: Pa([-4.0, 140.2, 2.0]), on: rib1 }); lab('Clavicle', [-13.5, 141.6, 2.5]);
       }
 
       // ---- posed-limb inset: the deformity the lesion produces ----
@@ -368,37 +381,53 @@
         IG.updateMatrixWorld(true);
         var iP = function (grp, p) { var pv = grp.userData.pivot || [0, 0, 0]; var q = new THREE.Vector3(p[0] - pv[0], p[1] - pv[1], p[2] - pv[2]); grp.localToWorld(q); g.worldToLocal(q); return [q.x, q.y, q.z]; };
         if (v === 'erb') {
-          IL.push({ t: "Waiter's tip", p: iP(lb.hand, [-27, 72, 4]) });
-          IL.push({ t: 'Adducted, internally rotated', p: iP(lb.arm, [-19, 124, -3]) });
-          IL.push({ t: 'Elbow extended, pronated', p: iP(lb.fa, [-24, 98, -1]) });
+          IL.push({ t: "Waiter's tip", p: iP(lb.hand, [-27, 72, 4]), on: lb.hand });
+          IL.push({ t: 'Adducted, internally rotated', p: iP(lb.arm, [-19, 124, -3]), on: lb.arm });
+          IL.push({ t: 'Elbow extended, pronated', p: iP(lb.fa, [-24, 98, -1]), on: lb.fa });
         } else if (v === 'klumpke') {
-          IL.push({ t: 'Claw hand', p: iP(lb.hand, [-25.5, 81, 3]) });
-          IL.push({ t: 'MCP extended, IP flexed', p: iP(lb.fingers[2][1], [-28, 74, 6]) });
+          IL.push({ t: 'Claw hand', p: iP(lb.hand, [-25.5, 81, 3]), on: lb.hand });
+          IL.push({ t: 'MCP extended, IP flexed', p: iP(lb.fingers[2][1], [-28, 74, 6]), on: lb.fingers[2][1] });
         } else if (v === 'lt') {
           IL.push({ t: 'Winged scapula (from behind)', p: iP(IS, [-7.5, 128, -10]) });
         } else {
-          IL.push({ t: 'Wrist drop', p: iP(lb.hand, [-27, 72, 4]) });
-          IL.push({ t: 'Pronated forearm', p: iP(lb.fa, [-24, 96, 0]) });
+          IL.push({ t: 'Wrist drop', p: iP(lb.hand, [-27, 72, 4]), on: lb.hand });
+          IL.push({ t: 'Pronated forearm', p: iP(lb.fa, [-24, 96, 0]), on: lb.fa });
         }
       }
       if (v === 'erb') {
-        lab('Erb point: upper trunk (C5-C6)', at(W.ut, 0.22)); lab('C5', at(CL.C5, 0.15)); lab('C6', at(CL.C6, 0.12));
-        lab('Suprascapular n. (supra/infraspinatus)', at(W.ss, 0.2)); lab('Musculocutaneous n. (biceps)', at(W.mcn, 0.3));
-        lab('Axillary n. (deltoid, teres minor)', at(W.ax, 0.85)); lab('Middle / lower trunks intact', at(W.lt, 0.6));
+        labc('Erb point: upper trunk (C5-C6)', W.ut, 0.22); labc('C5', CL.C5, 0.15); labc('C6', CL.C6, 0.12);
+        labc('Suprascapular n. (supra/infraspinatus)', W.ss, 0.2); labc('Musculocutaneous n. (biceps)', W.mcn, 0.3);
+        labc('Axillary n. (deltoid, teres minor)', W.ax, 0.85); labc('Middle / lower trunks intact', W.lt, 0.6);
       } else if (v === 'klumpke') {
-        lab('Lower trunk (C8-T1)', at(W.lt, 0.3)); lab('C8', at(CL.C8, 0.1)); lab('T1', at(CL.T1, 0.12));
-        lab('Medial cord', at(W.mc, 0.6)); lab('Ulnar n. (intrinsics)', at(W.uln, 0.1)); lab('Median n. (medial root)', at(W.mroot, 0.5));
-        lab('Stellate ganglion: Horner', [-2.05, 142.6, -1.0]); lab('Upper trunk intact', at(W.ut, 0.45));
+        labc('Lower trunk (C8-T1)', W.lt, 0.3); labc('C8', CL.C8, 0.1); labc('T1', CL.T1, 0.12);
+        labc('Medial cord', W.mc, 0.6); labc('Ulnar n. (intrinsics)', W.uln, 0.1); labc('Median n. (medial root)', W.mroot, 0.5);
+        lab('Stellate ganglion: Horner', [-2.05, 142.6, -1.0]); labc('Upper trunk intact', W.ut, 0.45);
       } else if (v === 'lt') {
-        lab('Long thoracic n. (C5-C7)', at(W.ltn, 0.3)); lab('Injury on chest wall', at(W.ltn, 0.5));
-        lab('Serratus anterior (paralysed)', [-11.5, 124, 1.5]); lab('Scapula', [-15, 129, -7]); lab('Plexus intact', at(W.mt, 0.5));
+        labc('Long thoracic n. (C5-C7)', W.ltn, 0.3); labc('Injury on chest wall', W.ltn, 0.5);
+        lab('Serratus anterior (paralysed)', [-11.5, 124, 1.5]); lab('Scapula', [-15, 129, -7]); labc('Plexus intact', W.mt, 0.5);
       } else if (v === 'rad') {
-        lab('Midshaft humerus fracture', [-19.6, 123.6, 0]); lab('Radial n. in spiral groove', at(W.rad, 0.5));
-        lab('Radial n. (posterior cord)', at(W.rad, 0.2)); lab('Humerus (posterior view)', [-19, 132, -5]);
-        lab('Wrist and finger extensors lost', at(W.rad, 0.85));
+        lab('Midshaft humerus fracture', [-19.6, 123.6, 0]); labc('Radial n. in spiral groove', W.rad, 0.5);
+        labc('Radial n. (posterior cord)', W.rad, 0.2); lab('Humerus (posterior view)', [-19, 132, -5]);
+        labc('Wrist and finger extensors lost', W.rad, 0.85);
       }
       L = L.concat(IL);
-      return { labels: L, info: '' };
+      var info = {
+        norm: '<ul><li><b>Roots</b> (anterior rami C5-T1) → <b>trunks</b> (upper C5-C6, middle C7, lower C8-T1) → anterior and posterior <b>divisions</b> behind the clavicle → <b>cords</b> named for their position around the axillary artery → terminal branches.</li>' +
+          '<li><b>Lateral cord</b>: musculocutaneous n. and the lateral root of the median n. <b>Medial cord</b>: ulnar n. and the medial root of the median n. <b>Posterior cord</b> (all posterior divisions): axillary and radial nn.</li>' +
+          '<li>From the roots: <b>long thoracic n.</b> (C5-C7, serratus anterior). From the upper trunk: <b>suprascapular n.</b> Trunks and cords are spread apart here (exploded view) so each one reads.</li></ul>',
+        erb: '<ul><li><b>Erb palsy</b>: upper trunk (C5-C6) stretched by forced lateral neck flexion away from the shoulder (shoulder dystocia, falls on the shoulder).</li>' +
+          '<li>Lost: deltoid and supraspinatus (abduction), infraspinatus and teres minor (lateral rotation), biceps (elbow flexion, supination).</li>' +
+          '<li><b>Waiter\'s tip</b> (inset): arm adducted and medially rotated, elbow extended, forearm pronated, wrist flexed.</li></ul>',
+        klumpke: '<ul><li><b>Klumpke palsy</b>: lower trunk (C8-T1) injured by traction on an abducted arm (grabbing a branch while falling; breech delivery with the arm overhead).</li>' +
+          '<li>Intrinsic hand muscles paralysed → <b>total claw hand</b> (inset): MCP joints extended, IP joints flexed.</li>' +
+          '<li>A <b>T1</b> root avulsion can interrupt preganglionic sympathetic fibres to the stellate ganglion → <b>Horner syndrome</b> (ptosis, miosis, anhidrosis).</li></ul>',
+        lt: '<ul><li><b>Long thoracic nerve</b> (C5-C7, from the roots) runs down the lateral chest wall on serratus anterior, where axillary node dissection, mastectomy or stab wounds injure it.</li>' +
+          '<li>Serratus anterior paralysed → <b>winged scapula</b> (inset, from behind): the medial border lifts off the chest wall, worse when pushing against a wall; difficulty abducting the arm above horizontal.</li></ul>',
+        rad: '<ul><li><b>Midshaft humerus fracture</b>: the radial nerve lies in the radial (spiral) groove on the back of the humerus.</li>' +
+          '<li>Loss of wrist and finger extension → <b>wrist drop</b> (inset); sensory loss over the dorsal first web space.</li>' +
+          '<li><b>Triceps is usually spared</b>: its branches leave the nerve proximal to the groove.</li></ul>',
+      }[v];
+      return { labels: L, info: info };
     },
   });
 })();

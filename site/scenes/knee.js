@@ -17,8 +17,10 @@
   }
   function V3(p) { return new THREE.Vector3(p[0], p[1], p[2]); }
   // Triangles of a baked part for which keep(centroid) is true (cm); the rest are dropped.
+  var KM = null; // per build: part -> drawn meshes (labels anchor on their visible surface)
+  function keepM(part, me) { if (KM) (KM[part] = KM[part] || []).push(me); return me; }
   function piece(parent, part, m, keep) {
-    var me = Kit.meshPart(parent, 'knee', part, m);
+    var me = keepM(part, Kit.meshPart(parent, 'knee', part, m));
     var src = me.geometry, pos = src.attributes.position, idx = src.index.array, out = [];
     var a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
     for (var i = 0; i < idx.length; i += 3) {
@@ -48,6 +50,7 @@
     ] }],
     build: function (g, st) {
       var v = st.v, h = Kit.helpers;
+      KM = {};
       // per-variant view: front (slightly anteromedial) for the triad; from the medial side for the PCL sag
       var yaw = { norm: -0.3, triad: -0.45, pcl: -1.35 }[v];
       var K = new THREE.Group(); K.rotation.y = yaw; g.add(K);
@@ -60,8 +63,8 @@
       var menC = 0x9fc4c8;
 
       // ---- femur and patella (stay put) ----
-      Kit.meshPart(body, 'knee', 'femur', T('bone', { color: 0xe2cfa8, opacity: 0.4, depthWrite: false, side: THREE.FrontSide }));
-      Kit.meshPart(body, 'knee', 'patella', T('bone', { color: 0xe2cfa8, opacity: 0.45, depthWrite: false, side: THREE.FrontSide }));
+      keepM('femur', Kit.meshPart(body, 'knee', 'femur', T('bone', { color: 0xe2cfa8, opacity: 0.4, depthWrite: false, side: THREE.FrontSide })));
+      keepM('patella', Kit.meshPart(body, 'knee', 'patella', T('bone', { color: 0xe2cfa8, opacity: 0.45, depthWrite: false, side: THREE.FrontSide })));
 
       // ---- leg block: tibia, fibula, menisci (moved for drawer / sag / valgus) ----
       var leg = new THREE.Group(); body.add(leg);
@@ -75,10 +78,10 @@
       if (v === 'pcl') leg.position.z -= 1.3; // posterior sag / drawer
       body.updateMatrixWorld(true);
       function legB(p) { var q = V3(p); legIn.localToWorld(q); body.worldToLocal(q); return [q.x, q.y, q.z]; }
-      Kit.meshPart(legIn, 'knee', 'tibia', T('bone', { color: 0xe2cfa8, opacity: 0.4, depthWrite: false, side: THREE.FrontSide }));
+      keepM('tibia', Kit.meshPart(legIn, 'knee', 'tibia', T('bone', { color: 0xe2cfa8, opacity: 0.4, depthWrite: false, side: THREE.FrontSide })));
       if (v !== 'norm') Kit.meshPart(body, 'knee', 'tibia', T('bone', { color: 0x6fa8d8, opacity: 0.16, depthWrite: false })); // normal position
-      Kit.meshPart(legIn, 'knee', 'fibula', T('bone', { color: 0xe2cfa8, opacity: 0.5, depthWrite: false, side: THREE.FrontSide }));
-      Kit.meshPart(legIn, 'knee', 'lat_meniscus', T('cartilage', { color: menC }));
+      keepM('fibula', Kit.meshPart(legIn, 'knee', 'fibula', T('bone', { color: 0xe2cfa8, opacity: 0.5, depthWrite: false, side: THREE.FrontSide })));
+      keepM('lat_meniscus', Kit.meshPart(legIn, 'knee', 'lat_meniscus', T('cartilage', { color: menC })));
       var mm = bboxC('med_meniscus');
       if (v === 'triad') {
         // longitudinal (bucket-handle) tear: the inner rim splits off and flips toward the notch
@@ -88,7 +91,7 @@
         var hb = new THREE.Group(); legIn.add(hb); hb.position.set(-0.7, 0.2, 0);
         piece(hb, 'med_meniscus', T('cartilage', { color: 0xff8a70, emissive: 0xc0301a, emissiveIntensity: 0.6 }), inner);
       } else {
-        Kit.meshPart(legIn, 'knee', 'med_meniscus', T('cartilage', { color: menC }));
+        keepM('med_meniscus', Kit.meshPart(legIn, 'knee', 'med_meniscus', T('cartilage', { color: menC })));
       }
       // patellar ligament (drawn): patellar apex -> tibial tuberosity
       var tt = legB([-7.9, 38.4, 0.9]);
@@ -104,7 +107,7 @@
         h.dot(a1, [acl[0], acl[1] + 0.35, acl[2] - 0.2], 0xff3b2f, 0.32).material = torn;
         h.dot(legIn, [acl[0], acl[1] - 0.35, acl[2] + 0.1], 0xff3b2f, 0.32).material = torn;
       } else {
-        Kit.meshPart(legIn, 'knee', 'acl', lig());
+        keepM('acl', Kit.meshPart(legIn, 'knee', 'acl', lig()));
       }
       if (v === 'pcl') {
         var p1 = new THREE.Group(); body.add(p1); p1.position.set(0, 0.35, 0);
@@ -113,7 +116,7 @@
         h.dot(p1, [pcl[0], pcl[1] + 0.3, pcl[2]], 0xff3b2f, 0.32).material = torn;
         h.dot(legIn, [pcl[0], pcl[1] - 0.4, pcl[2]], 0xff3b2f, 0.32).material = torn;
       } else {
-        Kit.meshPart(legIn, 'knee', 'pcl', lig({ color: 0xd9d2bd }));
+        keepM('pcl', Kit.meshPart(legIn, 'knee', 'pcl', lig({ color: 0xd9d2bd })));
       }
 
       // ---- collaterals ----
@@ -126,15 +129,15 @@
         piece(legIn, 'mcl_deep', lig({ color: 0xcfc7b0 }), function (q) { return !side(mclCut, mclN)(q); });
         h.dot(body, [-3.2, JL + 0.45, -2.2], 0xff3b2f, 0.32).material = torn;
       } else {
-        Kit.meshPart(legIn, 'knee', 'mcl_sup', lig());
-        Kit.meshPart(legIn, 'knee', 'mcl_deep', lig({ color: 0xcfc7b0 }));
+        keepM('mcl_sup', Kit.meshPart(legIn, 'knee', 'mcl_sup', lig()));
+        keepM('mcl_deep', Kit.meshPart(legIn, 'knee', 'mcl_deep', lig({ color: 0xcfc7b0 })));
       }
-      Kit.meshPart(legIn, 'knee', 'lcl', lig());
+      keepM('lcl', Kit.meshPart(legIn, 'knee', 'lcl', lig()));
 
       // ---- the injury: force arrows and the resulting laxity ----
       if (v === 'triad') {
         h.arrow(g, P(-19, 44.5, -2.4), P(-12.6, 44.5, -2.4), 0xffd23f);     // lateral blow to the planted knee
-        h.arrow(g, P(-7.0, 37.5, 2.2), P(-7.0, 37.5, 5.6), 0x7fd0ff);           // anterior translation of the tibia
+        h.arrow(g, P(-2.4, 41.4, -1.0), P(-2.4, 41.4, 4.4), 0x7fd0ff);          // anterior translation of the proximal tibia (medial side, so it reads in this view)
       }
       if (v === 'pcl') {
         h.arrow(g, P(-7.8, 39.5, 6.8), P(-7.8, 39.5, 1.6), 0xffd23f);       // dashboard strikes the proximal tibia
@@ -142,25 +145,25 @@
 
       // ---- labels ----
       var L = [];
-      function lab(t, p) { L.push({ t: t, p: P(p[0], p[1], p[2]) }); }
+      function lab(t, p, on) { L.push(on ? { t: t, p: P(p[0], p[1], p[2]), on: on } : { t: t, p: P(p[0], p[1], p[2]) }); }
       function legP(p) { var q = V3(p); legIn.localToWorld(q); body.worldToLocal(q); return [q.x, q.y, q.z]; }
       body.updateMatrixWorld(true);
-      lab('Femur', [-8.5, 53, -2]);
+      lab('Femur', [-8.5, 51, -2]);
       lab('Patella', [-8.4, 45.2, 1.8]);
       lab('Tibia', legP([-6.5, 37, -1]));
       if (v !== 'pcl') lab('Fibula', legP([-11.6, 38.5, -4]));
-      lab(v === 'triad' ? 'ACL tear' : 'ACL', v === 'triad' ? [acl[0], acl[1] + 0.4, acl[2]] : legP(acl));
-      lab(v === 'pcl' ? 'PCL tear' : 'PCL', v === 'pcl' ? [pcl[0], pcl[1] + 0.5, pcl[2]] : legP(pcl));
-      lab(v === 'triad' ? 'MCL (tibial collateral) tear' : 'MCL (tibial collateral)', v === 'triad' ? [-3.2, JL + 0.5, -2.2] : legP([-3.4, 41, -2.2]));
-      if (v !== 'pcl') lab('LCL (fibular collateral)', legP([-11.9, 44.2, -4]));
-      lab(v === 'triad' ? 'Medial meniscus tear' : 'Medial meniscus', legP([mm[0] + 0.6, mm[1], mm[2] + 1.2]));
-      lab('Lateral meniscus', legP([-10.3, 43.2, -1.5]));
+      lab(v === 'triad' ? 'ACL tear' : 'ACL', v === 'triad' ? [acl[0], acl[1] + 0.4, acl[2]] : legP(acl), v === 'triad' ? null : KM.acl);
+      lab(v === 'pcl' ? 'PCL tear' : 'PCL', v === 'pcl' ? [pcl[0], pcl[1] + 0.5, pcl[2]] : legP(pcl), v === 'pcl' ? null : KM.pcl);
+      lab(v === 'triad' ? 'MCL (tibial collateral) tear' : 'MCL (tibial collateral)', v === 'triad' ? [-3.2, JL + 0.5, -2.2] : legP([-3.4, 41, -2.2]), v === 'triad' ? null : KM.mcl_sup);
+      if (v !== 'pcl') lab('LCL (fibular collateral)', legP([-11.9, 44.2, -4]), KM.lcl);
+      lab(v === 'triad' ? 'Medial meniscus tear' : 'Medial meniscus', legP([mm[0] + 0.6, mm[1], mm[2] + 1.2]), v === 'triad' ? null : KM.med_meniscus);
+      lab('Lateral meniscus', legP([-10.3, 43.2, -1.5]), KM.lat_meniscus);
       if (v === 'triad') {
-        lab('Lateral blow (valgus force)', [-17, 45.6, -2.4]);
-        lab('Anterior drawer / Lachman +', [-7.0, 36.6, 5.0]);
+        lab('Lateral blow (valgus force)', [-16.5, 44.5, -2.4]); // on the arrow
+        lab('Anterior drawer / Lachman +', [-2.4, 41.4, 4.2]);
       }
       if (v === 'pcl') {
-        lab('Dashboard blow (knee flexed)', [-7.8, 40.6, 6.5]);
+        lab('Dashboard blow: force pushes the tibia back', [-7.8, 39.5, 5.0]); // on the arrow
         lab('Posterior sag / drawer +', legP([-7.8, 35.5, 0]));
       }
       var info = {

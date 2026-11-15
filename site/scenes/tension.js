@@ -134,21 +134,20 @@
         Kit.helpers.arrow(g, P(-3, 3, 11), P(6.5, 3, 11));
       }
 
-      var tx = T ? shiftAt(13) : 0;
       var L = [
         { t: 'Trachea', p: P(T ? 0.6 : 0, 19.5, 0) },
-        { t: 'Heart', p: P(4.5 + (T ? SHIFT : 0), -0.5, 7) },
-        { t: 'Left lung', p: P(7.5, 12.5, 5) },
-        { t: 'Right hemidiaphragm', p: P(-8.5, T ? -6 : -2, 3) },
+        { t: 'Heart', p: T ? P(5.2, 1.6, 7.2) : P(1.5, 3.1, 7.3) }, // where the heart shows between the lungs
+        { t: 'Left lung', p: P(8.0, 10.2, 2.4) },
+        { t: 'Right hemidiaphragm', p: T ? P(-8.5, -6, 3) : P(-9.8, -9.8, -5.4) }, // normal: the dome is behind the lung base
       ];
       if (!T) {
-        L.push({ t: 'Right lung', p: P(-10, 11, 2) });
+        L.push({ t: 'Right lung', p: P(-7.9, 8.5, 3.6) });
       } else {
         L.push(
           { t: 'Collapsed right lung', p: P(-4.5, 8.5, 1) },
           { t: 'Trapped pleural air', p: P(-11, 3, 3) },
           { t: 'Mediastinal shift →', p: P(1.5, 4.5, 11) },
-          { t: 'Trachea deviated away', p: P(tx + 1, 12.5, 0) },
+          { t: 'Trachea deviated away', p: P(1.5, 14.5, -0.2) }, // on the displaced trachea, above the arch
           { t: 'Compressed left lung', p: P(11.5, -1, 3) });
       }
       var info = T

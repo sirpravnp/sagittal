@@ -168,17 +168,17 @@
       }
 
       var L = [
-        { t: 'Liver', p: P(5.5, 7.5, 2) }, { t: 'Gallbladder', p: P(-3.2, 0.2, 2.6) }, { t: 'Hartmann pouch / neck', p: P(-1.9, 2.1, 0.2) },
+        { t: 'Liver', p: P(5.5, 7.5, 2) }, { t: 'Gallbladder', p: P(-3.2, 0.2, 2.6) }, { t: 'Hartmann pouch / neck', p: P(NECK[0], NECK[1], NECK[2]), on: gb, side: 'left' },
         { t: 'Cystic duct', p: P(-0.7, 2.75, 0.1) }, { t: 'Common hepatic duct', p: P(0.55, 3.7, 0) }, { t: 'Common bile duct', p: P(0.6, 0.6, 0) },
         { t: 'Right / left hepatic ducts', p: P(1.4, 5.4, 0) }, { t: 'Calot triangle', p: P(-0.3, 4.0, 0.3) }, { t: 'Cystic artery', p: P(-0.7, 3.4, 1.2) },
-        { t: 'Duodenum', p: P(-4.6, -3.6, 1.5) }, { t: 'Pancreatic head', p: P(-1.0, -3.6, 0) }, { t: 'Ampulla of Vater', p: P(-3.8, -4.1, -1) },
+        { t: 'Duodenum', p: P(-1.3, -6.2, -0.4) }, { t: 'Pancreatic head', p: P(-1.0, -3.6, 0) }, { t: 'Ampulla of Vater', p: P(-3.8, -4.1, -1) },
         { t: 'Pancreatic duct', p: P(3.0, -0.6, -1.5) },
       ];
       if (p === 'gb') L.push({ t: 'Gallstones', p: P(-2.6, 0.6, 1.8) });
       if (p === 'cbd') L.push({ t: 'CBD stone (dilated duct)', p: BD[19].map(function (x) { return x * S; }) });
       if (p === 'pan') L.push({ t: 'Stone impacted at ampulla', p: P(-3.6, -4.0, -0.9) });
-      if (p === 'mir') L.push({ t: 'Impacted stone compressing CHD', p: P(-0.95, 2.55, 0) });
-      if (p === 'cou') L.push({ t: 'Pancreatic head mass', p: P(-0.6, -4.9, 0.4) });
+      if (p === 'mir') L.push({ t: 'Impacted stone compressing CHD', p: P(-0.95, 2.55, 0), side: 'left' });
+      if (p === 'cou') L.push({ t: 'Pancreatic head mass', p: P(-0.6, -4.9, 0.4), on: mass });
       var infos = {
         norm: '<ul><li>Bile flows: hepatic ducts → common hepatic duct → (cystic duct to gallbladder) → common bile duct → ampulla of Vater (sphincter of Oddi) → duodenum.</li><li><b>Calot triangle</b>: cystic duct, common hepatic duct and inferior liver edge; contains the cystic artery. Key landmark in cholecystectomy.</li></ul>',
         gb: '<ul><li><b>Cholelithiasis</b>: often silent; biliary colic after fatty meals (RUQ pain, 30 min to hours).</li><li>If the stone impacts the cystic duct and inflammation follows: acute cholecystitis (fever, Murphy sign, ↑WBC).</li></ul>',

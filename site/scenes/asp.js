@@ -179,19 +179,19 @@
       }
 
       // Vertebral column for orientation (it marks posterior).
-      Kit.meshPart(body, M, 'thoracic_spine', 'bone');
+      var spine = Kit.meshPart(body, M, 'thoracic_spine', 'bone');
       // Airways: opaque, drawn first.
       AIRWAY_PARTS.forEach(function (k) { Kit.meshPart(body, M, k, airwayMat(k)); });
       Object.keys(LOBE_OF).forEach(function (k) { Kit.meshPart(body, M, k, airwayMat(k)); });
 
       // Lit segment territories: solid patches on the real lobe surface.
-      var segAnchor = {};
+      var segAnchor = {}, segMesh = {};
       P.sites.forEach(function (s) {
         var t = territory(LOBE_OF[s[0]], s[0]);
         var m = Kit.tissue('lung', { color: s[1] >= 1 ? 0xff9a1a : 0xf2c56e, emissive: AMBER, emissiveIntensity: s[1] >= 1 ? 0.9 : 0.4,
           sheen: 0, vertexColors: true, opacity: s[1] >= 1 ? 0.9 : 0.6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
         var me = new THREE.Mesh(t.geo, m); me.renderOrder = 2; body.add(me);
-        segAnchor[s[0]] = t.c;
+        segAnchor[s[0]] = t.c; segMesh[s[0]] = me;
       });
 
       // Translucent lobes (pleural surface), drawn last, front faces only so the tree shows through.
@@ -204,11 +204,12 @@
       var C = {};
       Object.keys(info).forEach(function (k) { C[k] = bboxCenter(info[k]); });
       var L = [
-        { t: 'Trachea', p: toG([C.trachea[0], info.trachea[4] - 1, C.trachea[2]]) },
-        { t: 'Right main bronchus: wider, shorter, more vertical', p: toG(C.main_bronchus_r) },
+        { t: 'Trachea', p: toG([C.trachea[0], info.trachea[4] - 2.5, C.trachea[2]]) },
+        // upright: chip to the left of the right bronchus so it does not lie across the left one
+        { t: 'Right main bronchus: wider, shorter, more vertical', p: toG(C.main_bronchus_r), side: st.p === 'up' ? 'left' : undefined },
       ];
       if (st.p !== 'sup') L.push({ t: 'Left main bronchus', p: toG(C.main_bronchus_l) });
-      else L.push({ t: 'Spine (posterior)', p: toG([0, info.thoracic_spine[1] + 6, info.thoracic_spine[2] + 1]) });
+      else L.push({ t: 'Spine (posterior)', p: toG([0, info.thoracic_spine[1] + 6, info.thoracic_spine[2] + 1]), on: spine });
       // Lobe labels near each lobe's outer edge.
       ['lobe_rul', 'lobe_rml', 'lobe_rll', 'lobe_lul', 'lobe_lll'].forEach(function (k) {
         // Seen from the right (supine) the left lobes are hidden; lit lobes are named by their segment label.
@@ -223,7 +224,7 @@
         seg_r_b4_lateral: 'RML lateral segment',
         seg_r_b9_lateral_basal: 'RLL lateral basal segment',
       };
-      P.sites.forEach(function (s) { L.push({ t: NAMES[s[0]], p: toG(segAnchor[s[0]]) }); });
+      P.sites.forEach(function (s) { L.push({ t: NAMES[s[0]], p: toG(segAnchor[s[0]]), on: segMesh[s[0]] }); });
 
       // Model extent in the scene (for the bed and the gravity arrow).
       var low = 1e9, top = -1e9, xl = 1e9, xh = -1e9;

@@ -112,4 +112,17 @@ post-processing, no transmission.
 - `site/viewer.html?scene=<id>&<k>=<value>` (any control), `&embed=1` hides the page chrome.
 - Serve locally: `python3 -m http.server 8000 --directory site`, open
   `http://localhost:8000/viewer.html?scene=<id>`.
-- `window.viewer.debug()` gives `labelRects`, `nonBlank`, `rot` (used by the e2e tests).
+- `window.viewer.debug()` gives `labelRects`, `leaders` (per label: anchor dot `ax, ay`, leader end
+  `x2, y2`, `len`, `occluded`, `text`, `behind`), `nonBlank`, `rot` (used by the e2e tests) and
+  `pick(x, y)` (the opaque surface under a stage pixel, in mesh and label coordinates).
+- Labels: `{ t, p, on?, alt?, side?, behind? }`. The kit draws an anchor dot and a leader line
+  from it to the chip, and raycasts the anchor whenever the view settles.
+  - `on`: the mesh, meshes or group the label names (keep the return value of `Kit.meshPart` or
+    your tube helper). The dot goes on the visible, camera-facing surface of that mesh nearest to
+    `p`, so it follows the structure as the user rotates and never sits on something in front.
+    Prefer this for every vessel, nerve, chamber and ligament label.
+  - `alt`: extra candidate points (label coordinates) tried in order when `p` is hidden.
+  - `side: 'left'`: the chip goes left of its dot.
+  - `behind: true`: the anchor is deliberately hidden (a defect drawn x-ray style through the
+    heart). Drawn with a hollow dot and dashed leader; any other hidden anchor fails e2e.
+  Surfaces with opacity below 0.7 do not hide anchors.

@@ -137,14 +137,15 @@
 
       // ---- blood casts of the four chambers ----
       var see = { opacity: 0.4 };
-      Kit.meshPart(H, 'heart-blood', 'cav_la', blood('LA'));
-      Kit.meshPart(H, 'heart-blood', 'cav_lv', blood('LV'));
-      Kit.meshPart(H, 'heart-blood', 'cav_ra', blood('RA', d === 'asd' || d === 'tga' ? see : {}));
+      var cav = {}; // chamber casts, so each chamber label can find a visible point on its own chamber
+      cav.la = Kit.meshPart(H, 'heart-blood', 'cav_la', blood('LA'));
+      cav.lv = Kit.meshPart(H, 'heart-blood', 'cav_lv', blood('LV'));
+      cav.ra = Kit.meshPart(H, 'heart-blood', 'cav_ra', blood('RA', d === 'asd' || d === 'tga' ? see : {}));
       var rvO = d === 'vsd' ? see : {};
       if (d === 'tof') {
         // narrowed right ventricular outflow tract (infundibular stenosis)
-        editable(H, 'heart-blood', 'cav_rv', blood('RV', rvO), function (v) { pinch(v, PV, sub(PV, RV_BODY), 3.2, 0.62); });
-      } else Kit.meshPart(H, 'heart-blood', 'cav_rv', blood('RV', rvO));
+        cav.rv = editable(H, 'heart-blood', 'cav_rv', blood('RV', rvO), function (v) { pinch(v, PV, sub(PV, RV_BODY), 3.2, 0.62); });
+      } else cav.rv = Kit.meshPart(H, 'heart-blood', 'cav_rv', blood('RV', rvO));
 
       // ---- myocardium as glass ----
       // (no sheen/clearcoat on the see-through shell: it covers most pixels and software GL pays per pixel)
@@ -170,19 +171,16 @@
       var tubeM = function (k) { return blood(k); };
       var aoShift = d === 'tof' ? [-0.55, 0, 0.45] : [0, 0, 0]; // overriding aorta: root moved over the septum
       if (d !== 'tga') {
-        var ao = Kit.meshPart(H, 'heart', 'aorta', tubeM('AO'));
+        var ao = Kit.meshPart(H, 'heart', 'aorta', tubeM('AO')); cav.ao = [ao];
         ao.position.set(aoShift[0], aoShift[1], aoShift[2]);
         var asc = AO_ASC.map(function (p, i) { return i === 0 ? addv(p, aoShift) : p; });
-        vtube(H, asc.concat(AO_ARCH), 1.3, 1.0, tubeM('AO'), true);
+        cav.ao.push(vtube(H, asc.concat(AO_ARCH), 1.3, 1.0, tubeM('AO'), true));
         var pr = d === 'tof' ? 0.62 : 1;
-        vtube(H, PT, 1.3 * pr, 1.1 * pr, tubeM('PA'));
-        vtube(H, LPA, 0.85 * pr, 0.7 * pr, tubeM('PA'));
-        vtube(H, RPA, 0.85 * pr, 0.7 * pr, tubeM('PA'));
+        cav.pa = [vtube(H, PT, 1.3 * pr, 1.1 * pr, tubeM('PA')), vtube(H, LPA, 0.85 * pr, 0.7 * pr, tubeM('PA')),
+          vtube(H, RPA, 0.85 * pr, 0.7 * pr, tubeM('PA'))];
       } else {
-        vtube(H, TGA_AO.concat(AO_ARCH), 1.3, 1.0, tubeM('AO'));
-        vtube(H, TGA_PT, 1.2, 1.1, tubeM('PA'));
-        vtube(H, LPA, 0.85, 0.7, tubeM('PA'));
-        vtube(H, RPA, 0.85, 0.7, tubeM('PA'));
+        cav.ao = [vtube(H, TGA_AO.concat(AO_ARCH), 1.3, 1.0, tubeM('AO'))];
+        cav.pa = [vtube(H, TGA_PT, 1.2, 1.1, tubeM('PA')), vtube(H, LPA, 0.85, 0.7, tubeM('PA')), vtube(H, RPA, 0.85, 0.7, tubeM('PA'))];
       }
       vtube(H, BCT, 0.6, 0.55, tubeM('AO'));
       vtube(H, LCCA, 0.42, 0.4, tubeM('AO'));
@@ -193,12 +191,17 @@
       PVS.forEach(function (pv) { vtube(H, pv, 0.55, 0.5, pvM); });
 
       var back = d === 'asd'; // posterior view: anchor labels on the posterior surfaces
+      // Each chamber/vessel label names its mesh (on): if the preferred point is hidden in this view the
+      // kit moves the dot to the nearest visible point of that chamber. The right atrium is not seen
+      // from the left side (PDA view), so it is not labelled there.
       var L = [
-        { t: 'Right atrium', p: P(back ? [-5.4, 0.2, -1.6] : d === 'pda' ? [-3.4, 2.6, 2.4] : [-5.6, 0.6, 0.4]) }, { t: 'Left atrium', p: P(back ? [0.8, 1.6, -5.0] : [1.6, 2.6, -3.0]) },
-        { t: 'Right ventricle', p: P(back ? [-0.6, -5.2, -0.2] : [-1.2, -3.6, 3.6]) }, { t: 'Left ventricle', p: P(back ? [3.4, -3.2, -1.6] : [3.6, -2.4, 0.6]) },
-        { t: 'Aorta', p: P(d === 'tga' ? [-1.6, 7.0, 2.4] : [-1.4, 9.6, -0.4]) },
-        { t: 'Pulmonary artery', p: P(d === 'tga' ? [3.6, 5.0, -4.5] : [1.6, 4.6, 2.0]) },
-      ];
+        { t: 'Right atrium', p: P(back ? [-5.4, 0.2, -1.6] : [-5.6, 0.6, 0.4]), on: cav.ra, skip: d === 'pda' },
+        { t: 'Left atrium', p: P(back ? [-2.6, 3.4, -4.4] : [1.6, 2.6, -3.0]), on: cav.la, skip: d === 'normal' },
+        { t: 'Right ventricle', p: P(back ? [-0.4, -3.8, -0.6] : [-1.2, -3.6, 3.6]), on: cav.rv },
+        { t: 'Left ventricle', p: P(back ? [0.9, -2.2, -3.3] : [3.6, -2.4, 0.6]), on: cav.lv },
+        { t: 'Aorta', p: P(d === 'tga' ? [-1.6, 7.0, 2.4] : [-1.4, 9.6, -0.4]), on: cav.ao },
+        { t: 'Pulmonary artery', p: P(d === 'tga' ? [3.6, 5.0, -4.5] : back ? [-2.9, 5.7, -2.3] : [0.6, 5.2, 3.7]), on: cav.pa },
+      ].filter(function (l) { return !l.skip; });
       var info = '';
       if (d === 'normal') {
         info = '<ul><li>Blue = deoxygenated, red = oxygenated, purple = mixed.</li><li>Systemic return: RA → RV → pulmonary artery. Pulmonary return: LA → LV → aorta.</li><li>Left-sided pressures exceed right-sided, so a hole between the sides shunts left → right unless the right side is obstructed.</li></ul>';
@@ -212,7 +215,7 @@
       }
       if (d === 'asd') {
         top(h.arrow(g, P(addv(FO, FO_N, 1.9)), P(addv(FO, FO_N, -1.6))));
-        L.push({ t: 'ASD (fossa ovalis)', p: P(addv(FO, [0, 1.4, 0])) });
+        L.push({ t: 'ASD (fossa ovalis)', p: P(FO), behind: true }); // in the septum: ring drawn through the heart
         info = '<ul><li><b>Left-to-right shunt</b> at atrial level (ostium secundum most common; ostium primum is associated with Down syndrome).</li><li>Right atrial/ventricular volume overload and increased pulmonary flow.</li><li>Fixed split S2; systolic ejection murmur at the left upper sternal border (extra flow across the pulmonic valve).</li><li>Paradoxical embolism is possible. Eisenmenger if the shunt reverses.</li></ul>';
       }
       if (d === 'vsd' || d === 'tof') {
@@ -236,12 +239,12 @@
       if (d === 'tof') {
         top(h.ring(g, P(addv(PV, [0, 0.2, 0])), 0.2, 0xff7a3f)).quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), V3(norm(sub(PV, RV_BODY))).transformDirection(H.matrix));
         top(h.arrow(g, P([-1.2, -1.2, 2.4]), P([-1.9, 3.0, 0.9])));
-        L.push({ t: 'VSD', p: P([0.2, -0.2, 1.2]) }, { t: 'Pulmonary stenosis', p: P([1.6, 3.4, 3.4]) },
-          { t: 'RV hypertrophy', p: P([-3.6, -2.4, 4.0]) }, { t: 'Overriding aorta', p: P([-3.2, 4.6, 1.6]) });
+        L.push({ t: 'VSD', p: P(vm), behind: true }, { t: 'Pulmonary stenosis', p: P([1.6, 3.4, 3.4]) },
+          { t: 'RV hypertrophy', p: P([-3.6, -2.4, 4.0]) }, { t: 'Overriding aorta', p: P([-2.1, 5.1, 2.6]), on: cav.ao });
         info = '<ul><li>Four features: <b>pulmonary (infundibular) stenosis, RVH, overriding aorta, VSD.</b></li><li>Right-to-left shunt across the VSD → cyanosis. “Tet spells” improve with squatting (raises SVR, pushes blood toward the lungs).</li><li>Boot-shaped heart on CXR. Associated with 22q11 deletion. Classically the most common cyanotic CHD beyond infancy.</li></ul>';
       }
       if (d === 'tga') {
-        L.push({ t: 'Mixing site needed (ASD/VSD/PDA)', p: P(addv(FO, [-0.5, -1.8, 0])) });
+        L.push({ t: 'Mixing site needed (ASD/VSD/PDA)', p: P(FO), behind: true }); // at the atrial septum (ring drawn through)
         info = '<ul><li><b>Aorta arises from the RV; pulmonary artery from the LV</b> → two parallel circuits.</li><li>Not compatible with life without mixing (PDA, ASD or VSD). Cyanosis in the first days of life.</li><li>“Egg on a string” CXR (narrow mediastinum). Associated with maternal diabetes.</li><li>Keep the ductus open with prostaglandin E1; definitive fix is the arterial switch.</li></ul>';
       }
       return { labels: L, info: info };

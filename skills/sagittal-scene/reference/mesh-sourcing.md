@@ -10,7 +10,8 @@ folders, never modify or delete existing ones.
 
 Check first: free in size and credits. Print the current list with
 `for f in site/meshes/*.js; do head -c 300 $f | tail -c 200; echo; done` or load one in node
-(see `tests/meshes.test.mjs`). As of this writing:
+(see `tests/meshes.test.mjs`); the printed list is authoritative if this table falls behind.
+As of wave C (2026-11):
 
 | mesh | KB | credit | offset (cm) | parts |
 |---|---|---|---|---|
@@ -23,6 +24,14 @@ Check first: free in size and credits. Print the current list with
 | `eye` (right) | 355 | zanatomy | [-3.06, 159.07, 6.33] | sclera, cornea, iris, lens, retina, vitreous, anterior_chamber, optic_nerve |
 | `heart` | 251 | rodero-heart | [-0.4, 0.9, 0.2] | wall_lv, wall_rv, wall_la, wall_ra, aorta (root) |
 | `heart-blood` | 179 | rodero-heart | [-0.4, 0.9, 0.2] | cav_lv, cav_rv, cav_la, cav_ra (blood casts) |
+| `upper-limb` (right) | 370 | zanatomy | [0, 0, 0] (raw Z-Anatomy frame) | spine, rib1, ribs, clavicle, scapula, humerus, scalenus_anterior, scalenus_medius, serratus_anterior |
+| `hand` (right) | 113 | zanatomy | [0, 0, 0] | radius, ulna, carpals, mc1-mc5, and each phalanx (pp1, dp1, pp2, mp2, dp2, ... dp5) |
+| `knee` (right) | 196 | zanatomy | [0, 0, 0] | femur, tibia, fibula, patella, acl, pcl, mcl_sup, mcl_deep, lcl, med_meniscus, lat_meniscus |
+| `willis` | 321 | zanatomy (+ possibly Dundee CAHID for CN II/III) | [0, 161, 0] | ica_l/r, ophthalmic, aca, aca_branches, m1_l/r, mca_br_l/r, pcom_l/r, pca, basilar, vertebral, sca, aica, pica, cn3_l/r, brainstem, optic_nerves, optic_tracts |
+| `cranium` | 328 | zanatomy | [0, 161, 0] (registers with willis) | frontal, parietal_l/r, temporal_l/r, occipital, sphenoid, temporalis_l/r, galea, falx, sss, mma_l/r |
+| `endocast` | 94 | zanatomy (computed) | [0, 161, 0] | endocast (cranial cavity) |
+| `portal` | 280 | zanatomy | [0, 105, 3] | liver, spleen, stomach, pancreas, duodenum, rectum, anal_sphincter, umbilicus |
+| `thyroid` | 273 | zanatomy | [0, 142, 0] | thyroid_cartilage, cricoid, hyoid, trachea, cricothyroid, aorta, brachiocephalic_trunk, carotids, subclavians, external_carotids, thyrocervical, jugular_veins, pulmonary |
 
 Two Z-Anatomy meshes register in the scene by shifting one by the difference of their
 `offset`s (both are Blender world coordinates in cm). Rodero meshes are in their own frame.

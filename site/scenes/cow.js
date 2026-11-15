@@ -162,8 +162,11 @@
       var NOCLIP = new THREE.Plane(V(0, 1, 0), 1e5);
       function three(list) { list = list.slice(); while (list.length < 3) list.push(NOCLIP); return list; }
       var ART = { color: 0xb3261e, clearcoat: 0.45 };
+      var AM = {}; // part -> drawn meshes, so labels can sit on each artery's visible surface
       function art(part, opts, clip) {
-        return Kit.meshPart(M, 'willis', part, Kit.tissue('vessel-artery', Object.assign({ clippingPlanes: three(clip || [low]) }, ART, opts || {})));
+        var me = Kit.meshPart(M, 'willis', part, Kit.tissue('vessel-artery', Object.assign({ clippingPlanes: three(clip || [low]) }, ART, opts || {})));
+        (AM[part] = AM[part] || []).push(me);
+        return me;
       }
       var dead = { color: 0x7b6a70, roughness: 0.6, clearcoat: 0.2 }; // no flow distal to the clot
 
@@ -254,14 +257,14 @@
         { t: 'Internal carotid', p: W(near('ica_r', [-1.4, -1.0, 2.0])) },
         { t: 'ACA (A1)', p: W(near('aca', [0.9, 0, 3])) },
         { t: v === 'mca' ? 'Right MCA' : 'MCA (M1)', p: W(near('m1_r', [-3, 0.4, 2.2])) },
-        { t: 'PCA', p: W(near('pca', [-2.4, -0.5, -0.6])) },
+        { t: 'PCA', p: W(near('pca', [-3.4, -0.6, -1.4])), on: AM.pca }, // lateral to the optic tract
         { t: 'Basilar', p: W(near('basilar', [0, -2, 0.6])) },
         { t: 'Vertebral', p: W(near('vertebral', [1.0, -4, -1.5])) },
-        { t: 'SCA', p: W(near('sca', [2.6, -1, -1.6])) },
-        { t: 'PICA', p: W(near('pica', [3, -4, -4])) },
+        { t: 'SCA', p: W(near('sca', [2.6, -1, -1.6])), on: AM.sca },
+        { t: 'PICA', p: W(near('pica', [3, -4, -4])), on: AM.pica },
       ];
       if (v !== 'acom') L.push({ t: 'ACom', p: W(acomMid) });
-      if (v !== 'pcom') L.push({ t: 'PCom', p: W(near('pcom_r', [-0.8, -0.5, 1.2])) });
+      if (v !== 'pcom') L.push({ t: 'PCom', p: W(near('pcom_r', [-0.8, -0.5, 1.2])), on: AM.pcom_r });
       if (v === 'norm') {
         L.push({ t: 'AICA', p: W(near('aica', [2.6, -3, -1])) });
         L.push({ t: 'CN III', p: W(near('cn3_l', [1.5, -0.6, 1])) });

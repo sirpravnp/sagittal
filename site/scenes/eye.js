@@ -469,9 +469,10 @@
         { t: 'Sclera', p: W(E, X0, -1.21, 0.38) },
         { t: 'Macula / fovea', p: W(E, X0, FOV[1], -1.11) },
         { t: 'Optic disc / nerve', p: W(E, 0.46, 0.42, -1.5) },
-        { t: 'Trabecular meshwork / canal of Schlemm', p: W(I, X0, ANG.y + ANG_H * 1.12, ANG.z - ANG_H * 0.75) },
+        // inset labels point into the magnified angle: the meshwork, and the angle recess itself
+        { t: 'Trabecular meshwork / canal of Schlemm', p: W(I, X0, 0.785, 1.02) },
         { t: 'Ciliary body', p: W(E, X0, -0.85, 0.86) },
-        { t: c === 'ac' ? 'Angle closed by the iris' : 'Iridocorneal angle (open)', p: W(I, X0, ANG.y - ANG_H * 1.12, ANG.z - ANG_H * 0.75) },
+        { t: c === 'ac' ? 'Angle closed by the iris' : 'Iridocorneal angle (open)', p: W(I, X0, ANG.y - ANG_H * 0.25, ANG.z + ANG_H * 0.1) },
       ];
       if (c === 'rd') {
         L.push({ t: 'Detached retina', p: W(E, X0, 0.88, -0.1) }, { t: 'Subretinal fluid', p: W(E, X0, 1.06, 0.15) });

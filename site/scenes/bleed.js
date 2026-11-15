@@ -485,7 +485,7 @@
       });
       var kUp = Math.max(0, iSq - Math.round(0.45 / arc));
       var sq0 = at(CF, iSq, -0.03), sq1 = at(CF, kUp, -sqThick - 0.02);
-      M.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(V(sq0[0], sq0[1], ZF + 4 * EPS), V(sq1[0], sq1[1], ZF + 4 * EPS)), 2, 0.022, 6, false), flat('fat', { color: 0x5a4630 })));
+      M.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(V(sq0[0], sq0[1], ZF + 4 * EPS), V(sq1[0], sq1[1], ZF + 4 * EPS)), 2, 0.045, 6, false), flat('fat', { color: 0x3a2c1e })));  // drawn thick enough to read at card size
 
       /* --- bridging veins: cortex to the superior sagittal sinus --- */
       var veinMat = Kit.tissue('vessel-vein', { color: 0x37589e });
