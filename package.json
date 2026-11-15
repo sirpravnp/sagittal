@@ -12,7 +12,8 @@
     "decks:3d": ".venv/bin/python tools/build_decks.py --site site --cards build/cards --out build/decks --include-3d",
     "test:py": ".venv/bin/pytest tests/python -q",
     "thumbs": "node tools/render_thumbs.mjs",
-    "organs": "node tools/build_organs.mjs"
+    "organs": "node tools/build_organs.mjs",
+    "figure": "node player/make-figure.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1"
