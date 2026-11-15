@@ -5,6 +5,12 @@ const dir = new URL('../../site/scenes/', import.meta.url);
 const ids = JSON.parse(readFileSync(new URL('index.json', dir), 'utf8'));
 const metas = ids.map((id) => JSON.parse(readFileSync(new URL(`${id}.meta.json`, dir), 'utf8')));
 
+function roman(n) {
+  let r = '';
+  for (const [v, s] of [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]) while (n >= v) { r += s; n -= v; }
+  return r;
+}
+
 function watchErrors(page) {
   const errors = [];
   page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
@@ -17,13 +23,13 @@ test('index lists every scene in index.json as a numbered plate linking to the v
   await page.goto('index.html');
   await expect(page.locator('h1')).toHaveText('Sagittal');
   expect(await page.locator('body').innerText()).not.toContain('nreviewed');
-  await expect(page.locator('.desc')).toHaveText('Medical image generation');
+  await expect(page.locator('.desc')).toHaveText('Text-to-image for anatomy');
   const plates = page.locator('.plate');
   await expect(plates).toHaveCount(ids.length);
   for (let i = 0; i < metas.length; i++) {
     const m = metas[i];
     const plate = plates.nth(i);
-    await expect(plate.locator('.fig')).toHaveText(`Fig. ${i + 1}`);
+    await expect(plate.locator('.fig')).toHaveText(`Plate ${roman(i + 1)}`);
     await expect(plate.locator('a')).toHaveText(m.title);
     await expect(plate.locator('a')).toHaveAttribute('href', `viewer.html?scene=${m.id}`);
     await expect(plate).toContainText(m.topic);
@@ -46,6 +52,40 @@ test('index lists every scene in index.json as a numbered plate linking to the v
   await expect(page).toHaveURL(new RegExp(`viewer\\.html\\?scene=${ids[0]}$`));
   await expect(page.locator('h1')).toHaveText(metas[0].title);
   expect(errors).toEqual([]);
+});
+
+test('comparison: the generic LLM figure and the Sagittal figure, both loaded, with alt text and captions', async ({ page }) => {
+  const errors = watchErrors(page);
+  await page.goto('index.html');
+  const figs = page.locator('#compare figure');
+  await expect(figs).toHaveCount(2);
+  await expect(page.locator('#compare')).toContainText('the hepatobiliary tree');
+  for (const [i, src] of [[0, 'compare/generic-llm.png'], [1, 'compare/sagittal-hepatobiliary.png']]) {
+    const img = figs.nth(i).locator('img');
+    await expect(img).toHaveAttribute('src', src);
+    expect((await img.getAttribute('alt')).length, src).toBeGreaterThan(40);
+    await img.scrollIntoViewIfNeeded();
+    await expect.poll(() => img.evaluate((e) => e.complete && e.naturalWidth > 0)).toBe(true);
+  }
+  // the caption names the generic figure's errors
+  const cap = (await figs.nth(0).locator('figcaption').innerText()).toLowerCase();
+  for (const w of ['cloud of points', 'corkscrew', 'tube', 'labels float']) expect(cap).toContain(w);
+  expect(errors).toEqual([]);
+});
+
+test('every heading is at most four words; no review disclaimer anywhere', async ({ page }) => {
+  await page.goto('index.html');
+  await expect(page.locator('.plate')).toHaveCount(ids.length);
+  const heads = await page.locator('h1, h2, h3, h4, h5, h6').allInnerTexts();
+  expect(heads.length).toBeGreaterThanOrEqual(7);
+  for (const h of heads) expect(h.trim().split(/\s+/).length, `heading "${h}"`).toBeLessThanOrEqual(4);
+  for (const t of ['Same prompt, two figures', 'How it works', 'Install the skill', 'The plates', 'Anki decks', 'Credits']) {
+    expect(heads.map((h) => h.trim())).toContain(t);
+  }
+  await expect(page.locator('#install pre')).toContainText('ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal');
+  await expect(page.locator('#how .steps li')).toHaveCount(3);
+  expect(await page.locator('body').innerText()).not.toContain('nreviewed');
+  expect(await page.content()).not.toContain('nreviewed');
 });
 
 test('index lists one deck row per topic', async ({ page }) => {
@@ -85,6 +125,7 @@ test.describe('phone width', () => {
   test('index has no horizontal scroll at 375 px', async ({ page }) => {
     const errors = watchErrors(page);
     await page.goto('index.html');
+    await expect(page.locator('#compare img')).toHaveCount(2);
     await expect(page.locator('.plate')).toHaveCount(ids.length);
     const { sw, cw } = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
     expect(sw).toBeLessThanOrEqual(cw);

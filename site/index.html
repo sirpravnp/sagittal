@@ -4,26 +4,69 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Sagittal: medical image generation</title>
-<meta name="description" content="Open-source, labelled 3D anatomy figures for medical students, with Anki decks.">
+<title>Sagittal: text-to-image anatomy</title>
+<meta name="description" content="Ask your LLM for an anatomical variant and get an accurate, labelled, interactive 3D figure built from real reconstructed anatomy.">
 <!-- Optional: the GitHub repository URL, e.g. https://github.com/OWNER/sagittal. Left empty, it is
      worked out from an OWNER.github.io/REPO address; the GitHub links are hidden if neither is known. -->
 <meta name="sagittal-repo" content="">
 <link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="index-page">
 <a class="skip" href="#plates">Skip to the plates</a>
 <div class="wrap">
+  <p class="run"><span>Sagittal</span><span>Anatomy, drawn on request</span></p>
   <header class="masthead">
     <h1>Sagittal</h1>
-    <p class="desc">Medical image generation</p>
-    <p class="intro">Sagittal draws labelled anatomy figures in your browser from 3D models: rotate them, zoom in, and switch between normal anatomy and the pathology. Every view is also rendered into an Anki deck, with the structures unlabelled on the front of each card and labelled on the back. The project is open source and no figure has been reviewed yet, so check what you learn here against your textbook.</p>
+    <p class="desc">Text-to-image for anatomy</p>
+    <p class="intro">Ask your LLM for an anatomical variant and get back an accurate, labelled, interactive 3D figure, built from real reconstructed anatomy rather than drawn from memory.</p>
   </header>
 
   <main>
+    <section class="sec" id="compare" aria-labelledby="compare-h">
+      <h2 id="compare-h">Same prompt, two figures</h2>
+      <div class="sec-body">
+        <p class="prompt">Prompt: <q>the hepatobiliary tree</q></p>
+        <div class="pair">
+          <figure class="cmp">
+            <div class="cmp-img"><img src="compare/generic-llm.png" width="811" height="776" loading="lazy" decoding="async"
+              alt="A general LLM's 3D hepatobiliary figure: the liver is a cloud of red dots, the cystic duct a green corkscrew, the duodenum a bent brown tube, with labels on lines that end in empty space."></div>
+            <figcaption><span class="fig">Fig. 1</span> <span class="who">A general LLM.</span> The liver is a cloud of points, the cystic duct a corkscrew and the duodenum a bent tube; several labels float off the structures they name.</figcaption>
+          </figure>
+          <figure class="cmp">
+            <div class="cmp-img"><img src="compare/sagittal-hepatobiliary.png" width="940" height="940" loading="lazy" decoding="async"
+              alt="Sagittal's figure of the same prompt: a translucent liver over the gallbladder, cystic duct, common hepatic and common bile ducts, with the pancreas in the C-loop of the duodenum, each labelled in italic with a leader to a dot on the structure."></div>
+            <figcaption><span class="fig">Fig. 2</span> <span class="who">Sagittal.</span> Liver, gallbladder, ducts, duodenum and pancreas from reconstructed organ models, each label pinned to the structure it names.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="how" aria-labelledby="how-h">
+      <h2 id="how-h">How it works</h2>
+      <div class="sec-body">
+        <ol class="steps">
+          <li><h3>Ask</h3><p>Name a structure or a variant in your own words, in Claude Code: <q>replaced right hepatic artery off the SMA</q>.</p></li>
+          <li><h3>Build</h3><p>The skill starts from base organs reconstructed from open CT data and atlases. A variant may only reroute vessels and ducts through named landmarks, and every claim cites a source.</p></li>
+          <li><h3>Study</h3><p>Open the figure it saves. Rotate it, switch between normal anatomy and the variant, read the claims, and save the labelled plate as an image.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="sec" id="install" aria-labelledby="install-h">
+      <h2 id="install-h">Install the skill</h2>
+      <div class="sec-body">
+        <p class="sec-note">For Claude Code. From a clone of this repository, link the skill into your skills folder:</p>
+        <pre class="cmd"><code>ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre>
+        <p class="sec-note">Then ask for a figure, for example <q>an aberrant right subclavian artery</q>.</p>
+      </div>
+    </section>
+
     <section class="sec" id="plates" aria-labelledby="plates-h" tabindex="-1">
-      <h2 id="plates-h">Plates</h2>
+      <h2 id="plates-h">The plates</h2>
       <div class="sec-body">
         <p class="sec-note" id="plates-note">Select a plate to open the scene.</p>
         <div id="gallery"></div>
@@ -33,21 +76,23 @@
     <section class="sec" id="decks" aria-labelledby="decks-h" hidden>
       <h2 id="decks-h">Anki decks</h2>
       <div class="sec-body">
-        <p class="sec-note">One deck per topic. Import the <code>.apkg</code> file in Anki with File, Import. The standard decks use still images and work in every Anki client. The 3D decks run the scene inside the card and have only been tried on Anki desktop.</p>
+        <p class="sec-note">One deck per topic, made from the plates: structures unlabelled on the front of each card, labelled on the back. Import the <code>.apkg</code> file in Anki with File, Import. The standard decks use still images and work in every Anki client; the 3D decks run the scene inside the card and have only been tried on Anki desktop.</p>
         <ul id="deck-list" class="decks"></ul>
       </div>
     </section>
   </main>
 
-  <footer class="foot">
-    <h2 class="visually-hidden">About this site</h2>
-    <p>Code under the MIT licence. Scene text and claims under CC BY-SA 4.0. 3D models adapted from Z-Anatomy / BodyParts3D (DBCLS), CC BY-SA 4.0, and Rodero et al. 2021, CC BY 4.0; anatomical meshes keep the licence of their source. See the <a href="credits.html">model credits</a>.</p>
-    <ul class="foot-links">
-      <li data-repo-link=""><a href="#">Source on GitHub</a></li>
-      <li data-repo-link="blob/main/CONTRIBUTING.md"><a href="#">Contributing a scene</a></li>
-      <li data-repo-link="issues/new?template=medical-correction.md"><a href="#">Report a medical error</a></li>
-    </ul>
-    <p>For learning only. Not clinical advice.</p>
+  <footer class="foot sec" aria-labelledby="credits-h">
+    <h2 id="credits-h">Credits</h2>
+    <div class="sec-body">
+      <p>Code under the MIT licence. Scene text and claims under CC BY-SA 4.0. 3D models adapted from Z-Anatomy / BodyParts3D (DBCLS), CC BY-SA 4.0, and Rodero et al. 2021, CC BY 4.0; anatomical meshes keep the licence of their source. See the <a href="credits.html">model credits</a>.</p>
+      <ul class="foot-links">
+        <li data-repo-link=""><a href="#">Source on GitHub</a></li>
+        <li data-repo-link="blob/main/CONTRIBUTING.md"><a href="#">Contributing a scene</a></li>
+        <li data-repo-link="issues/new?template=medical-correction.md"><a href="#">Report a medical error</a></li>
+      </ul>
+      <p class="small">For learning only. Not clinical advice.</p>
+    </div>
   </footer>
 </div>
 <script src="app.js"></script>

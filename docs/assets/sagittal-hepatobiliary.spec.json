@@ -1,0 +1,246 @@
+{
+ "schema": "sagittal-figure/1",
+ "title": "The hepatobiliary tree",
+ "topic": "Hepatobiliary",
+ "organs": [
+  {
+   "id": "gallbladder",
+   "parts": {
+    "bile_duct": {
+     "visible": false
+    }
+   }
+  },
+  {
+   "id": "duodenum",
+   "parts": {
+    "duodenum": {
+     "opacity": 0.55
+    }
+   }
+  },
+  {
+   "id": "pancreas",
+   "parts": {
+    "pancreas": {
+     "opacity": 0.55
+    }
+   }
+  },
+  {
+   "id": "liver",
+   "parts": {
+    "liver": {
+     "opacity": 0.22
+    }
+   }
+  }
+ ],
+ "base": [
+  {
+   "op": "route",
+   "id": "cbd",
+   "name": "Common bile duct",
+   "tissue": "bile-duct",
+   "radius_cm": 0.13,
+   "from": {
+    "on": "gallbladder/bile_duct",
+    "t": 0.125
+   },
+   "via": [
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.2
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.3
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.4
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.5
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.6
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.7
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.8
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.9
+    }
+   ],
+   "to": {
+    "landmark": "gallbladder/bile_duct_lower_end"
+   }
+  },
+  {
+   "op": "branch",
+   "id": "chd",
+   "name": "Common hepatic duct",
+   "tissue": "bile-duct",
+   "radius_cm": 0.12,
+   "from": {
+    "on": "cbd",
+    "t": 0
+   },
+   "via": [
+    {
+     "landmark": "gallbladder/bile_duct_upper_end",
+     "offset": {
+      "dir": "superior",
+      "cm": 1.5
+     }
+    }
+   ],
+   "to": {
+    "landmark": "portal-venous/portal_vein_upper_end",
+    "offset": {
+     "dir": "right",
+     "cm": 1.5
+    }
+   }
+  },
+  {
+   "op": "route",
+   "id": "cystic_duct",
+   "name": "Cystic duct",
+   "tissue": "bile-duct",
+   "radius_cm": 0.1,
+   "from": {
+    "landmark": "gallbladder/gallbladder_neck"
+   },
+   "via": [
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.03
+    },
+    {
+     "on": "gallbladder/bile_duct",
+     "t": 0.07
+    }
+   ],
+   "to": {
+    "on": "cbd",
+    "t": 0
+   }
+  }
+ ],
+ "variant": {
+  "label": "Low cystic duct insertion",
+  "edits": [
+   {
+    "op": "remove",
+    "structure": "cystic_duct"
+   },
+   {
+    "op": "route",
+    "id": "cystic_duct_low",
+    "name": "Cystic duct (low insertion)",
+    "tissue": "bile-duct",
+    "radius_cm": 0.1,
+    "from": {
+     "landmark": "gallbladder/gallbladder_neck"
+    },
+    "via": [
+     {
+      "on": "cbd",
+      "t": 0.15,
+      "offset": {
+       "dir": "anterior",
+       "cm": 0.5
+      }
+     },
+     {
+      "on": "cbd",
+      "t": 0.32,
+      "offset": {
+       "dir": "anterior",
+       "cm": 0.5
+      }
+     },
+     {
+      "on": "cbd",
+      "t": 0.5,
+      "offset": {
+       "dir": "anterior",
+       "cm": 0.5
+      }
+     }
+    ],
+    "to": {
+     "on": "cbd",
+     "t": 0.68
+    }
+   }
+  ]
+ },
+ "labels": [
+  {
+   "text": "Gallbladder",
+   "on": "gallbladder/gallbladder"
+  },
+  {
+   "text": "Cystic duct",
+   "on": "cystic_duct"
+  },
+  {
+   "text": "Common hepatic duct",
+   "on": "chd"
+  },
+  {
+   "text": "Common bile duct",
+   "on": "cbd"
+  },
+  {
+   "text": "Duodenum",
+   "on": "duodenum/duodenum"
+  },
+  {
+   "text": "Liver",
+   "on": "liver/liver"
+  },
+  {
+   "text": "Pancreas",
+   "on": "pancreas/pancreas"
+  }
+ ],
+ "claims": [
+  {
+   "text": "The cystic duct is usually 2 to 4 cm long. It may join the bile duct low; even then it rarely passes behind the duodenum, so a duct seen there is more likely the bile duct.",
+   "refs": [
+    "jmas-anatomy-cholecystectomy"
+   ]
+  },
+  {
+   "text": "A cystic duct joining the bile duct low, near the ampulla, can mimic distal bile duct stones or obstruction on imaging and be mistaken for the bile duct at ERCP.",
+   "refs": [
+    "jmas-vasculobiliary-anatomy"
+   ]
+  },
+  {
+   "text": "A long, parallel or spiral cystic duct makes its insertion hard to find at cholecystectomy, which risks injury to the bile duct.",
+   "refs": [
+    "jmas-vasculobiliary-anatomy"
+   ]
+  }
+ ],
+ "view": {
+  "rot": [
+   0.12,
+   -0.25
+  ],
+  "zoom": 12.5
+ }
+}
