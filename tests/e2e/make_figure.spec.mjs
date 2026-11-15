@@ -63,7 +63,24 @@ test('look-figure renders both views of a written figure to PNGs and reports its
   const env = { ...process.env }; delete env.npm_lifecycle_event;
   const r = spawnSync('node', [path.join(ROOT, 'player/look-figure.mjs'), file, '--rot', '0.2,2.6'], { encoding: 'utf8', env, timeout: 120000 });
   expect(r.status, r.stdout + r.stderr).toBe(0);
-  for (const v of ['normal', 'variant']) expect(existsSync(path.join(OUT, `look-low-cystic-duct-rot0.2_2.6-${v}.png`))).toBe(true);
+  for (const v of ['normal', 'variant']) {
+    const png = path.join(OUT, '.check', `look-low-cystic-duct-rot0.2_2.6-${v}.png`);
+    expect(existsSync(png)).toBe(true);
+    expect(r.stdout).toContain(png);
+  }
   expect(r.stdout).toMatch(/view: Right posterior oblique view/);
   expect(r.stdout).toMatch(/label "Cystic duct \(low insertion\)" anchor \d+,\d+/);
+});
+
+test('look-figure exits 1 when the page shows errors', async () => {
+  const { spawnSync } = await import('node:child_process');
+  mkdirSync(OUT, { recursive: true });
+  const good = buildFigure(JSON.parse(readFileSync(path.join(FIX, 'low-cystic-duct.json'), 'utf8'))).html;
+  // a figure whose inlined spec no longer validates: the page shows its errors
+  const file = path.join(OUT, 'look-broken.html');
+  writeFileSync(file, good.replace(/"schema":"sagittal-figure\/1"/, '"schema":"nope"'));
+  const env = { ...process.env }; delete env.npm_lifecycle_event;
+  const r = spawnSync('node', [path.join(ROOT, 'player/look-figure.mjs'), file], { encoding: 'utf8', env, timeout: 120000 });
+  expect(r.status).toBe(1);
+  expect(r.stdout).toMatch(/the page shows errors:\nschema/);
 });

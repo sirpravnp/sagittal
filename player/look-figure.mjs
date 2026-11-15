@@ -5,12 +5,13 @@
 //   npm run look -- <figure.html> [...]
 //
 // Opens the file from disk in headless Chrome (software GL, no network), and for the normal and the
-// variant view writes <out>/<name>-<view>.png (the 3D stage with its labels; default <out> is the
-// figure's folder). --rot / --zoom start the camera elsewhere (radians about x and y, as in the
+// variant view writes <out>/<name>[-rot<x>_<y>]-<view>.png (the 3D stage with its labels; default
+// <out> is a .check/ folder next to the figure, so check images stay out of the student's way). --rot / --zoom start the camera elsewhere (radians about x and y, as in the
 // spec's view), to check a relation from another side. Prints, per view: the PNG path, the
 // orientation chip ("Right anterior oblique view · patient's right on screen left"), and each label
 // with its anchor (stage pixels) and whether the anchor is hidden behind another structure; and
-// labels the player dropped. Exit 1 if the page shows errors or renders blank.
+// labels the player dropped. Exit 1 if the page shows errors, throws, warns about a label, or
+// renders blank; exit 3 if no browser is installed.
 import { chromium } from '@playwright/test';
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -38,13 +39,20 @@ if (!a.file) usage('give a figure .html written by make-figure');
 const base = (process.env.npm_lifecycle_event === 'look' && process.env.INIT_CWD) || process.cwd();
 const file = path.resolve(base, a.file);
 if (!existsSync(file)) usage('no such file ' + file);
-const out = path.resolve(base, a.out || path.dirname(file));
+const out = path.resolve(base, a.out || path.join(path.dirname(file), '.check'));
 mkdirSync(out, { recursive: true });
 const name = path.basename(file, '.html') + (a.rot ? '-rot' + a.rot.replace(/,/g, '_') : '');
 
 let browser;
 try { browser = await chromium.launch({ channel: 'chrome', args: GL_ARGS }); }
-catch { browser = await chromium.launch({ args: GL_ARGS }); }
+catch {
+  try { browser = await chromium.launch({ args: GL_ARGS }); }
+  catch (e) {
+    process.stderr.write('look-figure: no browser to render with: install Google Chrome, or run  npx playwright install chromium'
+      + ' in the sagittal repo.\n(' + String(e.message || e).split('\n')[0] + ')\n');
+    process.exit(3);
+  }
+}
 const context = await browser.newContext({ viewport: { width: a.width, height: a.width < 600 ? 812 : 800 } });
 await context.setOffline(true);
 await context.route(/^(https?|wss?):/, (r) => r.abort());
@@ -59,11 +67,15 @@ for (const view of ['normal', 'variant']) {
   if (a.rot) q += '&rot=' + a.rot;
   if (a.zoom) q += '&zoom=' + a.zoom;
   await page.goto(pathToFileURL(file).href + q);
-  const ok = await page.waitForFunction(() => (window.viewer && window.viewer.debug().labelRects.length >= 0 && window.SagittalPlayer.debug())
-    || !document.getElementById('errors').hidden, null, { timeout: 60000 }).then(() => true, () => false);
+  // Ready: the page shows errors, or the player has built this view and the viewer has placed its
+  // labels (all of them, or after 15 s whatever it could place), then two more frames are drawn.
+  const ok = await page.waitForFunction(() => !document.getElementById('errors').hidden
+    || (window.viewer && window.SagittalPlayer && window.SagittalPlayer.debug() && window.SagittalPlayer.debug().view), null, { timeout: 60000 }).then(() => true, () => false);
   const errText = await page.evaluate(() => { const e = document.getElementById('errors'); return e && !e.hidden ? e.textContent : ''; });
   if (!ok || errText) { process.stdout.write(`${view}: the page shows errors:\n${errText || 'timed out'}\n`); failed = true; break; }
-  await page.waitForTimeout(400);
+  await page.waitForFunction((v) => { const p = window.SagittalPlayer.debug(); return p.view === v && window.viewer.debug().labelRects.length >= p.labels.length; },
+    view, { timeout: 15000 }).catch(() => {});
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   const s = await page.evaluate(() => {
     const d = window.viewer.debug(), p = window.SagittalPlayer.debug();
     return { nonBlank: d.nonBlank, orientation: p.orientation, dropped: p.dropped,
@@ -76,6 +88,6 @@ for (const view of ['normal', 'variant']) {
   if (s.dropped && s.dropped.length) process.stdout.write(`  dropped labels (structure not drawn): ${s.dropped.join('; ')}\n`);
   if (!s.nonBlank) { process.stdout.write('  BLANK render\n'); failed = true; }
 }
-if (problems.length) process.stdout.write(problems.join('\n') + '\n');
+if (problems.length) { process.stdout.write(problems.join('\n') + '\n'); failed = true; }
 await browser.close();
 process.exit(failed ? 1 : 0);
