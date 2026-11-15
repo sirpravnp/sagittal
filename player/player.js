@@ -6,12 +6,14 @@
  *
  * `resolved` is SagittalSpec.validate(spec, SagittalOrgans).resolved (never an invalid spec).
  * opts: { organs (default window.SagittalOrgans), credits (site/meshes/credits.json; default
- * window.SagittalCredits), id (default 'figure') }.
+ * window.SagittalCredits), id (default 'figure'), orientEl (an element on the stage that the
+ * player keeps filled with where the viewer stands, e.g. "Posterior view · patient's right on
+ * screen right", updated as the user rotates) }.
  *
  * Two views, chosen by control `v`: 'normal' (the listed organs plus `base` structures) and
- * 'variant' (with `variant.edits` applied). Organs are drawn from their baked meshes, except tubular
- * parts (vessels, ducts) whose centre lines are known: those are drawn as tapered tubes along the
- * manifest centre lines, so one line can be removed or moved without the rest of its part.
+ * 'variant' (with `variant.edits` applied). Organs are drawn from their baked meshes, except a part
+ * one of whose centre lines the variant removes or moves: that part is drawn as tapered tubes
+ * along its manifest centre lines, so the one line can go or move without the rest of the part.
  * All geometry is built in body-frame cm inside one group scaled by S; the scene centre is the
  * middle of the structures the spec is about.
  */
@@ -19,6 +21,7 @@
   'use strict';
 
   var TUBULAR = { 'vessel-artery': 1, 'vessel-vein': 1, 'bile-duct': 1 };
+  var THIN_CM = 0.07;         // tubular parts thinner than this are drawn only when the spec names them
   var STAGE = 5.4;            // scene units the region of interest spans at the default zoom
   var MIN_ROI_CM = 9;         // smallest region of interest (cm)
   var ZOOM = 9;
@@ -44,12 +47,6 @@
       target -= d;
     }
     return pts[pts.length - 1].slice();
-  }
-  // The point of a polyline nearest to c (a label anchor that stays inside the figure's region).
-  function nearest(pts, c) {
-    var best = pts[0], bd = Infinity;
-    pts.forEach(function (p) { var d = dist(p, c); if (d < bd) { bd = d; best = p; } });
-    return best;
   }
   // Drops points closer than eps to the previous kept point (zero-length Catmull-Rom spans give NaNs).
   function dedupe(pts, eps) {
@@ -188,8 +185,18 @@
       else variantRoutes.push(e);
     });
     var baseRoutes = R.base || [];
+    // Library structures the spec names anywhere: labels, edits, waypoints, explicit part styles.
+    var named = {};
+    (R.labels || []).forEach(function (l) { named[l.on] = true; });
+    edits.forEach(function (e) { if (e.structure) named[e.structure] = true; });
+    baseRoutes.concat(variantRoutes, edits).forEach(function (e) {
+      [e.from, e.to].concat(e.via || []).forEach(function (w) { if (w && w.on) named[w.on] = true; });
+    });
+    R.organs.forEach(function (o) { Object.keys(o.parts || {}).forEach(function (k) { if (k !== '*') named[o.id + '/' + k] = true; }); });
 
-    // Per organ: which parts are drawn as tubes, and which lines each such part has.
+    // Per organ: which parts are drawn as tubes, and which lines each such part has. A part is
+    // drawn from its baked mesh unless the variant removes or moves one of its lines; then the
+    // whole part is drawn as tubes, one per line, so that line alone can go or move.
     var model = {};
     listed.forEach(function (oid) {
       var m = M[oid], lp = lineParts(m), tubeParts = {}, linesOf = {};
@@ -197,9 +204,19 @@
       (m.parts || []).forEach(function (p) {
         var lines = linesOf[p.id] || [];
         var edited = lines.some(function (c) { return removed[oid + '/' + c] || moved[oid + '/' + c]; });
-        if (lines.length && (TUBULAR[p.tissue] || edited)) tubeParts[p.id] = lines;
+        if (lines.length && edited) tubeParts[p.id] = lines;
       });
-      model[oid] = { m: m, lineParts: lp, tubeParts: tubeParts };
+      // Hair-thin tubular parts (every line under THIN_CM, e.g. the pancreatic ducts with their
+      // side-branch stubs) are left out unless the spec names the part or one of its lines.
+      var thin = {};
+      (m.parts || []).forEach(function (p) {
+        var lines = linesOf[p.id] || [];
+        if (!TUBULAR[p.tissue] || !lines.length) return;
+        var r = Math.max.apply(null, lines.map(function (c) { return m.centerlines[c].radius_cm || 0; }));
+        var isNamed = named[oid + '/' + p.id] || lines.some(function (c) { return named[oid + '/' + c]; });
+        if (r < THIN_CM && !isNamed) thin[p.id] = true;
+      });
+      model[oid] = { m: m, lineParts: lp, tubeParts: tubeParts, thin: thin };
     });
 
     // Region of interest: every structure the spec draws or changes, besides whole organs.
@@ -259,7 +276,7 @@
         var mo = model[oid], m = mo.m;
         (m.parts || []).forEach(function (p) {
           var ref = oid + '/' + p.id, style = partStyle(oid, p.id);
-          if (style.visible === false) return;
+          if (style.visible === false || mo.thin[p.id]) return;
           if (variant && removed[ref]) return;
           var tubeLines = mo.tubeParts[p.id];
           if (!tubeLines) {
@@ -268,7 +285,7 @@
             return;
           }
           var pg = new THREE.Group(); body.add(pg); objs[ref] = pg; drawn.push(ref);
-          var kind = TUBULAR[p.tissue] ? p.tissue : 'vessel-artery';
+          var kind = p.tissue;
           tubeLines.forEach(function (cid) {
             var lref = oid + '/' + cid, cl = m.centerlines[cid];
             if (variant && removed[lref]) return;
@@ -296,34 +313,64 @@
       baseRoutes.forEach(function (e) { drawRoute(e, true); });
       if (variant) variantRoutes.forEach(function (e) { drawRoute(e, false); });
 
-      // 3. Labels for this view, anchored on what they name.
-      var labels = [];
+      // 3. Labels for this view, anchored on what they name. First find each label's target:
+      // a line (points, cm) or a single point, and the object its dot goes on.
+      var targets = [], dropped = [];
       (R.labels || []).forEach(function (l) {
         if ((l.views || ['normal', 'variant']).indexOf(view) < 0) return;
-        var ref = l.on, p = null, on = null, slash = ref.indexOf('/');
-        if (lines[ref]) { p = nearest(lines[ref], region.c); on = objs[ref]; }
+        var ref = l.on, slash = ref.indexOf('/'), tg = { l: l, line: null, p: null, on: null };
+        if (lines[ref]) { tg.line = lines[ref]; tg.on = objs[ref]; }
         else if (slash >= 0) {
           var oid = ref.slice(0, slash), id = ref.slice(slash + 1), mo = model[oid];
-          if (!mo || !st[orgKey[oid]]) return;
-          var m = mo.m;
-          if (has(m.landmarks, id)) p = m.landmarks[id].p;
-          else if (objs[ref]) {
-            on = objs[ref];
+          if (mo && !st[orgKey[oid]]) return; // its organ is switched off: not an error
+          var m = mo && mo.m, partRef = m && mo.lineParts[id] ? oid + '/' + mo.lineParts[id] : null;
+          if (m && has(m.landmarks, id)) tg.p = m.landmarks[id].p;
+          else if (m && objs[ref]) {
+            tg.on = objs[ref];
             var bb = bboxOf(m.mesh, id);
-            p = bb ? [(bb[0] + bb[3]) / 2, (bb[1] + bb[4]) / 2, (bb[2] + bb[5]) / 2] : region.c;
-          } else if (has(m.centerlines, id) && mo.lineParts[id] && objs[oid + '/' + mo.lineParts[id]]) {
-            // a centre line inside a part drawn as a mesh (e.g. the oesophagus)
-            on = objs[oid + '/' + mo.lineParts[id]];
-            p = nearest(m.centerlines[id].points, region.c);
-          } else return; // not drawn in this view
-        } else return;
-        var lab = { t: l.text, p: sc(p) };
-        if (on) lab.on = on;
-        labels.push(lab);
+            tg.p = bb ? [(bb[0] + bb[3]) / 2, (bb[1] + bb[4]) / 2, (bb[2] + bb[5]) / 2] : region.c;
+          } else if (m && has(m.centerlines, id) && partRef && objs[partRef]) {
+            // a centre line inside a part drawn from its mesh (e.g. the SMA, the oesophagus)
+            tg.line = m.centerlines[id].points; tg.on = objs[partRef];
+          }
+        }
+        if (!tg.line && !tg.p) { dropped.push(l.text); return; }
+        targets.push(tg);
       });
+      // Each line label is anchored at the point of its own line, inside the figure's region, that
+      // is furthest from every other labelled structure and from anchors already chosen, so dots
+      // do not pile up at the junction the figure is about.
+      var chosen = [];
+      targets.forEach(function (tg, i) {
+        if (!tg.line) { chosen.push(tg.p); return; }
+        var others = [];
+        targets.forEach(function (o, j) { if (j !== i) others.push(o.line ? densify(o.line, 0.4) : [o.p]); });
+        tg.p = spreadAnchor(densify(tg.line, 0.25), others, chosen, region);
+        chosen.push(tg.p);
+      });
+      var labels = targets.map(function (tg) {
+        var lab = { t: tg.l.text, p: sc(tg.p) };
+        if (tg.on) lab.on = tg.on;
+        return lab;
+      });
+      if (dropped.length && window.console) {
+        console.warn('Sagittal figure: not drawn in the ' + view + ' view, so not labelled: ' + dropped.join('; '));
+      }
 
-      last = { view: view, drawn: drawn };
-      return { labels: labels, info: infoHtml(view) };
+      last = { view: view, drawn: drawn, labels: labels.map(function (l) { return l.t; }), dropped: dropped };
+      return { labels: labels, info: infoHtml(view), update: orientUpdate(g) };
+    }
+
+    // The orientation cue follows the model's rotation (the group's parent is the viewer's root).
+    function orientUpdate(g) {
+      var el = opts.orientEl || null, shown = '';
+      return function () {
+        var root = g.parent;
+        if (!root) return;
+        var o = orientation([root.rotation.x, root.rotation.y]);
+        last.orientation = o.text;
+        if (el && o.text !== shown) { el.textContent = o.text; shown = o.text; }
+      };
     }
 
     /* ---------- info panel ---------- */
@@ -376,14 +423,66 @@
       build: build,
     };
     Kit.register(def);
-    api.debug = function () { return last.view ? { view: last.view, drawn: last.drawn.slice(), scale: S } : null; };
+    api.debug = function () {
+      return last.view ? { view: last.view, drawn: last.drawn.slice(), labels: last.labels.slice(), dropped: last.dropped.slice(),
+        orientation: last.orientation || orientation(def.rot).text, scale: S } : null;
+    };
     return def;
+  }
+
+  /* ---------- orientation ---------- */
+  // Where the viewer stands relative to the patient, for a model turned by Euler [x, y] (the
+  // kit's root rotation; camera on +z). The direction to the camera in body coordinates is
+  // Ry(y)^T Rx(x)^T (0,0,1) = (-sin y cos x, sin x, cos y cos x); screen right is (cos y, 0, sin y).
+  function orientation(rot) {
+    var a = rot[0], b = rot[1];
+    var v = [-Math.sin(b) * Math.cos(a), Math.sin(a), Math.cos(b) * Math.cos(a)];
+    var side = v[0] > 0 ? 'Left' : 'Right', face = v[2] > 0 ? 'anterior' : 'posterior';
+    var ax = Math.abs(v[0]), ay = Math.abs(v[1]), az = Math.abs(v[2]), OBL = 0.38, name;
+    if (ay > Math.max(ax, az)) name = v[1] > 0 ? 'Superior view (from above)' : 'Inferior view (from below)';
+    else {
+      if (ax > OBL && az > OBL) name = side + ' ' + face + ' oblique view';
+      else if (az >= ax) name = face === 'anterior' ? 'Anterior view' : 'Posterior view';
+      else name = side + ' lateral view';
+      if (ay > OBL) name += v[1] > 0 ? ', from above' : ', from below';
+    }
+    var sx = Math.cos(b), rightOn = sx > 0.3 ? 'left' : sx < -0.3 ? 'right' : null;
+    return { name: name, rightOn: rightOn,
+      text: name + (rightOn ? ' · patient’s right on screen ' + rightOn : '') };
+  }
+
+  // Points every `step` cm along a polyline (keeps the original vertices).
+  function densify(pts, step) {
+    var out = [pts[0]];
+    for (var i = 1; i < pts.length; i++) {
+      var a = pts[i - 1], b = pts[i], n = Math.max(1, Math.ceil(dist(a, b) / step));
+      for (var k = 1; k <= n; k++) out.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n, a[2] + (b[2] - a[2]) * k / n]);
+    }
+    return out;
+  }
+  // The candidate furthest (capped at 3 cm) from the other labelled structures and the anchors
+  // already chosen, preferring points inside the region and near its centre on ties.
+  function spreadAnchor(cands, others, chosen, region) {
+    var half = region.ext * 0.45, c = region.c;
+    var inside = cands.filter(function (p) { return Math.abs(p[0] - c[0]) < half && Math.abs(p[1] - c[1]) < half && Math.abs(p[2] - c[2]) < half; });
+    if (!inside.length) inside = cands;
+    var best = inside[0], bs = -Infinity;
+    inside.forEach(function (p) {
+      var d = 3;
+      others.forEach(function (o) { o.forEach(function (q) { d = Math.min(d, dist(p, q)); }); });
+      chosen.forEach(function (q) { d = Math.min(d, dist(p, q)); });
+      var s = d - 0.05 * dist(p, c);
+      if (s > bs) { bs = s; best = p; }
+    });
+    return best;
   }
 
   var api = {
     register: register,
+    orientation: orientation,
     // What the most recent build of the most recently registered figure drew:
-    // { view, drawn: [structure refs and route ids], scale } (null before any build).
+    // { view, drawn: [structure refs and route ids], labels: [texts], dropped: [label texts not
+    // drawn], orientation, scale } (null before any build).
     debug: function () { return null; },
   };
   window.SagittalPlayer = api;

@@ -317,6 +317,20 @@ test('hostile input: not an object, prototype keys, many problems at once', () =
   assert.equal(run(many).errors.length, 3);
 });
 
+test('a routed path that doubles back within 1.5 cm is refused (hairpins)', () => {
+  const s = example();
+  // up to the bifurcation, 1 cm straight back down, then on to the right lobe hilum
+  s.variant.edits[1].via = [{ landmark: 'portal/portal_vein_bifurcation' },
+    { landmark: 'portal/portal_vein_bifurcation', offset: { dir: 'inferior', cm: 1 } }];
+  assert.deepEqual(run(s).errors, [
+    'variant.edits[1].via[0]: the path turns 150° here, next to a stretch shorter than 1.5 cm; a vessel or duct does not double back: choose waypoints that give a smooth course',
+    'variant.edits[1].via[1]: the path turns 126° here, next to a stretch shorter than 1.5 cm; a vessel or duct does not double back: choose waypoints that give a smooth course',
+  ]);
+  // a wide turn between long stretches is fine
+  s.variant.edits[1].via = [{ landmark: 'portal/portal_vein_bifurcation', offset: { dir: 'superior', cm: 3 } }];
+  assert.deepEqual(run(s).errors, []);
+});
+
 test('validate does not modify the spec it is given', () => {
   const s = example(); const before = JSON.stringify(s);
   run(s);

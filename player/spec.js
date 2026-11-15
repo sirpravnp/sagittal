@@ -18,6 +18,7 @@
     organs: 12, base: 20, edits: 20, via: 12, labels: 20, claims: 12,
     title: 80, topic: 40, name: 60, label: 60, claim: 300,
     offsetCm: 3, radiusCm: 1.5, zoom: [3, 16],
+    turnDeg: 90, hairpinCm: 1.5,   // a routed path may not turn more than turnDeg next to a stretch shorter than hairpinCm
   };
   var DIRS = {
     anterior: [0, 0, 1], posterior: [0, 0, -1], left: [1, 0, 0], right: [-1, 0, 0],
@@ -298,6 +299,7 @@
       if (!to) ok = false;
 
       var points = ok ? [from.p].concat(via.map(function (w) { return w.p; }), [to.p]) : null;
+      if (points) hairpins(points, path);
       if (typeof e.id === 'string' && !dupId) {
         routes[e.id] = {
           name: e.name, tissue: tissue, radius_cm: radius, points: points, view: view,
@@ -314,6 +316,22 @@
       out.from = from; out.to = to; if (has(e, 'via')) out.via = via;
       out.tissue = tissue; out.radius_cm = radius; out.points = points;
       return out;
+    }
+
+    // A tube drawn through its waypoints loops where the path turns sharply next to a short
+    // stretch (e.g. a via on a small wiggle of a library line). Real vessels and ducts do not.
+    function hairpins(points, path) {
+      for (var k = 1; k + 1 < points.length; k++) {
+        var a = sub(points[k], points[k - 1]), b = sub(points[k + 1], points[k]);
+        var la = dist(points[k], points[k - 1]), lb = dist(points[k + 1], points[k]);
+        if (!(la > 1e-6 && lb > 1e-6) || Math.min(la, lb) >= LIMITS.hairpinCm) continue;
+        var c = (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]) / (la * lb);
+        var turn = Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
+        if (turn > LIMITS.turnDeg) {
+          err(idx(key(path, 'via'), k - 1), 'the path turns ' + Math.round(turn) + '° here, next to a stretch shorter than ' +
+            LIMITS.hairpinCm + ' cm; a vessel or duct does not double back: choose waypoints that give a smooth course');
+        }
+      }
     }
 
     // Name of a structure ref (library centre line, part, or route), for provenance.

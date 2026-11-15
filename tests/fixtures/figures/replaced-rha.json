@@ -49,6 +49,9 @@
       "id": "gallbladder",
       "parts": {
         "gallbladder": {
+          "opacity": 0.3
+        },
+        "bile_duct": {
           "visible": false
         }
       }
@@ -157,6 +160,105 @@
       "to": {
         "landmark": "liver-segments/liver_segment_ii_centroid"
       }
+    },
+    {
+      "op": "route",
+      "id": "cbd",
+      "name": "Common bile duct",
+      "tissue": "bile-duct",
+      "radius_cm": 0.13,
+      "from": {
+        "on": "gallbladder/bile_duct",
+        "t": 0.125
+      },
+      "via": [
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.2
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.3
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.4
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.5
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.6
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.7
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.8
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.9
+        }
+      ],
+      "to": {
+        "landmark": "gallbladder/bile_duct_lower_end"
+      }
+    },
+    {
+      "op": "branch",
+      "id": "chd",
+      "name": "Common hepatic duct",
+      "tissue": "bile-duct",
+      "radius_cm": 0.12,
+      "from": {
+        "on": "cbd",
+        "t": 0
+      },
+      "via": [
+        {
+          "landmark": "gallbladder/bile_duct_upper_end",
+          "offset": {
+            "dir": "superior",
+            "cm": 1.5
+          }
+        }
+      ],
+      "to": {
+        "landmark": "portal-venous/portal_vein_upper_end",
+        "offset": {
+          "dir": "right",
+          "cm": 1.5
+        }
+      }
+    },
+    {
+      "op": "route",
+      "id": "cystic_duct",
+      "name": "Cystic duct",
+      "tissue": "bile-duct",
+      "radius_cm": 0.1,
+      "from": {
+        "landmark": "gallbladder/gallbladder_neck"
+      },
+      "via": [
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.03
+        },
+        {
+          "on": "gallbladder/bile_duct",
+          "t": 0.07
+        }
+      ],
+      "to": {
+        "on": "cbd",
+        "t": 0
+      }
     }
   ],
   "variant": {
@@ -192,12 +294,11 @@
             }
           },
           {
-            "on": "coeliac-trunk/proper_hepatic_artery",
-            "t": 0.45
-          },
-          {
-            "on": "coeliac-trunk/proper_hepatic_artery",
-            "t": 0.56
+            "landmark": "gallbladder/bile_duct_upper_end",
+            "offset": {
+              "dir": "right",
+              "cm": 1.5
+            }
           },
           {
             "on": "coeliac-trunk/proper_hepatic_artery",
@@ -245,7 +346,7 @@
     },
     {
       "text": "Common bile duct",
-      "on": "gallbladder/bile_duct"
+      "on": "cbd"
     }
   ],
   "claims": [

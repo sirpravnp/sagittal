@@ -110,6 +110,9 @@ The same op grammar is used in `base` (only `route` and `branch`) and in `varian
   the proper hepatic artery 0.1, the bile duct 0.1.
 - `from`, `to`: waypoints. `via`: optional list of up to 12 waypoints the tube passes through,
   in order. The tube runs through `from`, `via...`, `to` in that order.
+- The path may not double back: at a `via` point it may not turn more than 90° when either
+  stretch next to it is shorter than 1.5 cm (a tube drawn through such points loops). This
+  happens most often with a `via` on a small wiggle of a library line; pick points further along.
 - An end given as `{"on", "t"}` **inserts** into that line: the structure depends on it (see
   `remove`) and its insertion can be moved (see `move_insertion`).
 
@@ -231,6 +234,7 @@ from 3 (close) to 16 (far). Optional.
 | offset | more than 0, at most 3 cm |
 | `t` | 0 to 1 |
 | `radius_cm` | more than 0, at most 1.5 |
+| turn at a `via` | at most 90° when a stretch next to it is under 1.5 cm |
 | labels | up to 20, text up to 60 characters |
 | claims | 1 to 12, text up to 300 characters, at least one reference each |
 | title / topic / names | 80 / 40 / 60 characters |
@@ -245,6 +249,7 @@ variant.edits[1].via[0]: unknown landmark "portal-venous/foo"
 variant.edits[1].from: t must be a number from 0 to 1 (got 1.4)
 variant.edits[1].via[0]: offset.cm must be more than 0 and at most 3 (got 4)
 variant.edits[1].via[0]: raw coordinates are not allowed; use a landmark, a centre-line point or an offset
+variant.edits[1].via[2]: the path turns 103° here, next to a stretch shorter than 1.5 cm; a vessel or duct does not double back: choose waypoints that give a smooth course
 claims[0].refs[0]: unknown reference "michels-1966"
 labels: at most 20 items (got 25)
 ```

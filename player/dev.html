@@ -22,6 +22,7 @@
   <div id="stage">
     <canvas id="cv"></canvas>
     <div id="labels"></div>
+    <div id="orient" aria-live="polite" style="position:absolute;left:8px;top:8px;pointer-events:none;font:12px/1.4 system-ui,sans-serif;color:#dfe6ef;background:rgba(15,20,27,.75);border:1px solid #3a4a5e;border-radius:4px;padding:2px 7px"></div>
   </div>
   <aside>
     <div id="controls"></div>
@@ -66,7 +67,7 @@
     return Promise.all(meshes.map(function (m) {
       return window.SagittalMeshes && SagittalMeshes[m] ? null : loadScript('../organs/meshes/' + encodeURIComponent(m) + '.js');
     })).then(function () {
-      var def = SagittalPlayer.register(R, { credits: r[1] });
+      var def = SagittalPlayer.register(R, { credits: r[1], orientEl: document.getElementById('orient') });
       var viewer = Kit.createViewer({
         canvas: document.getElementById('cv'),
         labelsEl: document.getElementById('labels'),

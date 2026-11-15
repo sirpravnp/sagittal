@@ -17,11 +17,11 @@ const fixtures = readdirSync(path.join(ROOT, FIX)).filter((f) => f.endsWith('.js
 const WIDTHS = [1200, 375];
 
 // Ground truth per fixture: a structure drawn only in the normal view, one drawn only in the
-// variant view, and the provenance entries the info panel must list.
+// variant view, the provenance entries the info panel must list, and the starting orientation cue.
 const EXPECT = {
-  'replaced-rha.json': { normalOnly: 'rha', variantOnly: 'rrha', provenance: ['pha', 'rha', 'lha', 'rrha'] },
-  'low-cystic-duct.json': { normalOnly: 'cystic_duct', variantOnly: 'cystic_duct_low', provenance: ['chd', 'cystic_duct', 'cystic_duct_low'] },
-  'aberrant-right-subclavian.json': { normalOnly: 'aorta/right_subclavian_artery', variantOnly: 'arsa', provenance: ['aorta/right_subclavian_artery', 'aorta/brachiocephalic_trunk', 'aorta/right_common_carotid_artery', 'arsa'] },
+  'replaced-rha.json': { normalOnly: 'rha', variantOnly: 'rrha', provenance: ['pha', 'rha', 'lha', 'chd', 'rrha'], orient: /^Right anterior oblique view/ },
+  'low-cystic-duct.json': { normalOnly: 'cystic_duct', variantOnly: 'cystic_duct_low', provenance: ['cbd', 'chd', 'cystic_duct', 'cystic_duct_low'], orient: /^Left anterior oblique view/ },
+  'aberrant-right-subclavian.json': { normalOnly: 'aorta/right_subclavian_artery', variantOnly: 'arsa', provenance: ['aorta/right_subclavian_artery', 'aorta/brachiocephalic_trunk', 'aorta/right_common_carotid_artery', 'arsa'], orient: /^(Posterior view|Right posterior oblique view)/ },
 };
 
 async function serveRepo(page) {
@@ -34,7 +34,10 @@ async function serveRepo(page) {
 }
 function watchErrors(page) {
   const errors = [];
-  page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
+  // and the player's own warnings (a label whose structure is not drawn); not Chrome's GL notices
+  page.on('console', (m) => {
+    if (m.type() === 'error' || (m.type() === 'warning' && m.text().startsWith('Sagittal'))) errors.push('console ' + m.type() + ': ' + m.text());
+  });
   page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
   return errors;
 }
@@ -43,11 +46,20 @@ async function openFigure(page, fixture, query = '') {
   await page.waitForFunction(() => window.viewer && window.viewer.debug().labelRects.length > 0, null, { timeout: 60000 });
   await page.waitForTimeout(150);
 }
+// The resolved spec (labels with their worked-out views), validated in the page.
+async function specOf(page, fixture) {
+  await page.goto(`${ORIGIN}/player/dev.html`);
+  const raw = JSON.parse(readFileSync(path.join(ROOT, FIX, fixture), 'utf8'));
+  return page.evaluate((sp) => SagittalSpec.validate(sp, SagittalOrgans).resolved, raw);
+}
 async function labelState(page) {
   return page.evaluate(() => {
     const c = document.querySelector('#cv');
     const d = window.viewer.debug();
-    return { rects: d.labelRects, leaders: d.leaders, cw: c.clientWidth, ch: c.clientHeight, nonBlank: d.nonBlank, drawn: window.SagittalPlayer.debug() };
+    // labels the spec asks for in this view (from the validated spec, as the page rendered it)
+    const p = window.SagittalPlayer.debug();
+    return { rects: d.labelRects, leaders: d.leaders, cw: c.clientWidth, ch: c.clientHeight, nonBlank: d.nonBlank, drawn: p,
+      orient: document.querySelector('#orient').textContent };
   });
 }
 
@@ -59,13 +71,28 @@ for (const fixture of fixtures) {
       await serveRepo(page);
       const errors = watchErrors(page);
       mkdirSync(OUT, { recursive: true });
+      const spec = await specOf(page, fixture);
       for (const view of ['variant', 'normal']) {
         await openFigure(page, fixture, `&v=${view}`);
         const s = await labelState(page);
         const tag = `${fixture}/${view}@${width}`;
         expect(s.drawn.view, tag).toBe(view);
         expect(s.nonBlank, tag).toBe(true);
-        expect(s.rects.length, tag).toBeGreaterThan(0);
+        // every label the spec asks for in this view is drawn and placed on the stage
+        const want = spec.labels.filter((l) => (l.views || ['normal', 'variant']).includes(view)).map((l) => l.text);
+        expect(s.drawn.dropped, tag).toEqual([]);
+        expect(s.drawn.labels.sort(), tag).toEqual([...want].sort());
+        expect(s.rects.length, `${tag}: every label placed`).toBe(want.length);
+        // anchor dots are distinct: no two within 12 px (dots piled at a junction are unreadable)
+        for (let i = 0; i < s.leaders.length; i++) {
+          for (let j = i + 1; j < s.leaders.length; j++) {
+            const a = s.leaders[i], b = s.leaders[j];
+            expect(Math.hypot(a.ax - b.ax, a.ay - b.ay), `${tag}: dots of "${a.text}" and "${b.text}" overlap`).toBeGreaterThanOrEqual(12);
+          }
+        }
+        // the orientation cue is shown and agrees with the player
+        expect(s.orient, tag).toBe(s.drawn.orientation);
+        expect(s.orient, tag).toMatch(EXPECT[fixture].orient);
         s.rects.forEach((r, i) => {
           const lt = `${tag} "${s.leaders[i] && s.leaders[i].text}"`;
           expect(r.x, lt).toBeGreaterThanOrEqual(0);

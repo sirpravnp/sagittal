@@ -57,8 +57,16 @@
         },
         "via": [
           {
+            "on": "aorta/aortic_arch",
+            "t": 0.72,
+            "offset": {
+              "dir": "superior",
+              "cm": 1.4
+            }
+          },
+          {
             "on": "oesophagus/oesophagus",
-            "t": 0.3,
+            "t": 0.27,
             "offset": {
               "dir": "posterior",
               "cm": 1.5
@@ -66,7 +74,7 @@
           },
           {
             "on": "oesophagus/oesophagus",
-            "t": 0.25,
+            "t": 0.22,
             "offset": {
               "dir": "right",
               "cm": 1.6
