@@ -71,15 +71,15 @@ function organsNamed(spec, resolved, manifests) {
 }
 
 // JSON safe inside <script>: no "</script>", "<!--" or line separators can end or confuse it.
-const jsonForScript = (x) => JSON.stringify(x).replace(/</g, '\\u003c')
+export const jsonForScript = (x) => JSON.stringify(x).replace(/</g, '\\u003c')
   .replace(new RegExp('\\u2028', 'g'), '\\u2028').replace(new RegExp('\\u2029', 'g'), '\\u2029');
 
-function inlineScript(name, code) {
+export function inlineScript(name, code) {
   if (/<\/script/i.test(code) || /<!--/.test(code)) throw new Error(name + ' contains "</script" or "<!--"; it cannot be inlined as is');
   return `<script data-src="${name}">\n${code}\n</script>\n`;
 }
 
-function inlineCss(css) {
+export function inlineCss(css) {
   // The figure must work offline: drop remote @import (e.g. web fonts); the CSS falls back to its
   // local font stack.
   const out = css.replace(/@import\s+(url\()?\s*["']?https?:[^;]*;/gi, () => {
