@@ -10,7 +10,9 @@ Reads tools/organs/organs.json. For each organ it
   3. writes organs/manifests/<id>.json (schema sagittal-organ/0): parts, centre lines taken point for
      point from Z-Anatomy curves (CACHE/zanatomy-organs/all_curves.json, made by dump_curves.py) and
      landmarks computed from that geometry by the rules in organs.json, each with a 'derived' note,
-and finally organs/index.json. Mesh landmarks use the baked vertices, so they lie on the rendered surface.
+and finally organs/index.json. Rigid corrections of source objects (organs.json "corrections", e.g. the bile
+duct) are computed first from source geometry, written to tools/organs/corrections.json and applied to
+the curves and, through the bake config's per-part "rigid", to the meshes. Mesh landmarks use the baked vertices, so they lie on the rendered surface.
 Prerequisites (asset cache): zanatomy-organs/obj (extract_blend.py), zanatomy-organs/all_curves.json
 (dump_curves.py), organs-registered/ (register.py). See organs/README.md.
 """
@@ -47,14 +49,85 @@ def fmt(p):
 # ---------------------------------------------------------------- meshes
 
 
-def bake_config(org, spec):
+def bake_config(org, spec, corrections=None):
     d = dict(spec["defaults"][org["src"]])
     cfg = {"name": org["id"], "credit": d["credit"], "license": d["license"], "source": d["source"],
            "source_root": d["source_root"], "transform": d["transform"], "center": [0, 0, 0],
            "default_budget": 1500, "parts": {}}
     for p in org["parts"]:
         cfg["parts"][p["id"]] = {k: p[k] for k in ("files", "budget", "subdivide", "smooth") if k in p}
+        if p.get("correction"):
+            c = corrections[p["correction"]]
+            cfg["parts"][p["id"]]["rigid"] = {"rotation": c["rotation"], "translation": c["translation_cm"],
+                                             "why": "tools/organs/corrections.json %s" % p["correction"]}
     return cfg
+
+
+# ---------------------------------------------------------------- source corrections
+
+
+def rotation_onto(a, b):
+    """Smallest rotation taking direction a onto direction b."""
+    a, b = a / np.linalg.norm(a), b / np.linalg.norm(b)
+    k, c = np.cross(a, b), float(a @ b)
+    s = np.linalg.norm(k)
+    if s < 1e-12:
+        return np.eye(3)
+    K = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+    return np.eye(3) + K + K @ K * ((1 - c) / s ** 2)
+
+
+def compute_corrections(spec, curves, assets):
+    """Rigid corrections of Z-Anatomy objects whose source position is anatomically wrong
+    (organs.json "corrections"). Each is derived from source geometry only and applied to the curve
+    (centre line, landmarks) and, through bake.py's per-part "rigid", to the swept mesh.
+
+    rotate_end_onto_wall: rotate the curve about its `pivot` end, by the smallest rotation that turns
+    its other end towards the target: the vertex of a wall mesh (source OBJ, body frame) that lies
+    farthest in `direction` from the centre of the wall's horizontal slab at the moving end's height."""
+    out = {}
+    for cid, c in spec.get("corrections", {}).items():
+        if c["type"] != "rotate_end_onto_wall":
+            raise SystemExit("unknown correction type %r" % c["type"])
+        pts = np.array(curves[c["curve"]]["splines"][0]["points"], np.float64)
+        hi = pts[0][1] >= pts[-1][1]
+        U, E = (pts[0], pts[-1]) if (c["pivot"] == "highest") == hi else (pts[-1], pts[0])
+        w = c["wall"]
+        wv = bake.to_frame(bake.load(os.path.join(assets, "zanatomy-organs", "obj", w["file"]))[0], bake.PRESET_FRAMES["zanatomy"])
+        sel = (np.abs(wv[:, 1] - E[1]) < w["slab_cm"]) & (wv[:, 0] < w["x_below"])
+        slab = wv[sel]
+        centre = slab.mean(0)
+        d = np.array(w["direction"], np.float64)
+        d /= np.linalg.norm(d)
+        T = slab[np.argmax((slab - centre) @ d)]
+        R = rotation_onto(E - U, T - U)
+        t = U - R @ U
+        E2 = R @ E + t
+        moved = np.linalg.norm((pts @ R.T + t) - pts, axis=1)
+        ang = float(np.degrees(np.arccos(np.clip((np.trace(R) - 1) / 2, -1, 1))))
+        out[cid] = {
+            "type": c["type"], "curve": c["curve"], "why": c["why"],
+            "rotation": np.round(R, 6).tolist(), "translation_cm": np.round(t, 4).tolist(),
+            "pivot_cm": np.round(U, 3).tolist(), "rotation_deg": round(ang, 2),
+            "moving_end_before_cm": np.round(E, 3).tolist(), "moving_end_after_cm": np.round(E2, 3).tolist(),
+            "moving_end_shift_cm": round(float(np.linalg.norm(E2 - E)), 2),
+            "max_point_shift_cm": round(float(moved.max()), 2), "mean_point_shift_cm": round(float(moved.mean()), 2),
+            "wall": {"file": w["file"], "slab_vertices": int(sel.sum()), "slab_centre_cm": np.round(centre, 3).tolist(),
+                     "target_cm": np.round(T, 3).tolist(),
+                     "moving_end_before_offset_from_slab_centre_cm": np.round(E - centre, 2).tolist(),
+                     "moving_end_after_offset_from_slab_centre_cm": np.round(E2 - centre, 2).tolist(),
+                     "moving_end_after_to_target_cm": round(float(np.linalg.norm(E2 - T)), 2)}}
+    return out
+
+
+def apply_corrections(curves, corrections):
+    """Return a copy of the curves with each correction applied to every spline of its curve."""
+    curves = dict(curves)
+    for c in corrections.values():
+        R, t = np.array(c["rotation"]), np.array(c["translation_cm"])
+        src = curves[c["curve"]]
+        curves[c["curve"]] = dict(src, splines=[dict(s, points=(np.array(s["points"]) @ R.T + t).tolist()) for s in src["splines"]])
+    return curves
 
 
 def load_baked(path, name):
@@ -132,8 +205,9 @@ def dist_to_line(p, pts):
 
 
 class Library:
-    def __init__(self, spec, curves, registration, baked, assets=None):
+    def __init__(self, spec, curves, registration, baked, assets=None, corrections=None):
         self.spec, self.curves, self.reg, self.baked, self.assets = spec, curves, registration, baked, assets
+        self.corrections = corrections or {}
         self.lines = {}       # id -> dict(points ndarray, organ, ...)
         self.landmarks = {}   # id -> dict(p, name, derived, organ)
         self.warnings = []
@@ -156,18 +230,27 @@ class Library:
         return self.baked[organ_id][part_id]
 
     # -- landmark rules
+    def corrected_note(self, curve):
+        for cid, c in self.corrections.items():
+            if c["curve"] == curve:
+                return ("; the curve is rigidly corrected (rotated %.1f deg about its upper end, lower end moved %.2f cm "
+                        "onto the posteromedial wall of the descending duodenum; tools/organs/corrections.json %s)") % (
+                    c["rotation_deg"], c["moving_end_shift_cm"], cid)
+        return ""
+
     def landmark(self, organ, lm):
         r = lm["rule"]
         t = r["type"]
+        extra = ("; " + r["note"]) if r.get("note") and t in ("curve_end", "line_point", "mesh_nearest") else ""
         if t == "curve_end":
             p = self.curve_end(r["curve"], r["end"])
-            return p, "%s end of Z-Anatomy curve '%s' (spline 0)" % (r["end"], r["curve"])
+            return p, "%s end of Z-Anatomy curve '%s' (spline 0)%s%s" % (r["end"], r["curve"], self.corrected_note(r["curve"]), extra)
         if t == "line_point":
             ln = self.lines.get(r["line"])
             if ln is None:
                 return None
             p = ln["points"][0 if r["at"] == "start" else -1]
-            return p, "%s point of centre line '%s' (Z-Anatomy curve '%s')" % (r["at"], r["line"], ln["curve"])
+            return p, "%s point of centre line '%s' (Z-Anatomy curve '%s')%s%s" % (r["at"], r["line"], ln["curve"], self.corrected_note(ln["curve"]), extra)
         if t == "curve_ends_meet":
             (a, _), (b, _) = self.curve_pts(r["curves"][0]), self.curve_pts(r["curves"][1])
             best = min(((np.linalg.norm(x - y), x, y) for x in (a[0], a[-1]) for y in (b[0], b[-1])), key=lambda z: z[0])
@@ -222,7 +305,9 @@ class Library:
             if q is None:
                 return None
             d, i = cKDTree(v).query(q["p"])
-            return v[i], "baked '%s' vertex nearest landmark '%s' (%.2f cm away)" % (r["part"], r["to"], d)
+            if "rigidly corrected" in q["derived"]:
+                extra += "; that landmark is on a rigidly corrected curve (see its note and tools/organs/corrections.json)"
+            return v[i], "baked '%s' vertex nearest landmark '%s' (%.2f cm away)%s" % (r["part"], r["to"], d, extra)
         if t == "mesh_farthest":
             q = self.landmarks.get(r["from"])
             if q is None:
@@ -366,8 +451,15 @@ def main(argv=None):
     os.makedirs(os.path.join(OUT, "meshes"), exist_ok=True)
     os.makedirs(os.path.join(OUT, "manifests"), exist_ok=True)
     baked, stats, credits = {}, {}, {}
+    curves = json.load(open(os.path.join(a.assets, "zanatomy-organs", "all_curves.json")))
+    corrections = compute_corrections(spec, curves, a.assets)
+    with open(os.path.join(HERE, "corrections.json"), "w") as fh:
+        json.dump({"about": "Rigid corrections of Z-Anatomy source objects, written by tools/organs/build.py from "
+                            "organs.json 'corrections'; see organs/README.md (Corrections).", "corrections": corrections}, fh, indent=1)
+        fh.write("\n")
+    curves = apply_corrections(curves, corrections)
     for o in organs:
-        cfg = bake_config(o, spec)
+        cfg = bake_config(o, spec, corrections)
         cpath = os.path.join(CONFIG_DIR, "organ-%s.json" % o["id"])
         with open(cpath, "w") as fh:
             json.dump(cfg, fh, indent=2)
@@ -380,9 +472,8 @@ def main(argv=None):
         credits[o["id"]] = doc["credit"]
         stats[o["id"]] = {"kb": round(os.path.getsize(mpath) / 1024, 1), "tris": tri_count(parts), "credit": doc["credit"],
                           "license": cfg["license"]}
-    curves = json.load(open(os.path.join(a.assets, "zanatomy-organs", "all_curves.json")))
     reg = json.load(open(os.path.join(HERE, "registration.json")))
-    lib = Library(spec, curves, reg, baked, a.assets)
+    lib = Library(spec, curves, reg, baked, a.assets, corrections)
     resolve_all(lib, organs)
     # landmark ids are global: make sure no clash between organs
     index = []

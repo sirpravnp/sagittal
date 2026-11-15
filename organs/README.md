@@ -31,6 +31,27 @@ Organs from other sources were mapped into this frame by similarity transforms
 | thyroid | TotalSegmentator s1304 | vertebrae C3-T3 (ICP) | vertebra centroids RMS 0.22 cm |
 | brain | TotalSegmentator s1304 | Z-Anatomy cranial-cavity endocast (ICP) | surface RMS 0.32 cm, p95 0.65 cm |
 
+## Corrections of the source
+
+One Z-Anatomy object is moved, because its source position is anatomically wrong and students would
+learn it. The correction is rigid, derived from source geometry only, applied to both the centre line
+and the swept mesh (bake.py's per-part `rigid`), and recorded with its size in
+`tools/organs/corrections.json` (spec: `corrections` in `tools/organs/organs.json`). Every landmark on
+the corrected curve says so in its `derived` note.
+
+| id | object | what was wrong in the source | correction | size |
+|---|---|---|---|---|
+| `bile_duct_onto_d2` | Bile duct (CBD: curve and mesh) | it runs on the anterior surface of the pancreatic head and ends 0.5 cm in front of the anterior wall of the descending duodenum (1.1 cm anterior to the centre of the duodenal slab at that height). Our extraction and bake are not the cause: the source OBJ and curve agree with the baked mesh and manifest (median 0.13 cm) | rotated about its upper end (kept, where the cystic and common hepatic ducts would join) by the smallest rotation that turns its lower end onto the posteromedial wall (the slab vertex farthest medially + posteriorly, among `Duodenum.obj` vertices right of x = -3.5 at the lower end's height) | 18.6 deg; lower end moved 2.37 cm (mean 1.04 cm along the duct); it now lies 0.18 cm inside that wall point, 0.5 cm medial and 1.05 cm posterior to the slab centre |
+
+After the correction the duct runs through the pancreatic head (at mid depth for its upper part, which
+lies directly against the inferior vena cava in this model, so a larger posterior shift would put it
+into the IVC) and leaves the back of the head to enter the duodenum posteromedially; the major papilla
+landmark (`duodenum/major_duodenal_papilla`, nearest duodenal vertex) follows it. The main pancreatic
+duct is **not** moved (rotating it would take its body out of the pancreas): its papillary end, which in
+the source meets the bile duct 0.8 cm in front of the duodenum, is 2.0 cm from the corrected bile duct.
+Route an ampulla or a pancreatic duct entry to `duodenum/major_duodenal_papilla`, not to
+`pancreas/pancreatic_duct_papillary_end`.
+
 ## Manifest schema (`sagittal-organ/0`)
 
 ```json
@@ -106,6 +127,8 @@ library" section). Any figure that includes a Z-Anatomy organ is CC BY-SA 4.0.
   anal canal are inside the "Sigmoid colon" object. Jejunum and ileum are one tube without a boundary.
 - Female reproductive organs: none (Z-Anatomy is a male model; TotalSegmentator has no uterus or ovary).
 - Trachea centre line: the trachea is a mesh in the source (landmarks: `carina`, `trachea_upper_end`).
+- Main pancreatic duct to papilla: in the source its last 1 cm runs outside the pancreas in front of the
+  duodenum; after the bile duct correction it ends 2.0 cm from the bile duct (see Corrections).
 - Pancreatic duct side branches (< 0.7 cm) are in the mesh but have no centre lines; in the source the
   accessory duct does not reach the main duct (1.8 cm gap).
 - Brain: no lobes, gyri or deep structures (Z-Anatomy's cortex objects have an unclear licence; the

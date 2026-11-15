@@ -142,3 +142,19 @@ def test_quadric_decimate_meets_budget():
     v, f = sphere(40)
     v2, f2 = bake.decimate(v, f, 500, "quadric")
     assert 0 < len(f2) <= 520 and f2.max() < len(v2)
+
+
+def test_part_rigid_correction_is_applied_after_the_frame_transform(tmp_path):
+    # a 90 degree turn about +y then a shift, in the output frame (cm)
+    R = [[0, 0, 1], [0, 1, 0], [-1, 0, 0]]
+    cfg = make_cfg(tmp_path, center="none")
+    c = json.loads(cfg.read_text())
+    c["parts"]["left"]["rigid"] = {"rotation": R, "translation": [0, 0, 3]}
+    cfg.write_text(json.dumps(c))
+    bake.bake(str(cfg), "", str(tmp_path / "o"), quiet=True)
+    _, doc = decode((tmp_path / "o" / "balls.js").read_text())
+    left = np.frombuffer(base64.b64decode(doc["parts"]["left"]["p"]), np.float32).reshape(-1, 3)
+    right = np.frombuffer(base64.b64decode(doc["parts"]["right"]["p"]), np.float32).reshape(-1, 3)
+    # left ball centre (10, 120, 0) cm -> R @ c + t = (0, 120, -10 + 3)
+    assert left.mean(0).tolist() == pytest.approx([0, 120, -7], abs=0.3)
+    assert right.mean(0).tolist() == pytest.approx([-10, 120, 0], abs=0.3)  # other parts untouched

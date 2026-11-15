@@ -122,3 +122,48 @@ def test_heart_chamber_centroids_lie_inside_the_heart():
         a, b, m = lm[a_ + "_centroid"], lm[b_ + "_centroid"], lm[v_ + "_valve_centre"]
         t = (m - a) @ (b - a) / ((b - a) @ (b - a))
         assert 0 < t < 1, v_
+
+
+def test_rotation_onto_is_the_smallest_proper_rotation():
+    a, b = np.array([1.0, 2, 0.5]), np.array([-0.3, 1, 2])
+    R = build.rotation_onto(a, b)
+    assert np.allclose(R @ R.T, np.eye(3)) and abs(np.linalg.det(R) - 1) < 1e-9
+    assert np.allclose(R @ (a / np.linalg.norm(a)), b / np.linalg.norm(b))
+    axis = np.cross(a, b)
+    assert np.allclose(R @ axis, axis)  # turns about the common normal only
+    assert np.allclose(build.rotation_onto(a, a), np.eye(3))
+
+
+def test_bile_duct_correction_is_rigid_and_recorded():
+    spec = json.loads((ROOT / "tools" / "organs" / "organs.json").read_text())
+    rec = json.loads((ROOT / "tools" / "organs" / "corrections.json").read_text())["corrections"]
+    assert set(rec) == set(spec["corrections"]) == {"bile_duct_onto_d2"}
+    c = rec["bile_duct_onto_d2"]
+    R, t = np.array(c["rotation"]), np.array(c["translation_cm"])
+    assert np.allclose(R @ R.T, np.eye(3), atol=1e-5) and abs(np.linalg.det(R) - 1) < 1e-5
+    assert np.allclose(R @ np.array(c["pivot_cm"]) + t, c["pivot_cm"], atol=1e-3)  # the upper end stays
+    assert c["rotation_deg"] < 25 and c["moving_end_shift_cm"] < 3
+    # the baked gallbladder config carries the same transform for the swept duct mesh
+    cfg = json.loads((ROOT / "tools" / "meshes" / "configs" / "organ-gallbladder.json").read_text())
+    assert cfg["parts"]["bile_duct"]["rigid"]["rotation"] == c["rotation"]
+    # every landmark on the corrected duct says so
+    lm = json.loads((ROOT / "organs" / "manifests" / "gallbladder.json").read_text())["landmarks"]
+    for k in ("bile_duct_upper_end", "bile_duct_lower_end"):
+        assert "rigidly corrected" in lm[k]["derived"] and "bile_duct_onto_d2" in lm[k]["derived"]
+
+
+def test_bile_duct_enters_the_posteromedial_wall_of_the_descending_duodenum():
+    from scipy.spatial import cKDTree
+    dv, df = _baked("duodenum")["duodenum"]
+    gl, dl = _landmarks("gallbladder"), _landmarks("duodenum")
+    for p in (gl["bile_duct_lower_end"], dl["major_duodenal_papilla"]):
+        slab = dv[(np.abs(dv[:, 1] - p[1]) < 0.25) & (dv[:, 0] < -3.5)]  # descending part, this height
+        off = p - slab.mean(0)
+        assert off[0] > 0.3 and off[2] < -0.5, off  # medial (+x for the right-sided D2) and posterior (-z)
+        assert cKDTree(dv).query(p)[0] < 0.3  # on the wall
+    # the duct's upper end still meets the gallbladder neck; its middle runs through the pancreatic head
+    assert np.linalg.norm(gl["bile_duct_upper_end"] - gl["gallbladder_neck"]) < 0.2
+    pv, pf = _baked("pancreas")["pancreas"]
+    line = np.array(json.loads((ROOT / "organs" / "manifests" / "gallbladder.json").read_text())["centerlines"]["bile_duct"]["points"])
+    inside = [build.winding_number(p, pv, pf) > 0.5 for p in line]
+    assert sum(inside) >= 10, sum(inside)

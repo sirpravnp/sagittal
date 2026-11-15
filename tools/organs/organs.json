@@ -37,6 +37,24 @@
    "source": "Rodero et al. 2021 average heart (doi:10.5281/zenodo.4593739), per-chamber surfaces from rodero/work/parts, registered by tools/organs/register.py"
   }
  },
+ "corrections": {
+  "bile_duct_onto_d2": {
+   "type": "rotate_end_onto_wall",
+   "curve": "Bile duct",
+   "pivot": "highest",
+   "wall": {
+    "file": "Duodenum.obj",
+    "x_below": -3.5,
+    "slab_cm": 0.25,
+    "direction": [
+     1,
+     0,
+     -1
+    ]
+   },
+   "why": "In Z-Anatomy the bile duct runs on the anterior surface of the pancreatic head and ends 0.5 cm in front of the anterior wall of the descending duodenum (1.1 cm anterior to the centre of its slab at that height); the bile duct descends behind the first part of the duodenum and through the back of the pancreatic head and enters the posteromedial wall of the descending part at the major papilla. The duct is rotated rigidly about its upper end (kept where the cystic and common hepatic ducts would join) so its lower end reaches the posteromedial wall (direction medial + posterior) of the descending duodenum's source mesh at the same height."
+  }
+ },
  "organs": [
   {
    "id": "brain",
@@ -1614,7 +1632,8 @@
      "files": [
       "Bile_duct.obj"
      ],
-     "budget": 600
+     "budget": 600,
+     "correction": "bile_duct_onto_d2"
     }
    ],
    "centerlines": [
@@ -1742,7 +1761,8 @@
      "rule": {
       "type": "line_point",
       "line": "main_pancreatic_duct",
-      "at": "end"
+      "at": "end",
+      "note": "in the source the main pancreatic duct ends on the bile duct 0.8 cm in front of the descending duodenum; it is not moved with the corrected bile duct (rotating it would take its body out of the pancreas), so this point lies about 2 cm from the corrected bile duct and does not reach the duodenum: route to 'duodenum/major_duodenal_papilla' for the ampulla"
      }
     },
     {

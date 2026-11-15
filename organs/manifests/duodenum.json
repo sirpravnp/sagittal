@@ -26,11 +26,11 @@
   "major_duodenal_papilla": {
    "name": "Major duodenal papilla (duodenal surface point nearest the lower end of the bile duct)",
    "p": [
-    -5.777,
-    108.601,
-    2.732
+    -4.686,
+    109.311,
+    0.828
    ],
-   "derived": "baked 'duodenum' vertex nearest landmark 'bile_duct_lower_end' (0.46 cm away)"
+   "derived": "baked 'duodenum' vertex nearest landmark 'bile_duct_lower_end' (0.18 cm away); that landmark is on a rigidly corrected curve (see its note and tools/organs/corrections.json)"
   },
   "duodenojejunal_flexure": {
    "name": "Duodenojejunal flexure (duodenal surface point nearest the duodenal end of the small-intestine curve)",

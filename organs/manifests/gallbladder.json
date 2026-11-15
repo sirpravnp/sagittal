@@ -27,164 +27,164 @@
      3.916
     ],
     [
-     -2.781,
-     115.936,
-     3.859
+     -2.801,
+     115.962,
+     3.949
     ],
     [
-     -2.541,
-     116.125,
-     3.885
+     -2.588,
+     116.154,
+     4.059
     ],
     [
-     -2.259,
-     116.144,
-     3.911
+     -2.315,
+     116.187,
+     4.128
     ],
     [
-     -1.899,
-     115.928,
-     3.914
+     -1.935,
+     116.008,
+     4.123
     ],
     [
-     -1.67,
-     115.624,
-     3.923
+     -1.675,
+     115.733,
+     4.082
     ],
     [
-     -1.54,
-     115.25,
-     3.933
+     -1.505,
+     115.383,
+     4.009
     ],
     [
-     -1.478,
-     114.826,
-     3.939
+     -1.396,
+     114.981,
+     3.909
     ],
     [
-     -1.45,
-     114.372,
-     3.933
+     -1.316,
+     114.551,
+     3.784
     ],
     [
-     -1.426,
-     113.908,
-     3.911
+     -1.236,
+     114.115,
+     3.641
     ],
     [
-     -1.416,
-     113.575,
-     3.874
+     -1.184,
+     113.808,
+     3.517
     ],
     [
-     -1.448,
-     113.282,
-     3.823
+     -1.176,
+     113.54,
+     3.385
     ],
     [
-     -1.535,
-     113.002,
-     3.776
+     -1.225,
+     113.279,
+     3.252
     ],
     [
-     -1.69,
-     112.711,
-     3.75
+     -1.341,
+     112.996,
+     3.127
     ],
     [
-     -1.898,
-     112.455,
-     3.756
+     -1.518,
+     112.733,
+     3.034
     ],
     [
-     -2.131,
-     112.276,
-     3.785
+     -1.731,
+     112.536,
+     2.98
     ],
     [
-     -2.391,
-     112.122,
-     3.822
+     -1.974,
+     112.358,
+     2.937
     ],
     [
-     -2.678,
-     111.943,
-     3.852
+     -2.24,
+     112.155,
+     2.877
     ],
     [
-     -2.942,
-     111.778,
-     3.873
+     -2.484,
+     111.971,
+     2.815
     ],
     [
-     -3.191,
-     111.647,
-     3.896
+     -2.717,
+     111.82,
+     2.767
     ],
     [
-     -3.429,
-     111.529,
-     3.916
+     -2.941,
+     111.682,
+     2.72
     ],
     [
-     -3.662,
-     111.405,
-     3.928
+     -3.158,
+     111.542,
+     2.665
     ],
     [
-     -3.895,
-     111.256,
-     3.928
+     -3.371,
+     111.381,
+     2.592
     ],
     [
-     -4.134,
-     111.06,
-     3.911
+     -3.582,
+     111.18,
+     2.489
     ],
     [
-     -4.394,
-     110.788,
-     3.886
+     -3.805,
+     110.907,
+     2.355
     ],
     [
-     -4.599,
-     110.514,
-     3.864
+     -3.973,
+     110.635,
+     2.232
     ],
     [
-     -4.771,
-     110.239,
-     3.832
+     -4.107,
+     110.368,
+     2.102
     ],
     [
-     -4.933,
-     109.965,
-     3.773
+     -4.229,
+     110.11,
+     1.949
     ],
     [
-     -5.106,
-     109.692,
-     3.673
+     -4.357,
+     109.863,
+     1.756
     ],
     [
-     -5.313,
-     109.421,
-     3.518
+     -4.513,
+     109.632,
+     1.506
     ],
     [
-     -5.474,
-     109.253,
-     3.346
+     -4.633,
+     109.507,
+     1.274
     ],
     [
-     -5.607,
-     109.141,
-     3.145
+     -4.729,
+     109.447,
+     1.034
     ],
     [
-     -5.757,
-     109.015,
-     2.922
+     -4.837,
+     109.378,
+     0.766
     ]
    ],
    "radius_cm": 0.104,
@@ -200,7 +200,7 @@
     115.737,
     3.916
    ],
-   "derived": "highest end of Z-Anatomy curve 'Bile duct' (spline 0)"
+   "derived": "highest end of Z-Anatomy curve 'Bile duct' (spline 0); the curve is rigidly corrected (rotated 18.6 deg about its upper end, lower end moved 2.37 cm onto the posteromedial wall of the descending duodenum; tools/organs/corrections.json bile_duct_onto_d2)"
   },
   "gallbladder_neck": {
    "name": "Gallbladder neck (gallbladder surface point nearest the upper end of the bile duct)",
@@ -209,7 +209,7 @@
     115.801,
     4.02
    ],
-   "derived": "baked 'gallbladder' vertex nearest landmark 'bile_duct_upper_end' (0.12 cm away)"
+   "derived": "baked 'gallbladder' vertex nearest landmark 'bile_duct_upper_end' (0.12 cm away); that landmark is on a rigidly corrected curve (see its note and tools/organs/corrections.json)"
   },
   "gallbladder_fundus": {
    "name": "Gallbladder fundus (gallbladder surface point farthest from the neck)",
@@ -232,11 +232,11 @@
   "bile_duct_lower_end": {
    "name": "Lower (duodenal) end of the bile duct curve",
    "p": [
-    -5.757,
-    109.015,
-    2.922
+    -4.837,
+    109.378,
+    0.766
    ],
-   "derived": "end point of centre line 'bile_duct' (Z-Anatomy curve 'Bile duct')"
+   "derived": "end point of centre line 'bile_duct' (Z-Anatomy curve 'Bile duct'); the curve is rigidly corrected (rotated 18.6 deg about its upper end, lower end moved 2.37 cm onto the posteromedial wall of the descending duodenum; tools/organs/corrections.json bile_duct_onto_d2)"
   }
  }
 }
