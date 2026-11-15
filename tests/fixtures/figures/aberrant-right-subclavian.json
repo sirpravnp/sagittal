@@ -53,20 +53,20 @@
         "radius_cm": 0.3,
         "from": {
           "on": "aorta/aortic_arch",
-          "t": 0.72
+          "t": 0.74
         },
         "via": [
           {
-            "on": "aorta/aortic_arch",
-            "t": 0.72,
+            "on": "oesophagus/oesophagus",
+            "t": 0.28,
             "offset": {
-              "dir": "superior",
-              "cm": 1.4
+              "dir": "left",
+              "cm": 1.8
             }
           },
           {
             "on": "oesophagus/oesophagus",
-            "t": 0.27,
+            "t": 0.24,
             "offset": {
               "dir": "posterior",
               "cm": 1.5
@@ -74,7 +74,7 @@
           },
           {
             "on": "oesophagus/oesophagus",
-            "t": 0.22,
+            "t": 0.2,
             "offset": {
               "dir": "right",
               "cm": 1.6

@@ -324,14 +324,16 @@
           var oid = ref.slice(0, slash), id = ref.slice(slash + 1), mo = model[oid];
           if (mo && !st[orgKey[oid]]) return; // its organ is switched off: not an error
           var m = mo && mo.m, partRef = m && mo.lineParts[id] ? oid + '/' + mo.lineParts[id] : null;
+          // (a centre line wins over a part of the same id, e.g. the SMA: the validator resolves
+          // labels the same way)
           if (m && has(m.landmarks, id)) tg.p = m.landmarks[id].p;
-          else if (m && objs[ref]) {
+          else if (m && has(m.centerlines, id) && partRef && objs[partRef]) {
+            // a centre line inside a part drawn from its mesh (e.g. the SMA, the oesophagus)
+            tg.line = m.centerlines[id].points; tg.on = objs[partRef];
+          } else if (m && objs[ref]) {
             tg.on = objs[ref];
             var bb = bboxOf(m.mesh, id);
             tg.p = bb ? [(bb[0] + bb[3]) / 2, (bb[1] + bb[4]) / 2, (bb[2] + bb[5]) / 2] : region.c;
-          } else if (m && has(m.centerlines, id) && partRef && objs[partRef]) {
-            // a centre line inside a part drawn from its mesh (e.g. the SMA, the oesophagus)
-            tg.line = m.centerlines[id].points; tg.on = objs[partRef];
           }
         }
         if (!tg.line && !tg.p) { dropped.push(l.text); return; }
@@ -340,12 +342,20 @@
       // Each line label is anchored at the point of its own line, inside the figure's region, that
       // is furthest from every other labelled structure and from anchors already chosen, so dots
       // do not pile up at the junction the figure is about.
+      // A library line that a spec structure drawn in this view branches from (e.g. the SMA giving
+      // off a replaced hepatic artery) is anchored on its stretch just past that takeoff, so its
+      // label sits where the figure's point is made.
       var chosen = [];
       targets.forEach(function (tg, i) {
         if (!tg.line) { chosen.push(tg.p); return; }
         var others = [];
         targets.forEach(function (o, j) { if (j !== i) others.push(o.line ? densify(o.line, 0.4) : [o.p]); });
-        tg.p = spreadAnchor(densify(tg.line, 0.25), others, chosen, region);
+        var cands = densify(tg.line, 0.25), take = takeoff(tg.l.on, view);
+        if (take !== null) {
+          var near = afterTakeoff(tg.line, take);
+          if (near.length) cands = near;
+        }
+        tg.p = spreadAnchor(cands, others, chosen, region);
         chosen.push(tg.p);
       });
       var labels = targets.map(function (tg) {
@@ -359,6 +369,27 @@
 
       last = { view: view, drawn: drawn, labels: labels.map(function (l) { return l.t; }), dropped: dropped };
       return { labels: labels, info: infoHtml(view), update: orientUpdate(g) };
+    }
+
+    // t on library line `ref` where a structure drawn in `view` leaves it (a branch's `from`), or null.
+    function takeoff(ref, view) {
+      if (ref.indexOf('/') < 0) return null;
+      var list = baseRoutes.concat(view === 'variant' ? variantRoutes : []);
+      for (var i = 0; i < list.length; i++) {
+        var e = list[i];
+        if (view === 'variant' && removed[e.id]) continue;
+        if (e.from && e.from.on === ref) return e.from.t;
+      }
+      return null;
+    }
+    // Points of a line from 0.4 to 2.4 cm past fraction t of its length.
+    function afterTakeoff(pts, t) {
+      var dense = densify(pts, 0.2), total = lenOf(pts), s0 = t * total, acc = 0, out = [];
+      for (var i = 1; i < dense.length; i++) {
+        acc += dist(dense[i - 1], dense[i]);
+        if (acc >= s0 + 0.4 && acc <= s0 + 2.4) out.push(dense[i]);
+      }
+      return out;
     }
 
     // The orientation cue follows the model's rotation (the group's parent is the viewer's root).
