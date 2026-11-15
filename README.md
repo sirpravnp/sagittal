@@ -71,6 +71,15 @@ write the scene and meta, render the cards and check them by eye, then test. To 
 Claude Code, copy or symlink the folder into `.claude/skills/` (for example
 `mkdir -p .claude/skills && ln -s ../../skills/sagittal-scene .claude/skills/sagittal-scene`).
 
+## Use it from claude.ai, ChatGPT or any MCP client
+
+`mcp/` is an MCP server with the same figures: `list_organs`, `get_organ`, `list_references`,
+`validate_figure` and `render_figure`, which shows the interactive figure in the chat (MCP Apps;
+ChatGPT's Apps SDK too) and returns a link to the figure file for clients without in-chat views.
+Run it with `npm run mcp` (stdio, e.g. `claude mcp add sagittal -- node mcp/main.mjs`) or
+`npm run mcp:http` (Streamable HTTP at `/mcp`). claude.ai and ChatGPT need it hosted at a public
+https address; `fly.toml` and `Dockerfile` are ready but not deployed. See [docs/mcp.md](docs/mcp.md).
+
 ## Licenses
 
 - Code: MIT (see `LICENSE`).

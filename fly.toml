@@ -1,0 +1,41 @@
+# Sagittal MCP server on Fly.io (not deployed yet; see docs/mcp.md "Hosting").
+# First time: fly launch --no-deploy --copy-config --name <app-name>, set SAGITTAL_PUBLIC_URL below,
+# then: fly deploy --ha=false
+#
+# One small machine, asleep when unused: Fly stops it when no requests remain and starts it on the next
+# request (a second or two). The server is stateless, so nothing is lost while it sleeps; no volume.
+
+app = "sagittal-mcp"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8788"
+  HOST = "0.0.0.0"
+  # The public base address; figure links in tool results point here. Change it to your domain.
+  SAGITTAL_PUBLIC_URL = "https://sagittal-mcp.fly.dev"
+
+[http_service]
+  internal_port = 8788
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 40
+    hard_limit = 60
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "60s"
+    method = "GET"
+    path = "/health"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
