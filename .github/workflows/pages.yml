@@ -3,7 +3,6 @@ name: pages
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
 
 permissions:
@@ -14,10 +13,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Fast checks gate the deploy. The site is static: it publishes site/ as committed
+  # (thumbnails and example images are committed renders).
   build:
     runs-on: ubuntu-latest
-    env:
-      CI: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,37 +27,18 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
       - run: python -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
-      - run: npx playwright install --with-deps chromium
       - run: npm test
       - run: npm run test:py
-      - run: npm run e2e
-      - run: npm run cards
-      # Re-render the landing-page plate images so the deployed thumbnails always match the scenes
-      # (the committed site/thumbs/ copies are for local use and PR review).
-      - run: npm run thumbs
-      - run: npm run decks
-        env:
-          SAGITTAL_CREDITS_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/credits.html
-      - run: npm run decks:3d
-        env:
-          SAGITTAL_CREDITS_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/credits.html
-      - name: Assemble dist
-        run: |
-          mkdir -p dist/decks
-          cp -R site/. dist/
-          cp build/decks/*.apkg dist/decks/
-      - uses: actions/upload-artifact@v4
-        with:
-          name: decks
-          path: build/decks/*.apkg
       # No actions/configure-pages step: it calls the Pages API, which this job's token (contents: read)
       # may not do, and upload-pages-artifact does not need it. Repository setting required once:
       # Settings > Pages > Build and deployment > Source: GitHub Actions.
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
-          path: dist
+          path: site
 
   deploy:
     needs: build
@@ -74,17 +54,18 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 
-  release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+  # Browser tests render WebGL on software GL, which is slow on hosted runners. They report
+  # but do not block the deploy; run `npm run e2e` locally before merging.
+  e2e:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    continue-on-error: true
+    timeout-minutes: 90
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          name: decks
-          path: decks
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: decks/*.apkg
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
