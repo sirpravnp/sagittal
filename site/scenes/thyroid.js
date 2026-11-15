@@ -255,7 +255,7 @@
         { t: 'Thyroid gland', p: P(2.5, 3.6, 1.6), in: A },
         { t: 'Trachea', p: P(0.9, -1.0, 0.9), in: A },
         { t: 'Thyroid cartilage', p: P(1.9, 7.4, 1.8), in: 'norm sln' },
-        { t: v === 'sln' ? 'Cricothyroid (paralysed: no pitch)' : 'Cricothyroid muscle', p: P(1.35, 4.5, 1.6), in: 'norm sln' },
+        { t: v === 'sln' ? 'Cricothyroid paralysed: loss of high pitch' : 'Cricothyroid muscle', p: P(1.35, 4.5, 1.6), in: 'norm sln' },
         { t: 'Left vagus nerve', p: P(3.35, -3.2, 0.4), in: A },
         { t: 'Right vagus nerve', p: P(-2.3, 1.5, 0.55), in: 'norm rln para' },
         { t: 'Left recurrent laryngeal n. (under arch)', p: P(2.6, -6.65, -1.05), in: 'norm rln' },

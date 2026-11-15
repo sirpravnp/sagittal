@@ -32,8 +32,9 @@
   "sources": [
     "StatPearls: Epidural Hematoma. https://www.ncbi.nlm.nih.gov/books/NBK518982/",
     "StatPearls: Subdural Hematoma. https://www.ncbi.nlm.nih.gov/books/NBK532970/",
-    "StatPearls: Acute Stroke: Evaluation and Management. https://www.ncbi.nlm.nih.gov/books/NBK535369/",
-    "StatPearls: Saccular Aneurysm. https://www.ncbi.nlm.nih.gov/books/NBK557867/"
+    "StatPearls: Subarachnoid Hemorrhage. https://www.ncbi.nlm.nih.gov/books/NBK441958/",
+    "StatPearls: Saccular Aneurysm. https://www.ncbi.nlm.nih.gov/books/NBK557867/",
+    "Z-Anatomy, the libre 3D atlas of anatomy (CC BY-SA 4.0), based on BodyParts3D (DBCLS, CC BY-SA 2.1 JP). https://github.com/Z-Anatomy/Models-of-human-anatomy"
   ],
   "status": "unreviewed"
 }

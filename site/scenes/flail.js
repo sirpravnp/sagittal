@@ -185,7 +185,7 @@
         flail.position.copy(out).multiplyScalar(-2.0 * s);         // the free segment goes the other way
         dentLung(lgeo, out, Math.round((s > 0 ? -2.6 : -1.1) * s * 50) / 50); // the lung under it follows (stays inside)
       };
-      var info = '<ul><li><b>Flail chest</b>: ≥3 adjacent ribs each fractured in ≥2 places, producing a free-floating segment.</li><li><b>Paradoxical motion</b>: the segment moves inward on inspiration and outward on expiration (watch the loose ribs against the rest of the thorax).</li><li>Hypoxia is driven mainly by the underlying <b>pulmonary contusion</b> and pain-limited breathing, not the paradoxical motion itself.</li><li>Management: oxygen, analgesia (including regional blocks), judicious fluids; ventilatory support if failing; rib fixation in selected patients.</li></ul>';
+      var info = '<ul><li><b>Flail chest</b>: ≥3 adjacent ribs each fractured in ≥2 places, producing a free-floating segment (definitions vary: ATLS uses ≥2 adjacent ribs).</li><li><b>Paradoxical motion</b>: the segment moves inward on inspiration and outward on expiration (watch the loose ribs against the rest of the thorax).</li><li>Hypoxia is driven mainly by the underlying <b>pulmonary contusion</b> and pain-limited breathing, not the paradoxical motion itself.</li><li>Management: oxygen, analgesia (including regional blocks), judicious fluids; ventilatory support if failing; rib fixation in selected patients.</li></ul>';
       return { labels: L, info: info, update: update };
     },
   });

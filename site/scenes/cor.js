@@ -235,7 +235,7 @@
         info = '<ul><li><b>Anterior / anteroseptal STEMI: ST elevation V1-V4</b> (V1-V2 septal, V3-V4 anterior; add I, aVL, V5-V6 if diagonals are involved: anterolateral).</li>' +
           '<li>The LAD is the most commonly occluded coronary artery and supplies the anterior LV, apex and anterior 2/3 of the septum.</li>' +
           '<li>Proximal LAD occlusion can cause new RBBB / LAFB (septal conduction tissue), cardiogenic shock, LV apical aneurysm and mural thrombus.</li>' +
-          '<li>Treatment: emergent PCI (door-to-balloon ≤ 90 min) or fibrinolysis if PCI is not available within 120 min.</li></ul>';
+          '<li>Treatment: emergent PCI (first medical contact to device ≤ 90 min) or fibrinolysis if PCI is not available within 120 min.</li></ul>';
       } else if (v === 'lcx') {
         lab('Circumflex occlusion', CL.lcx.p[3]);
         lab('Lateral wall', [6.4, -1.4, 1.0]);

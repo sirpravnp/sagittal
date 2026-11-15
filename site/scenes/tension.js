@@ -152,7 +152,7 @@
           { t: 'Compressed left lung', p: P(11.5, -1, 3) });
       }
       var info = T
-        ? '<ul><li>Air enters the pleural space through a <b>one-way valve</b>; intrapleural pressure rises.</li><li>Ipsilateral lung collapses; the <b>mediastinum and trachea shift away</b>; the hemidiaphragm flattens; the contralateral lung is compressed.</li><li>Kinking of the great veins reduces venous return → <b>obstructive shock</b> (hypotension, JVD, tachycardia).</li><li>Exam: absent breath sounds and hyperresonance on the affected side. <b>Clinical diagnosis: do not wait for imaging.</b></li><li>Immediate needle decompression (classically 2nd intercostal space, midclavicular line; ATLS 10th ed. uses the 5th space, anterior axillary line), then chest tube.</li></ul>'
+        ? '<ul><li>Air enters the pleural space through a <b>one-way valve</b>; intrapleural pressure rises.</li><li>Ipsilateral lung collapses; the <b>mediastinum and trachea shift away</b>; the hemidiaphragm flattens; the contralateral lung is compressed.</li><li>Kinking of the great veins reduces venous return → <b>obstructive shock</b> (hypotension, JVD, tachycardia).</li><li>Exam: absent breath sounds and hyperresonance on the affected side. <b>Clinical diagnosis: do not wait for imaging.</b></li><li>Immediate needle decompression (classically 2nd intercostal space, midclavicular line; ATLS 10th ed. for adults: 4th/5th intercostal space just anterior to the midaxillary line), then chest tube.</li></ul>'
         : '<ul><li>Normal coronal view: trachea midline, mediastinum central, both lungs inflated, right hemidiaphragm slightly higher than left.</li><li>Switch to the tension state to compare.</li></ul>';
       var syncCut = function () {
         body.updateMatrixWorld(true);
