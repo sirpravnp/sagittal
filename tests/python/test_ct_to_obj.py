@@ -9,8 +9,15 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-nib = pytest.importorskip("nibabel")
-pytest.importorskip("skimage")
+import os
+
+if os.environ.get("CI"):
+    # CI installs tools/requirements.txt: a missing package there is a broken install, not a skip.
+    import nibabel as nib  # noqa: E402
+    import skimage  # noqa: E402,F401
+else:
+    nib = pytest.importorskip("nibabel")
+    pytest.importorskip("skimage")
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools" / "meshes"))
 import bake  # noqa: E402

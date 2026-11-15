@@ -38,7 +38,11 @@ jobs:
       # (the committed site/thumbs/ copies are for local use and PR review).
       - run: npm run thumbs
       - run: npm run decks
+        env:
+          SAGITTAL_CREDITS_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/credits.html
       - run: npm run decks:3d
+        env:
+          SAGITTAL_CREDITS_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/credits.html
       - name: Assemble dist
         run: |
           mkdir -p dist/decks
@@ -48,8 +52,9 @@ jobs:
         with:
           name: decks
           path: build/decks/*.apkg
-      - uses: actions/configure-pages@v5
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      # No actions/configure-pages step: it calls the Pages API, which this job's token (contents: read)
+      # may not do, and upload-pages-artifact does not need it. Repository setting required once:
+      # Settings > Pages > Build and deployment > Source: GitHub Actions.
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:

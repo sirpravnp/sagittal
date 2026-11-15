@@ -6,7 +6,8 @@ export const GL_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'
 export default defineConfig({
   testDir: 'tests/e2e',
   testMatch: '**/*.spec.mjs',
-  timeout: 30000,
+  // Software GL on shared CI runners is slow; test.slow() triples this (scene specs: 3 min).
+  timeout: 60000,
   workers: 2,
   use: {
     baseURL: `http://127.0.0.1:${PORT}/`,
