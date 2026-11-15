@@ -1,0 +1,46 @@
+{
+  "id": "thyroid",
+  "title": "Thyroid surgery: nerves and parathyroids at risk",
+  "topic": "Surgery",
+  "variantControl": "v",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal anatomy"
+    },
+    {
+      "key": "rln",
+      "label": "Recurrent laryngeal nerve injury"
+    },
+    {
+      "key": "sln",
+      "label": "External branch of superior laryngeal nerve injury"
+    },
+    {
+      "key": "para",
+      "label": "Parathyroids removed / devascularised"
+    }
+  ],
+  "claims": [
+    "The recurrent laryngeal nerves are branches of the vagus: the left hooks under the aortic arch beside the ligamentum arteriosum, the right hooks under the right subclavian artery.",
+    "Both recurrent laryngeal nerves ascend in the tracheo-oesophageal groove and enter the larynx behind the cricothyroid joint.",
+    "The recurrent laryngeal nerve supplies all intrinsic laryngeal muscles except cricothyroid.",
+    "The inferior thyroid artery (from the thyrocervical trunk) crosses the recurrent laryngeal nerve near the lower pole of the thyroid; this crossing and the nerve's entry into the larynx (near the ligament of Berry) are where it is most often injured in thyroidectomy.",
+    "Unilateral recurrent laryngeal nerve injury causes hoarseness (paralysed vocal fold); bilateral injury causes stridor and airway obstruction.",
+    "The external branch of the superior laryngeal nerve runs with the superior thyroid artery (first branch of the external carotid) toward the upper pole and supplies cricothyroid.",
+    "Cricothyroid tenses the vocal folds; external branch of superior laryngeal nerve injury causes loss of high-pitched voice and voice fatigue.",
+    "The internal branch of the superior laryngeal nerve is sensory to the larynx above the vocal folds; its loss impairs the cough reflex.",
+    "The parathyroid glands lie on the posterior surface of the thyroid lobes and are supplied mainly by the inferior thyroid artery.",
+    "Removal or devascularisation of the parathyroids in thyroidectomy causes hypocalcaemia with low PTH: perioral tingling, cramps, Chvostek and Trousseau signs.",
+    "Chvostek sign: tapping the facial nerve in front of the ear causes facial twitching. Trousseau sign: an inflated blood pressure cuff causes carpal spasm.",
+    "Severe post-thyroidectomy hypocalcaemia is treated with IV calcium gluconate."
+  ],
+  "sources": [
+    "StatPearls (NCBI Bookshelf): Anatomy, Head and Neck, Thyroid. https://www.ncbi.nlm.nih.gov/books/?term=Anatomy%2C+Head+and+Neck%2C+Thyroid",
+    "StatPearls (NCBI Bookshelf): Anatomy, Head and Neck, Larynx Recurrent Laryngeal Nerve. https://www.ncbi.nlm.nih.gov/books/?term=Anatomy%2C+Head+and+Neck%2C+Larynx+Recurrent+Laryngeal+Nerve",
+    "StatPearls (NCBI Bookshelf): Anatomy, Head and Neck, Larynx Superior Laryngeal Nerve. https://www.ncbi.nlm.nih.gov/books/?term=Anatomy%2C+Head+and+Neck%2C+Larynx+Superior+Laryngeal+Nerve",
+    "StatPearls (NCBI Bookshelf): Hypoparathyroidism. https://www.ncbi.nlm.nih.gov/books/?term=Hypoparathyroidism",
+    "Z-Anatomy, the libre 3D atlas of anatomy (CC BY-SA 4.0), based on BodyParts3D (DBCLS, CC BY-SA 2.1 JP). https://www.z-anatomy.com/"
+  ],
+  "status": "unreviewed"
+}

@@ -197,3 +197,29 @@ ethmoid bones (2 mm), seals small foramina, flood-fills the cranial cavity (clos
 foramen magnum) and writes its surface, which `tools/meshes/configs/endocast.json` smooths and decimates.
 It stands in for the brain base (cow) and the inner table (bleed); no brain-cortex objects are used.
 Used by: `scenes/cow.js`, `scenes/bleed.js`.
+## portal (Z-Anatomy abdominal organs for portal hypertension)
+
+`portal.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP):
+`Liver`, `Spleen`, `Stomach`, `Pancreas`, `Duodenum`, `Sigmoid colon` (which in Z-Anatomy spans the
+rectum and anal canal; baked as `rectum`), `External anal sphincter.l/.r` and `Umbilicus.l/.r`
+(config `tools/meshes/configs/portal.json`; objects extracted into the asset cache's
+`zanatomy-vascular/obj/`). Changes: subdivision cages subdivided and Taubin-smoothed, then
+decimated; re-centred on [0, 105, 3] cm. The `portal` scene also draws the oesophagus and the portal,
+splenic, superior and inferior mesenteric veins, IVC, hepatic vein stubs, azygos, iliac, internal
+pudendal and epigastric veins as tubes along **Z-Anatomy** centre lines (same licence); the left
+gastric, oesophageal, paraumbilical, rectal and caput medusae veins, intrahepatic branches and the
+TIPS stent are procedural. Used by: `scenes/portal.js`.
+
+## thyroid (Z-Anatomy larynx, trachea and great vessels)
+
+`thyroid.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP):
+`Thyroid cartilage`, `Cricoid cartilage`, `Hyoid bone`, `Trachea`, the straight and oblique parts
+of `cricothyroid muscle` (both sides), `Ascending aorta`, `Aortic arch`, `Brachiocephalic trunk`,
+both common carotid, subclavian and external carotid arteries, both thyrocervical trunks, both
+internal jugular and brachiocephalic veins, `Superior vena cava` and `Left pulmonary artery`
+(config `tools/meshes/configs/thyroid.json`; objects in the asset cache's `zanatomy-vascular/obj/`).
+Changes: decimated, re-centred on [0, 142, 0] cm. Z-Anatomy's thyroid gland (a thin shell over the
+thyroid cartilage) and its vagus (no recurrent or external laryngeal branches) are not used: the
+`thyroid` scene builds the gland, parathyroids, nerves and thyroid arteries procedurally on this
+anatomy, partly along Z-Anatomy centre lines (vagus at the skull base, inferior thyroid artery,
+oesophagus, descending aorta). Used by: `scenes/thyroid.js`.
