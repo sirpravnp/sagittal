@@ -77,6 +77,12 @@ Route an ampulla or a pancreatic duct entry to `duodenum/major_duodenal_papilla`
   where that names one, else the nearest centre line of the same system to the first point
   (within 1.5 cm, ignoring lines that start at the same point); `tools/organs/parents.mjs` writes it
   and prints the table. The figure validator refuses to remove a line while a child still hangs off it.
+  A confluence is modelled the same way: tributaries that unite to form a vessel name it as their
+  parent and keep the confluence landmark as `from` (their first point is the parent's first point).
+  So `superior_mesenteric_vein` and `splenic_vein` have `parent: "portal_vein"` and
+  `from: "portal_confluence"`, and the portal vein itself is a root (`parent: null`). In
+  `organs.json` such a line has `parent`, `from` and a `joins` note; build.py then keeps the named
+  landmark instead of making a `<id>_junction` one.
   Splines of a multi-spline source object that the source does not name are called
   "... (unnamed in source)": do not give them a textbook name.
 - `landmarks`: ids are unique across the whole library (a variant may route from any organ's landmark).

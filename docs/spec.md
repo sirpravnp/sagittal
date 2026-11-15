@@ -143,7 +143,11 @@ variant.edits[0]: coeliac-trunk/proper_hepatic_artery branches from coeliac-trun
 
 Fix it by removing the child too, or by moving its insertion onto the new parent with
 `move_insertion` (worked example 2). A library line's parent is its manifest `parent` field (listed
-in `reference/organs.md`); your own structures depend on the lines their `from`/`to` ends sit on.
+in `reference/organs.md`): the line it branches from or, for a vein, drains into. Tributaries that
+unite to form a vessel count as its children too: the superior mesenteric and splenic veins join at
+the portal confluence (the portal vein's start), so removing `portal-venous/portal_vein` is refused
+while they remain, and removing one of them is allowed. Your own structures depend on the lines
+their `from`/`to` ends sit on.
 
 ### `move_insertion` (variant only)
 

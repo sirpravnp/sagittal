@@ -1277,14 +1277,18 @@
      "curve": "Splenic vein",
      "spline": 0,
      "from": "portal_confluence",
-     "orient": "start_near:portal_confluence"
+     "parent": "portal_vein",
+     "kind": "vein",
+     "joins": "start of the parent, at the portal confluence (the landmark named in from)"
     },
     {
      "id": "superior_mesenteric_vein",
      "name": "Superior mesenteric vein",
      "curve": "Superior mesenteric vein",
      "from": "portal_confluence",
-     "orient": "start_near:portal_confluence"
+     "parent": "portal_vein",
+     "kind": "vein",
+     "joins": "start of the parent, at the portal confluence (the landmark named in from)"
     },
     {
      "id": "inferior_mesenteric_vein",

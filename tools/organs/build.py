@@ -358,6 +358,21 @@ class Library:
                     d0 = d1
                 if d0 > 0.35:
                     self.warnings.append("%s: start is %.2f cm from parent %s" % (c["id"], d0, parent))
+                if c.get("from"):
+                    # a tributary that joins its parent at a named confluence (e.g. the SMV and splenic
+                    # vein at the start of the portal vein): keep that landmark rather than a new one
+                    q = self.landmarks.get(c["from"])
+                    if q is None:
+                        return None
+                    gap = float(np.linalg.norm(q["p"] - pts[0]))
+                    if gap > 0.35:
+                        raise SystemExit("%s: from landmark %s is %.2f cm from its first point" % (c["id"], c["from"], gap))
+                    spacing = c.get("spacing_cm", 0.25)
+                    line = {"name": c["name"], "points": resample(pts, spacing), "radius_cm": rad, "from": c["from"],
+                            "curve": c["curve"], "spline": c.get("spline", 0), "organ": organ["id"], "parent": parent}
+                    self.lines[c["id"]] = line
+                    out[c["id"]] = line
+                    continue
                 kind = c.get("kind", "artery")
                 suffix = {"vein": "junction", "segment": "start"}.get(kind, "origin")
                 lid = "%s_%s" % (c["id"], suffix)
