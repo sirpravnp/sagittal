@@ -13,7 +13,8 @@
     "test:py": ".venv/bin/pytest tests/python -q",
     "thumbs": "node tools/render_thumbs.mjs",
     "organs": "node tools/build_organs.mjs",
-    "figure": "node player/make-figure.mjs"
+    "figure": "node player/make-figure.mjs",
+    "look": "node player/look-figure.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1"

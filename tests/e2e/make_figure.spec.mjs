@@ -52,3 +52,18 @@ for (const fixture of fixtures) {
     expect(errors).toEqual([]);
   });
 }
+
+test('look-figure renders both views of a written figure to PNGs and reports its labels', async () => {
+  test.slow();
+  const { spawnSync } = await import('node:child_process');
+  const { existsSync } = await import('node:fs');
+  mkdirSync(OUT, { recursive: true });
+  const file = path.join(OUT, 'look-low-cystic-duct.html');
+  writeFileSync(file, buildFigure(JSON.parse(readFileSync(path.join(FIX, 'low-cystic-duct.json'), 'utf8'))).html);
+  const env = { ...process.env }; delete env.npm_lifecycle_event;
+  const r = spawnSync('node', [path.join(ROOT, 'player/look-figure.mjs'), file, '--rot', '0.2,2.6'], { encoding: 'utf8', env, timeout: 120000 });
+  expect(r.status, r.stdout + r.stderr).toBe(0);
+  for (const v of ['normal', 'variant']) expect(existsSync(path.join(OUT, `look-low-cystic-duct-rot0.2_2.6-${v}.png`))).toBe(true);
+  expect(r.stdout).toMatch(/view: Right posterior oblique view/);
+  expect(r.stdout).toMatch(/label "Cystic duct \(low insertion\)" anchor \d+,\d+/);
+});

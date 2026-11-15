@@ -9,7 +9,7 @@
 // three.js, the kit, the player, the figure UI and its CSS, the organ manifests the spec names,
 // the meshes of the organs it draws, the mesh credits and the spec itself, so the file opens from
 // disk (file://) with no network. Default output: ./sagittal-figures/<slug of the title>.html
-// (relative to the current directory). Prints the written path on stdout. --open opens it in the
+// (relative to the current directory; under `npm run`, the directory npm was run from). Prints the written path on stdout. --open opens it in the
 // default browser.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
@@ -91,7 +91,8 @@ function inlineCss(css) {
 }
 
 // The page script: reads the inlined spec, validates it in the page, mounts the figure.
-// Query keys as in player/dev.html: ?v=normal|variant, organ toggles, &theme=light|dark.
+// Query keys as in player/dev.html: ?v=normal|variant, organ toggles, &theme=light|dark; and
+// &rot=x,y / &zoom=z for the starting camera.
 const BOOT = `(function () {
   function fail(lines) { var e = document.getElementById('errors'); e.textContent = lines.join('\\n'); e.hidden = false; }
   try {
@@ -100,9 +101,13 @@ const BOOT = `(function () {
     var spec = JSON.parse(document.getElementById('spec').textContent);
     var res = SagittalSpec.validate(spec, SagittalOrgans);
     if (!res.ok) { fail(res.errors); return; }
+    var R = res.resolved, rot = (q.get('rot') || '').split(',').map(Number), zoom = Number(q.get('zoom'));
+    // ?rot=x,y and ?zoom=z start the camera elsewhere (to look at a figure from another side)
+    if (rot.length === 2 && rot.every(isFinite)) R.view = Object.assign({}, R.view, { rot: rot });
+    if (q.get('zoom') && zoom >= 3 && zoom <= 16) R.view = Object.assign({}, R.view, { zoom: zoom });
     var state = {};
-    q.forEach(function (v, k) { if (k !== 'theme') state[k] = v; });
-    SagittalUI.mount({ resolved: res.resolved, credits: window.SagittalCredits, state: state });
+    q.forEach(function (v, k) { if (['theme', 'rot', 'zoom'].indexOf(k) < 0) state[k] = v; });
+    SagittalUI.mount({ resolved: R, credits: window.SagittalCredits, state: state });
   } catch (e) { fail([String(e && e.message || e)]); }
 })();`;
 
@@ -162,6 +167,9 @@ function openFile(file) {
 
 function main() {
   const a = parseArgs(process.argv.slice(2));
+  // `npm run figure` runs in the package root; paths are the user's, relative to where they ran it.
+  const base = (process.env.npm_lifecycle_event === 'figure' && process.env.INIT_CWD) || process.cwd();
+  a.spec = path.resolve(base, a.spec);
   let spec;
   try { spec = JSON.parse(readFileSync(a.spec, 'utf8')); }
   catch (e) {
@@ -174,7 +182,7 @@ function main() {
     for (const e of r.errors) process.stderr.write(e + '\n');
     process.exit(1);
   }
-  const out = path.resolve(a.out || path.join('sagittal-figures', slug(r.resolved.title) + '.html'));
+  const out = path.resolve(base, a.out || path.join('sagittal-figures', slug(r.resolved.title) + '.html'));
   mkdirSync(path.dirname(out), { recursive: true });
   writeFileSync(out, r.html);
   process.stdout.write(out + '\n');
