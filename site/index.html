@@ -4,8 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Sagittal: text-to-image anatomy</title>
-<meta name="description" content="Ask Claude Code for an anatomical variant and get an accurate, labelled, interactive 3D figure built from real reconstructed anatomy.">
+<title>Sagittal: text-to-image for anatomy</title>
+<meta name="description" content="Ask Claude Code for any anatomical structure, region or variant and get a labelled 3D figure you can turn, compare and save, built from real reconstructed anatomy.">
+
 <!-- Optional: the GitHub repository URL, e.g. https://github.com/OWNER/sagittal. Left empty, it is
      worked out from an OWNER.github.io/REPO address; the GitHub links are hidden if neither is known. -->
 <meta name="sagittal-repo" content="">
@@ -23,12 +24,11 @@
       <h1>Sagittal</h1>
       <p class="desc">Text-to-image for anatomy</p>
       <p class="ask"><span class="ask-who">You, in Claude Code</span><span class="ask-line">Draw a replaced right hepatic artery off the SMA.</span></p>
-      <p class="intro">Back comes an accurate, labelled, interactive 3D figure. Accurate because it is built from reconstructed CT and open-atlas anatomy, new vessels and ducts are drawn only through named landmarks, and every claim cites its source.</p>
+      <p class="intro">You get a labelled 3D figure you can turn, compare and save. It is built from real reconstructed anatomy, not drawn from memory, and every fact on it cites a source.</p>
     </div>
     <figure class="mast-fig">
-      <img src="hero/replaced-rha-figure.webp" width="1660" height="1143" decoding="async" fetchpriority="high"
-        alt="The figure Sagittal returned: a translucent liver with the replaced right hepatic artery, printed pale with clay hatching and a dark outline, rising from the superior mesenteric artery behind the portal vein; the coeliac trunk, proper and left hepatic arteries, portal vein and common bile duct labelled in italic; below it a Normal / Variant switch, a Labels toggle and a Save as image button.">
-      <figcaption>The figure that request returns, before it is rotated. The changed vessel is printed in a second colour: pale, hatched in clay and outlined.</figcaption>
+      <img src="hero/replaced-rha-figure.webp" width="1660" height="1140" decoding="async" fetchpriority="high"
+        alt="The figure Sagittal returned: a translucent liver with the replaced right hepatic artery, printed pale with clay hatching and a dark outline, rising from the superior mesenteric artery behind the portal vein; the coeliac trunk, proper and left hepatic arteries, portal vein and common bile duct labelled; below it a Normal / Variant switch, a Labels toggle and a Save as image button.">
     </figure>
   </header>
 
@@ -41,14 +41,13 @@
           <figure class="cmp">
             <div class="cmp-img"><img src="compare/generic-llm.webp" width="811" height="776" loading="lazy" decoding="async"
               alt="A general LLM's 3D hepatobiliary figure: the liver is a cloud of red dots, the cystic duct a green corkscrew, the gallbladder hangs below the liver, the pancreas lies outside the C-loop of a duodenum drawn as a bent brown tube, and the Liver label points at empty space."></div>
-            <figcaption><span class="fig">Fig. 1</span> <span class="who">A general LLM, asked for the hepatobiliary tree.</span> The liver is a cloud of points, the cystic duct a corkscrew, the gallbladder hangs free of the liver, the pancreas sits outside the duodenal C-loop, the duodenum is a bent tube, and the <span class="nb">“Liver”</span> label points off its structure.</figcaption>
           </figure>
           <figure class="cmp">
             <div class="cmp-img"><img src="compare/sagittal-hepatobiliary.webp" width="940" height="940" loading="lazy" decoding="async"
               alt="Sagittal's figure of the same subject: a translucent liver over the gallbladder; right and left hepatic ducts joining the common hepatic duct; the cystic duct; the common bile duct passing behind the head of the pancreas to the major duodenal papilla in the C-loop of the duodenum; each labelled in italic with a leader to a dot on the structure."></div>
-            <figcaption><span class="fig">Fig. 2</span> <span class="who">The same subject, drawn by Sagittal from reconstructed anatomy.</span> Hepatic ducts drawn through named liver landmarks; the common bile duct ends at the major duodenal papilla; each label sits on the structure it names.</figcaption>
           </figure>
         </div>
+        <p class="cmp-note">Left, a general LLM: a liver of points, a corkscrew cystic duct, a gallbladder hanging free of the liver, the pancreas outside the duodenal C-loop, a tube for a duodenum and a label off its structure. Right, Sagittal, from reconstructed anatomy.</p>
       </div>
     </section>
 
@@ -56,9 +55,9 @@
       <h2 id="how-h">How it works</h2>
       <div class="sec-body">
         <ol class="steps">
-          <li><h3>Ask</h3><p>Ask Claude Code for a structure or a variant in your own words: <q>replaced right hepatic artery off the SMA</q>.</p></li>
+          <li><h3>Ask</h3><p>Ask Claude Code for any structure, region or variant in your own words: <q>the hepatobiliary tree</q>, <q>the aortic arch and its branches</q>, <q>a replaced right hepatic artery off the SMA</q>.</p></li>
           <li><h3>Build</h3><p>The skill starts from base organs reconstructed from open CT data and atlases. New vessels and ducts are drawn only through named landmarks, and every claim cites a source.</p></li>
-          <li><h3>Study</h3><p>Open the figure it saves. Rotate it, switch between normal anatomy and the variant, read the claims, and save the labelled plate as an image.</p></li>
+          <li><h3>Study</h3><p>Open the figure it saves. Rotate it, turn structures on and off, compare a variant with normal anatomy, read the cited claims, and save the labelled figure as an image.</p></li>
         </ol>
       </div>
     </section>
@@ -74,7 +73,7 @@ cd sagittal</code></pre></li>
           <li><p>Link the skill into your skills folder (the first line creates the folder if it is missing):</p>
             <pre class="cmd"><code>mkdir -p ~/.claude/skills
 ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre></li>
-          <li><p>Start Claude Code and ask for a figure, for example <q>an aberrant right subclavian artery</q>.</p></li>
+          <li><p>Start Claude Code and ask for a figure, for example <q>the aortic arch and its branches</q> or <q>an aberrant right subclavian artery</q>.</p></li>
         </ol>
       </div>
     </section>
@@ -82,7 +81,7 @@ ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre></li>
     <section class="sec" id="examples" aria-labelledby="examples-h" tabindex="-1">
       <h2 id="examples-h">Examples</h2>
       <div class="sec-body">
-        <p class="sec-note">Three variants, each a figure built from the base anatomy and saved as an image here, labels and all.</p>
+        <p class="sec-note">Three figures built from the base anatomy, saved here as images.</p>
         <ol class="plates examples">
           <!-- figure-link hook: set data-figure-href to this example's one-file interactive figure
                (e.g. examples/replaced-rha.html) once it exists; app.js turns the title into a link. -->
@@ -92,7 +91,6 @@ ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre></li>
                 alt="Replaced right hepatic artery arising from the superior mesenteric artery and running up behind the portal vein to the liver, with the left and proper hepatic arteries, coeliac trunk and common bile duct labelled."></div>
               <figcaption>
                 <p class="plate-title"><span class="fig">Plate I</span><span class="t">Replaced right hepatic artery from the SMA</span></p>
-                <p class="ex-line">The right hepatic artery arises from the superior mesenteric artery instead of the proper hepatic artery.</p>
               </figcaption>
             </figure>
           </li>
@@ -104,7 +102,6 @@ ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre></li>
                 alt="The gallbladder with a long cystic duct running beside the common hepatic duct to join the common bile duct low, above the duodenum and pancreas."></div>
               <figcaption>
                 <p class="plate-title"><span class="fig">Plate II</span><span class="t">Low insertion of the cystic duct</span></p>
-                <p class="ex-line">The cystic duct runs alongside the common hepatic duct and joins the bile duct low, near the duodenum.</p>
               </figcaption>
             </figure>
           </li>
@@ -116,7 +113,6 @@ ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre></li>
                 alt="View from behind: the aberrant right subclavian artery leaves the aortic arch after the left subclavian and crosses behind the oesophagus and trachea to the right."></div>
               <figcaption>
                 <p class="plate-title"><span class="fig">Plate III</span><span class="t">Aberrant right subclavian artery</span></p>
-                <p class="ex-line">The right subclavian artery arises last from the aortic arch and crosses behind the oesophagus.</p>
               </figcaption>
             </figure>
           </li>

@@ -31,7 +31,6 @@ test('index shows the three example figures as numbered plates (not yet links) a
     await expect(plate).toHaveAttribute('data-figure-href', ''); // hook for the interactive figure
     await expect(plate.locator('.fig')).toHaveText(no);
     await expect(plate.locator('.plate-title .t')).toHaveText(title);
-    await expect(plate.locator('.ex-line')).not.toBeEmpty();
     await expect(plate.locator('a')).toHaveCount(0);
     const img = plate.locator('img');
     await expect(img).toHaveAttribute('src', `examples/${slug}.webp`);
@@ -68,13 +67,12 @@ test('comparison: the generic LLM figure and the Sagittal figure, both loaded, w
     await img.scrollIntoViewIfNeeded();
     await expect.poll(() => img.evaluate((e) => e.complete && e.naturalWidth > 0)).toBe(true);
   }
-  // the first caption names the generic figure's errors (the structures involved, not exact wording)
-  const cap = (await figs.nth(0).locator('figcaption').innerText()).toLowerCase();
-  for (const w of ['liver', 'cystic duct', 'gallbladder', 'pancreas', 'duodenum', 'label']) expect(cap).toContain(w);
-  // the second does not claim the skill produced it from that prompt
-  const cap2 = (await figs.nth(1).locator('figcaption').innerText()).toLowerCase();
-  expect(cap2).toContain('sagittal');
-  expect(cap2).not.toMatch(/prompt|skill/);
+  // no captions under the images; one plain note names the generic figure's errors (the
+  // structures involved, not exact wording) and does not claim the skill drew the right one
+  await expect(page.locator('#compare figcaption')).toHaveCount(0);
+  const note = (await page.locator('#compare .cmp-note').innerText()).toLowerCase();
+  for (const w of ['liver', 'cystic duct', 'gallbladder', 'pancreas', 'duodenum', 'label', 'sagittal']) expect(note).toContain(w);
+  expect(note).not.toMatch(/prompt|skill/);
   expect(errors).toEqual([]);
 });
 
@@ -99,6 +97,20 @@ test('every heading is at most four words; no review disclaimer anywhere', async
   await expect(page.locator('#how .steps li')).toHaveCount(3);
   expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   expect(await page.content()).not.toContain('nreviewed');
+});
+
+test('copy: text-to-image for anatomy in general, no italic captions', async ({ page }) => {
+  await page.goto('index.html');
+  await expect(page).toHaveTitle(/text-to-image for anatomy/i);
+  await expect(page.locator('.intro')).toHaveText('You get a labelled 3D figure you can turn, compare and save. It is built from real reconstructed anatomy, not drawn from memory, and every fact on it cites a source.');
+  // example prompts mix normal anatomy and a variant
+  const ask = await page.locator('#how').innerText();
+  expect(ask).toContain('the hepatobiliary tree');
+  expect(ask).toContain('replaced right hepatic artery');
+  await expect(page.locator('figcaption')).toHaveCount(3); // the example plates' titles only
+  for (const el of await page.locator('figcaption, .intro, .cmp-note, .sec-note').all()) {
+    expect(await el.evaluate((e) => getComputedStyle(e).fontStyle)).toBe('normal');
+  }
 });
 
 test('first viewport at 1440 px shows a typed request and the figure it produced', async ({ page }) => {

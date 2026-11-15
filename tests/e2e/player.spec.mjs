@@ -17,11 +17,11 @@ const fixtures = readdirSync(path.join(ROOT, FIX)).filter((f) => f.endsWith('.js
 const WIDTHS = [1200, 375];
 
 // Ground truth per fixture: a structure drawn only in the normal view, one drawn only in the
-// variant view, the provenance entries the info panel must list, and the starting orientation cue.
+// variant view, and the provenance entries the info panel must list.
 const EXPECT = {
-  'replaced-rha.json': { normalOnly: 'rha', variantOnly: 'rrha', provenance: ['pha', 'rha', 'lha', 'chd', 'rrha'], orient: /^Right anterior oblique view/ },
-  'low-cystic-duct.json': { normalOnly: 'cystic_duct', variantOnly: 'cystic_duct_low', provenance: ['cbd', 'chd', 'cystic_duct', 'cystic_duct_low'], orient: /^Left anterior oblique view/ },
-  'aberrant-right-subclavian.json': { normalOnly: 'aorta/right_subclavian_artery', variantOnly: 'arsa', provenance: ['aorta/right_subclavian_artery', 'aorta/brachiocephalic_trunk', 'aorta/right_common_carotid_artery', 'arsa'], orient: /^(Posterior view|Right posterior oblique view)/ },
+  'replaced-rha.json': { normalOnly: 'rha', variantOnly: 'rrha', provenance: ['pha', 'rha', 'lha', 'chd', 'rrha'] },
+  'low-cystic-duct.json': { normalOnly: 'cystic_duct', variantOnly: 'cystic_duct_low', provenance: ['cbd', 'chd', 'cystic_duct', 'cystic_duct_low'] },
+  'aberrant-right-subclavian.json': { normalOnly: 'aorta/right_subclavian_artery', variantOnly: 'arsa', provenance: ['aorta/right_subclavian_artery', 'aorta/brachiocephalic_trunk', 'aorta/right_common_carotid_artery', 'arsa'] },
 };
 
 async function serveRepo(page) {
@@ -58,8 +58,7 @@ async function labelState(page) {
     const d = window.viewer.debug();
     // labels the spec asks for in this view (from the validated spec, as the page rendered it)
     const p = window.SagittalPlayer.debug();
-    return { rects: d.labelRects, leaders: d.leaders, cw: c.clientWidth, ch: c.clientHeight, nonBlank: d.nonBlank, drawn: p,
-      orient: document.querySelector('#orient').textContent };
+    return { rects: d.labelRects, leaders: d.leaders, cw: c.clientWidth, ch: c.clientHeight, nonBlank: d.nonBlank, drawn: p };
   });
 }
 
@@ -90,9 +89,8 @@ for (const fixture of fixtures) {
             expect(Math.hypot(a.ax - b.ax, a.ay - b.ay), `${tag}: dots of "${a.text}" and "${b.text}" overlap`).toBeGreaterThanOrEqual(12);
           }
         }
-        // the orientation cue is shown and agrees with the player
-        expect(s.orient, tag).toBe(s.drawn.orientation);
-        expect(s.orient, tag).toMatch(EXPECT[fixture].orient);
+        // no orientation chip on the stage
+        expect(await page.locator('#stage .fig-orient, #orient').count(), tag).toBe(0);
         s.rects.forEach((r, i) => {
           const lt = `${tag} "${s.leaders[i] && s.leaders[i].text}"`;
           expect(r.x, lt).toBeGreaterThanOrEqual(0);
@@ -259,7 +257,7 @@ for (const fixture of fixtures) {
     await expect(group.getByRole('radio', { name: 'Variant' })).toBeChecked();
     await expect(group.getByRole('radio', { name: 'Normal' })).not.toBeChecked();
     if (!spec.title.toLowerCase().includes(spec.variant.label.toLowerCase())) {
-      await expect(page.locator('.fig-sub')).toHaveText('Variant shown: ' + spec.variant.label);
+      await expect(page.locator('.fig-sub')).toHaveText('Variant: ' + spec.variant.label);
     }
     // keyboard: arrow keys move between the two views
     await group.getByRole('radio', { name: 'Variant' }).focus();
@@ -276,8 +274,6 @@ for (const fixture of fixtures) {
     expect(await bar.locator('.fig-organs input[type=checkbox]').count()).toBe(spec.organs.length);
     await expect(bar.getByLabel('Labels')).toBeChecked();
     await expect(bar.getByRole('button', { name: 'Save as image' })).toBeVisible();
-    // the orientation chip sits on the stage
-    expect(await page.locator('#stage #orient').textContent()).toMatch(EXPECT[fixture].orient);
     // info: numbered claims, each with a link to its reference; references; provenance; credits
     const info = page.locator('#info');
     expect(await info.locator('.fig-claims li').count()).toBe(spec.claims.length);

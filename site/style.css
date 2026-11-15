@@ -63,13 +63,12 @@ h1,h2,h3{text-wrap:balance}
 .desc{margin:.6rem 0 0;font-style:italic;font-size:clamp(1.4rem,2.2vw,1.75rem);line-height:1.25;color:var(--ink-2)}
 .ask{position:relative;margin:40px 0 0;padding:18px 18px 15px;background:var(--surface);border:1px solid var(--rule-ctl)}
 /* the prompt box's label, set into its top edge like a field legend */
-.ask-who{position:absolute;top:-.8em;left:12px;padding:0 6px;background:var(--bg);font-style:italic;font-size:var(--fs-small);line-height:1.5;color:var(--mut)}
+.ask-who{position:absolute;top:-.8em;left:12px;padding:0 6px;background:var(--bg);font-size:var(--fs-small);line-height:1.5;color:var(--mut)}
 .ask-line{display:block;font-size:1.3rem;line-height:1.35;color:var(--ink)}
 .ask-line::after{content:"";display:inline-block;width:2px;height:1.05em;margin-left:3px;vertical-align:-.15em;background:var(--acc)}
 .intro{margin:24px 0 0;max-width:36em;font-size:1.08rem;line-height:1.55;color:var(--ink-2)}
 .mast-fig{margin:0}
 .mast-fig img{display:block;width:100%;height:auto;border:1px solid var(--ink);outline:1px solid var(--rule);outline-offset:4px}
-.mast-fig figcaption{margin:14px 0 0;font-style:italic;font-size:var(--fs-small);line-height:1.45;color:var(--mut)}
 
 main{counter-reset:none}
 .sec{border-top:1px solid var(--ink);padding:28px 0 88px}
@@ -77,7 +76,7 @@ main{counter-reset:none}
 .sec > h2{margin:0 0 24px;font-weight:400;font-size:var(--fs-h2);line-height:1.15;letter-spacing:-.01em;color:var(--ink)}
 .sec-body{min-width:0}
 .sec-note{margin:0 0 24px;max-width:68ch;color:var(--ink-2)}
-.notice{margin:0 0 20px;font-style:italic;color:var(--acc)}
+.notice{margin:0 0 20px;color:var(--acc)}
 
 /* comparison */
 .prompt{margin:0 0 22px;font-size:1.3rem;color:var(--mut)}
@@ -88,8 +87,7 @@ main{counter-reset:none}
 .cmp:first-child .cmp-img{background:#1e1e1e}
 .cmp:first-child .cmp-img img{object-fit:contain}
 .cmp-img img{display:block;width:100%;height:100%;object-fit:cover}
-.cmp figcaption{margin:18px 5px 0;font-style:italic;font-size:var(--fs-small);line-height:1.5;color:var(--ink-2);max-width:60ch}
-.cmp .who{font-style:normal;color:var(--ink)}
+.cmp-note{margin:24px 0 0;max-width:68ch;font-size:var(--fs-small);line-height:1.55;color:var(--ink-2)}
 .cmp .fig,.plate-title .fig,.top .fig{font-style:normal;color:var(--acc);margin-right:.35em;white-space:nowrap}
 .nb{white-space:nowrap}
 
@@ -117,7 +115,7 @@ main{counter-reset:none}
 .plate-img img{display:block;width:100%;height:100%;object-fit:cover}
 .plate-img.empty{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;padding:20px;background:var(--stage)}
 .empty-title{font-size:1.5rem;line-height:1.2;color:var(--ink-2)}
-.empty-note{font-style:italic;font-size:.95rem;color:var(--mut)}
+.empty-note{font-size:.95rem;color:var(--mut)}
 .plate figcaption{padding:16px 5px 0}
 .plate-title{margin:0;font-size:1.3rem;line-height:1.25}
 .plate-title .fig{display:block;margin:0 0 2px;font-size:1rem}
@@ -135,8 +133,7 @@ main{counter-reset:none}
 .examples .plate-title{font-size:var(--fs-h3)}
 .examples .plate-title .fig{display:inline;margin:0 .45em 0 0;font-size:.82em}
 .examples .plate-title .fig::after{content:"."}
-.ex-line{margin:8px 0 0;font-style:italic;font-size:1.02rem;line-height:1.45;color:var(--ink-2);max-width:30em}
-.topic{margin:2px 0 0;font-style:italic;font-size:1rem;color:var(--mut)}
+.topic{margin:2px 0 0;font-size:1rem;color:var(--mut)}
 .views{margin:8px 0 0;font-size:1rem;line-height:1.5;color:var(--ink-2)}
 .views .k{color:var(--mut)}
 .views em{font-style:italic;color:var(--ink)}
@@ -154,7 +151,7 @@ main{counter-reset:none}
 .foot p{margin:0 0 12px;max-width:68ch}
 .foot a{color:var(--ink)}
 .foot-links{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-wrap:wrap;gap:4px 24px}
-.foot .small{font-style:italic;color:var(--mut)}
+.foot .small{color:var(--mut)}
 
 /* ---------- viewer (library scenes) ---------- */
 .viewer-page{height:100vh;height:100dvh;display:flex;flex-direction:column;font-size:17px}
@@ -173,10 +170,10 @@ main{counter-reset:none}
 /* Label chips on the dark stage (embed=1: cards, thumbnails); keep in step with
    tools/build_decks.py (Anki card CSS). */
 .lab{position:absolute;left:0;top:0;white-space:nowrap;font:12px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;background:rgba(15,20,27,.82);border:1px solid #3a4a5e;border-radius:4px;padding:1px 6px;color:#fff}
-#hint{position:absolute;left:14px;bottom:10px;color:#93a1b3;font:italic 14px var(--serif);pointer-events:none}
+#hint{position:absolute;left:14px;bottom:10px;color:#93a1b3;font:14px var(--serif);pointer-events:none}
 #hint .h-touch{display:none}
 @media (hover:none) and (pointer:coarse){#hint .h-pointer{display:none}#hint .h-touch{display:inline}}
-.kit-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--plate-ink);font-style:italic}
+.kit-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--plate-ink)}
 /* the site viewer: paper stage and italic labels, as in the figures (kit leaderStyle 'css') */
 .site-stage #stage{background:var(--stage)}
 .site-stage .lab{font:italic 400 14.5px/1.25 var(--serif);font-variant-numeric:lining-nums;background:var(--stage-knock);border:0;border-radius:0;padding:1px 4px 2px;color:var(--stage-ink)}
@@ -203,7 +200,7 @@ aside h2{margin:24px 0 8px;font-weight:400;font-size:1.3rem;line-height:1.3;colo
 .claims li::marker{color:var(--acc)}
 .arrow{display:inline-block;color:var(--acc)}
 .i-arrow{display:inline-block;vertical-align:.05em}
-.note{color:var(--mut);font-style:italic;font-size:.95rem;margin:14px 0 0}
+.note{color:var(--mut);font-size:.95rem;margin:14px 0 0}
 body.embed .top,body.embed aside{display:none}
 body.embed .viewer{grid-template-columns:1fr}
 body.viewer-page #gallery{display:none}
@@ -219,7 +216,7 @@ body.missing{height:auto}
 .credits h1{font-weight:400;font-size:clamp(2.4rem,5vw,3.2rem);line-height:1.08;letter-spacing:-.01em;margin:44px 0 16px}
 .credits p,.credits li{max-width:68ch;color:var(--ink-2)}
 .credits .md h2{margin:40px 0 10px;padding-top:12px;border-top:1px solid var(--ink);font-weight:400;font-size:var(--fs-h3);line-height:1.25;color:var(--ink)}
-.credits .md h3{margin:28px 0 8px;font-weight:400;font-style:italic;font-size:1.25rem;color:var(--ink)}
+.credits .md h3{margin:28px 0 8px;font-weight:400;font-size:1.25rem;color:var(--ink)}
 .credits .md ul{padding-left:1.2em}
 .credits .md li{margin:4px 0}
 .credits .md li::marker{color:var(--acc)}
