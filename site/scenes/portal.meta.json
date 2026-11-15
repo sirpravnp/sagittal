@@ -1,0 +1,52 @@
+{
+  "id": "portal",
+  "title": "Portosystemic anastomoses in portal hypertension",
+  "topic": "Gastroenterology",
+  "variantControl": "v",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal portal circulation"
+    },
+    {
+      "key": "eso",
+      "label": "Esophageal varices"
+    },
+    {
+      "key": "caput",
+      "label": "Caput medusae"
+    },
+    {
+      "key": "rect",
+      "label": "Anorectal varices"
+    },
+    {
+      "key": "tips",
+      "label": "TIPS"
+    }
+  ],
+  "claims": [
+    "The portal vein forms behind the neck of the pancreas from the splenic vein and the superior mesenteric vein; the inferior mesenteric vein usually drains into the splenic vein.",
+    "The portal vein supplies about 75% of the liver's blood flow; blood leaves the liver through the hepatic veins into the IVC.",
+    "Portal hypertension is a hepatic venous pressure gradient above 5 mmHg; it becomes clinically significant at 10 mmHg, and varices can bleed above 12 mmHg. Cirrhosis is the most common cause.",
+    "Portal hypertension opens portosystemic collaterals and causes splenomegaly (often with thrombocytopenia) and ascites.",
+    "Oesophageal varices: left gastric (coronary) vein (portal) → oesophageal veins → azygos vein (systemic).",
+    "Acute variceal bleeding: resuscitation, IV octreotide, IV antibiotic prophylaxis (e.g. ceftriaxone), and endoscopic band ligation within 12 hours.",
+    "Primary prevention of variceal bleeding: a non-selective beta-blocker (propranolol, nadolol or carvedilol) or endoscopic band ligation.",
+    "Caput medusae: paraumbilical veins (portal, in the ligamentum teres) → superficial and inferior epigastric veins (systemic) around the umbilicus.",
+    "In caput medusae from portal hypertension, flow in the periumbilical veins runs away from the umbilicus.",
+    "Anorectal varices: superior rectal vein (portal, via the inferior mesenteric vein) → middle rectal (to internal iliac) and inferior rectal (to internal pudendal) veins (systemic).",
+    "Anorectal varices are distinct from haemorrhoids; haemorrhoids are not more common in portal hypertension.",
+    "TIPS places a stent through the liver from a hepatic vein (usually the right) to a portal vein branch, creating a low-resistance portosystemic shunt.",
+    "TIPS indications: variceal bleeding refractory to endoscopic and drug therapy, and refractory ascites. Main complication: hepatic encephalopathy."
+  ],
+  "sources": [
+    "StatPearls (NCBI Bookshelf): Portal Hypertension. https://www.ncbi.nlm.nih.gov/books/?term=Portal+Hypertension",
+    "StatPearls (NCBI Bookshelf): Esophageal Varices. https://www.ncbi.nlm.nih.gov/books/?term=Esophageal+Varices",
+    "StatPearls (NCBI Bookshelf): Caput Medusae. https://www.ncbi.nlm.nih.gov/books/?term=Caput+Medusae",
+    "StatPearls (NCBI Bookshelf): Anatomy, Abdomen and Pelvis, Liver Portal Vein. https://www.ncbi.nlm.nih.gov/books/?term=Anatomy%2C+Abdomen+and+Pelvis%2C+Liver+Portal+Vein",
+    "StatPearls (NCBI Bookshelf): Transjugular Intrahepatic Portosystemic Shunt. https://www.ncbi.nlm.nih.gov/books/?term=Transjugular+Intrahepatic+Portosystemic+Shunt",
+    "Z-Anatomy, the libre 3D atlas of anatomy (CC BY-SA 4.0), based on BodyParts3D (DBCLS, CC BY-SA 2.1 JP). https://www.z-anatomy.com/"
+  ],
+  "status": "unreviewed"
+}

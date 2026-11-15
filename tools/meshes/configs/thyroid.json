@@ -1,0 +1,97 @@
+{
+  "name": "thyroid",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py into sagittal-assets-cache/zanatomy-vascular/obj. Z-Anatomy's thyroid gland is a thin shell over the thyroid cartilage, above its real level, so the scene builds the gland and parathyroids procedurally on the real trachea and carotids; the vagus, recurrent and superior laryngeal nerves, thyroid arteries, descending aorta and oesophagus are drawn in the scene (site/scenes/thyroid.js) from Z-Anatomy centre lines.",
+  "source_root": "${ASSETS}/zanatomy-vascular/obj",
+  "transform": "zanatomy",
+  "center": [
+    0.0,
+    142.0,
+    0.0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "thyroid_cartilage": {
+      "files": [
+        "Thyroid_cartilage.obj"
+      ],
+      "budget": 3000
+    },
+    "cricoid": {
+      "files": [
+        "Cricoid_cartilage.obj"
+      ],
+      "budget": 1500
+    },
+    "hyoid": {
+      "files": [
+        "Hyoid_bone.obj"
+      ],
+      "budget": 1200
+    },
+    "trachea": {
+      "files": [
+        "Trachea.obj"
+      ],
+      "budget": 3600
+    },
+    "cricothyroid": {
+      "files": [
+        "*_part_of_cricothyroid_muscle.*.obj"
+      ],
+      "budget": 1600
+    },
+    "aorta": {
+      "files": [
+        "Ascending_aorta.obj",
+        "Aortic_arch.obj"
+      ],
+      "budget": 1200
+    },
+    "brachiocephalic_trunk": {
+      "files": [
+        "Brachiocephalic_trunk.obj"
+      ],
+      "budget": 400
+    },
+    "carotids": {
+      "files": [
+        "*_common_carotid_artery.obj"
+      ],
+      "budget": 900
+    },
+    "subclavians": {
+      "files": [
+        "*_subclavian_artery.obj"
+      ],
+      "budget": 900
+    },
+    "external_carotids": {
+      "files": [
+        "External_carotid_artery.*.obj"
+      ],
+      "budget": 700
+    },
+    "thyrocervical": {
+      "files": [
+        "Thyrocervical_trunk.*.obj"
+      ],
+      "budget": 200
+    },
+    "jugular_veins": {
+      "files": [
+        "Internal_jugular_vein.*.obj",
+        "*_brachiocephalic_vein.obj",
+        "Superior_vena_cava.obj"
+      ],
+      "budget": 1600
+    },
+    "pulmonary": {
+      "files": [
+        "Left_pulmonary_artery.obj"
+      ],
+      "budget": 500
+    }
+  }
+}

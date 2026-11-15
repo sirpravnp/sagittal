@@ -1,0 +1,80 @@
+{
+  "name": "portal",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py into sagittal-assets-cache/zanatomy-vascular/obj. The 'rectum' part is Z-Anatomy's 'Sigmoid colon' object, which spans the rectum and anal canal. The oesophagus and the portal, systemic and anastomotic veins are drawn in the scene (site/scenes/portal.js) as tubes along Z-Anatomy centre lines where they exist; the left gastric, oesophageal, paraumbilical, rectal and caput medusae veins and the TIPS stent are procedural.",
+  "source_root": "${ASSETS}/zanatomy-vascular/obj",
+  "transform": "zanatomy",
+  "center": [
+    0.0,
+    105.0,
+    3.0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "liver": {
+      "files": [
+        "Liver.obj"
+      ],
+      "budget": 5200,
+      "subdivide": 1,
+      "smooth": 8
+    },
+    "spleen": {
+      "files": [
+        "Spleen.obj"
+      ],
+      "budget": 2000,
+      "smooth": 4
+    },
+    "stomach": {
+      "files": [
+        "Stomach.obj"
+      ],
+      "budget": 3600,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "pancreas": {
+      "files": [
+        "Pancreas.obj"
+      ],
+      "budget": 2400,
+      "smooth": 4
+    },
+    "duodenum": {
+      "files": [
+        "Duodenum.obj"
+      ],
+      "budget": 2000,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "rectum": {
+      "files": [
+        "Sigmoid_colon.obj"
+      ],
+      "budget": 2600,
+      "subdivide": 1,
+      "smooth": 4
+    },
+    "anal_sphincter": {
+      "files": [
+        "External_anal_sphincter.l.obj",
+        "External_anal_sphincter.r.obj"
+      ],
+      "budget": 500,
+      "subdivide": 1,
+      "smooth": 4
+    },
+    "umbilicus": {
+      "files": [
+        "Umbilicus.l.obj",
+        "Umbilicus.r.obj"
+      ],
+      "budget": 200,
+      "subdivide": 1,
+      "smooth": 2
+    }
+  }
+}
