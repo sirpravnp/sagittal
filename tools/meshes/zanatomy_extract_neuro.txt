@@ -1,0 +1,52 @@
+# Z-Anatomy objects for the neuro scenes (cow, bleed), extracted into
+# sagittal-assets-cache/zanatomy-neuro/obj/:
+#   .venv/bin/python tools/meshes/extract_blend.py <cache>/zanatomy/extracted/Z-Anatomy/Startup.blend \
+#     --out <cache>/zanatomy-neuro/obj --match-file tools/meshes/zanatomy_extract_neuro.txt
+# No Brainder cortex/gyri/sulci or white-matter objects (licence unclear).
+
+# --- circle of Willis and posterior circulation ---
+^Internal carotid artery\.[lr]$
+^Anterior cerebral artery\.[lr]$
+^Anterior communicating artery$
+^Middle cerebral artery \(M1-segment\)\.[lr]$
+^Insular branches of middle cerebral artery
+^Middle cerebral artery \(M3
+^Temporal branches of middle cerebral artery\.[lr]$
+^Parietal branches of middle cerebral artery\.[lr]$
+^Posterior communicating artery\.[lr]$
+^Posterior cerebral artery\.[lr]$
+^Basilar artery$
+^Vertebral artery\.[lr]$
+^Superior cerebellar artery\.[lr]$
+^Anterior inferior cerebellar artery\.[lr]$
+^Posterior inferior cerebellar artery\.[lr]$
+^Ophthalmic artery\.[lr]$
+^Pericallosal artery\.[lr]$
+^Callosomarginal artery\.[lr]$
+^Orbitofrontal branches of anterior cerebral artery\.[lr]$
+# --- cranial nerves, chiasm, pituitary, brainstem ---
+^Oculomotor nerve \(III\)\.[lr]$
+^Optic nerve \(II\)\.[lr]$
+^Optic chiasm\.[lr]$
+^Optic tract\.[lr]$
+^Adenohypophysis$
+^Neurohypophysis$
+^Pons\.[lr]$
+^Medulla oblongata\.[lr]$
+^Midbrain\.[lr]$
+# --- skull, dura, meningeal vessels, sinuses ---
+^Frontal bone$
+^Parietal bone\.[lr]$
+^Temporal bone\.[lr]$
+^Occipital bone$
+^Sphenoid bone$
+^Ethmoid bone$
+^Middle meningeal artery\.[lr]$
+^Accessory branch of middle meningeal artery\.[lr]$
+^Maxillary artery\.[lr]$
+^Falx cerebri$
+^Tentorium cerebelli\.[lr]$
+^Superior sagittal sinus$
+^Transverse sinus\.[lr]$
+^Epicranial aponeurosis\.[lr]$
+^Temporalis muscle\.[lr]$

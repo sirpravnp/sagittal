@@ -1,0 +1,12 @@
+{
+  "name": "endocast",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Cranial-cavity endocast computed from the Z-Anatomy skull bones by tools/meshes/make_endocast.py (frontal, parietal, temporal, occipital, sphenoid, ethmoid)",
+  "source_root": "${ASSETS}/zanatomy-neuro/derived",
+  "transform": "zanatomy",
+  "center": [0, 161, 0],
+  "parts": {
+    "endocast": { "files": ["Endocast.obj"], "budget": 6000, "smooth": 10 }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "cranium",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived) cranial vault bones, temporalis, epicranial aponeurosis, falx cerebri, superior sagittal sinus, middle meningeal arteries; extracted with tools/meshes/extract_blend.py (tools/meshes/zanatomy_extract_neuro.txt)",
+  "source_root": "${ASSETS}/zanatomy-neuro/obj",
+  "transform": "zanatomy",
+  "center": [0, 161, 0],
+  "default_budget": 1000,
+  "parts": {
+    "frontal": { "files": ["Frontal_bone.obj"], "budget": 2200 },
+    "parietal_l": { "files": ["Parietal_bone.l.obj"], "budget": 1800 },
+    "parietal_r": { "files": ["Parietal_bone.r.obj"], "budget": 1800 },
+    "temporal_l": { "files": ["Temporal_bone.l.obj"], "budget": 2600 },
+    "temporal_r": { "files": ["Temporal_bone.r.obj"], "budget": 2600 },
+    "occipital": { "files": ["Occipital_bone.obj"], "budget": 1800 },
+    "sphenoid": { "files": ["Sphenoid_bone.obj"], "budget": 2400 },
+    "temporalis_l": { "files": ["Temporalis_muscle.l.obj"], "budget": 1000 },
+    "temporalis_r": { "files": ["Temporalis_muscle.r.obj"], "budget": 1000 },
+    "galea": { "files": ["Epicranial_aponeurosis.*.obj"], "budget": 2000 },
+    "falx": { "files": ["Falx_cerebri.obj"], "budget": 600, "subdivide": 1, "smooth": 4 },
+    "sss": { "files": ["Superior_sagittal_sinus.obj"], "budget": 500 },
+    "mma_l": { "files": ["Middle_meningeal_artery.l.obj"], "budget": 300 },
+    "mma_r": { "files": ["Middle_meningeal_artery.r.obj"], "budget": 300 }
+  }
+}
