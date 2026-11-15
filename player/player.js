@@ -1,5 +1,5 @@
 /* Sagittal figure player. Classic script: sets window.SagittalPlayer. Needs THREE, KitLabels, Kit,
- * SagittalOrgans (organs/organs.js) and the meshes of the listed organs (organs/meshes/<id>.js),
+ * SagittalOrgans (organs/organs.js), SagittalUI (player/ui.js, renders the info panel) and the meshes of the listed organs (organs/meshes/<id>.js),
  * loaded before register() (it reads their part bounding boxes).
  *
  *   SagittalPlayer.register(resolved, opts?) -> the SceneDef it registers as Kit scene 'figure'
@@ -29,9 +29,6 @@
 
   /* ---------- small helpers ---------- */
   function has(o, k) { return o != null && Object.prototype.hasOwnProperty.call(o, k); }
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
-  }
   function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); }
   function lenOf(pts) { var L = 0; for (var i = 1; i < pts.length; i++) L += dist(pts[i - 1], pts[i]); return L; }
   function pointAt(pts, t) {
@@ -404,37 +401,9 @@
       };
     }
 
-    /* ---------- info panel ---------- */
-    function infoHtml(view) {
-      var refs = organs.references || {};
-      var h = '<section class="fig-claims"><h2>Claims</h2><ul>';
-      R.claims.forEach(function (c) {
-        h += '<li>' + esc(c.text) + ' ' + c.refs.map(function (r) {
-          var ref = refs[r];
-          return ref ? '<a class="ref" href="' + esc(ref.url) + '" target="_blank" rel="noopener" title="' + esc(ref.title) + '">[' + esc(r) + ']</a>' : '';
-        }).join(' ') + '</li>';
-      });
-      h += '</ul></section>';
-      var cited = [];
-      R.claims.forEach(function (c) { c.refs.forEach(function (r) { if (cited.indexOf(r) < 0 && refs[r]) cited.push(r); }); });
-      if (cited.length) {
-        h += '<section class="fig-refs"><h2>References</h2><ul>';
-        cited.forEach(function (r) { h += '<li id="ref-' + esc(r) + '"><a href="' + esc(refs[r].url) + '" target="_blank" rel="noopener">' + esc(refs[r].title) + '</a></li>'; });
-        h += '</ul></section>';
-      }
-      h += '<section class="fig-provenance"><h2>Changed from base anatomy</h2><ul>';
-      (R.provenance || []).forEach(function (pv) {
-        var what = { route: 'drawn', branch: 'drawn as a branch', duplicate: 'duplicated', remove: 'removed', move_insertion: 'insertion moved' }[pv.op] || pv.op;
-        var where = pv.view === 'both' ? 'drawn from landmarks, in both views' : 'variant view only';
-        var through = (pv.via || []).concat(pv.on || []).map(function (x) { return x.indexOf('/') >= 0 ? libName(x) + ' (' + x + ')' : x; });
-        h += '<li data-structure="' + esc(pv.structure) + '"><b>' + esc(pv.name || pv.structure) + '</b>: ' + esc(what) + ' (' + esc(where) + ')';
-        if (through.length) h += '; built through ' + esc(through.join(', '));
-        h += '</li>';
-      });
-      h += '</ul></section>';
-      var line = creditLine();
-      if (line) h += '<p class="fig-credit note">' + esc(line) + '</p>';
-      return h;
+    /* ---------- info panel (player/ui.js renders it) ---------- */
+    function infoHtml() {
+      return window.SagittalUI ? window.SagittalUI.infoHtml({ spec: R, references: organs.references || {}, name: libName, credit: creditLine() }) : '';
     }
     function creditLine() {
       if (!credits) return '';

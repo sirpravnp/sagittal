@@ -4,7 +4,7 @@
 // routing a made-up origin to the working tree, so no second web server is needed.
 // Screenshots of every view are written to build/figures/ for visual review.
 import { test, expect } from '@playwright/test';
-import { readFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -148,3 +148,146 @@ test('an invalid spec shows its errors and renders nothing', async ({ page }) =>
   await expect(page.locator('#errors')).toContainText('unknown organ');
   expect(await page.evaluate(() => !!window.viewer)).toBe(false);
 });
+
+// ---------- Figure UI (player/ui.js, player/figure.css) and Save as image ----------
+const UI_OUT = path.join(OUT, 'ui');
+const STAGE_BG = [0x0f, 0x14, 0x1b];
+
+// Decodes a PNG data URL in the page: size, share of pixels that are not the stage background.
+async function decodePng(page, url) {
+  return page.evaluate(async ([u, bg]) => {
+    const img = new Image(); img.src = u; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+    const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height).data;
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 24) n++;
+    return { w: c.width, h: c.height, fg: n / (c.width * c.height) };
+  }, [url, STAGE_BG]);
+}
+// Pixels (share of the image) that differ clearly between two PNG data URLs of the same size.
+async function pngDiff(page, a, b) {
+  return page.evaluate(async ([ua, ub]) => {
+    const px = async (u) => {
+      const img = new Image(); img.src = u; await img.decode();
+      const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+      return x.getImageData(0, 0, c.width, c.height).data;
+    };
+    const da = await px(ua), db = await px(ub);
+    if (da.length !== db.length) return 1;
+    let n = 0;
+    for (let i = 0; i < da.length; i += 4) if (Math.abs(da[i] - db[i]) + Math.abs(da[i + 1] - db[i + 1]) + Math.abs(da[i + 2] - db[i + 2]) > 40) n++;
+    return n / (da.length / 4);
+  }, [a, b]);
+}
+
+test('Save as image downloads <slug>-<view>.png: decodes, not blank, labels drawn in', async ({ page }) => {
+  test.slow();
+  await page.setViewportSize({ width: 1200, height: 800 });
+  await serveRepo(page);
+  const errors = watchErrors(page);
+  mkdirSync(UI_OUT, { recursive: true });
+  await openFigure(page, 'replaced-rha.json');
+  const save = page.getByRole('button', { name: 'Save as image' });
+  await expect(save).toBeVisible();
+
+  const [dl] = await Promise.all([page.waitForEvent('download'), save.click()]);
+  expect(dl.suggestedFilename()).toBe('replaced-right-hepatic-artery-from-the-sma-variant.png');
+  const file = await dl.path();
+  const buf = readFileSync(file);
+  expect([...buf.subarray(0, 8)]).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const url = 'data:image/png;base64,' + buf.toString('base64');
+  const dec = await decodePng(page, url);
+  const cv = await page.evaluate(() => { const c = document.querySelector('#cv'); return { w: c.width, h: c.height }; });
+  expect(dec.w).toBe(cv.w);
+  expect(dec.h).toBe(cv.h);
+  expect(dec.fg, 'saved image is not blank').toBeGreaterThan(0.01);
+  writeFileSync(path.join(UI_OUT, 'saved-replaced-rha-variant.png'), buf);
+
+  // window.figure.snapshot: labels on differs from labels off; the page's own label state is kept
+  const on = await page.evaluate(() => window.figure.snapshot({ labels: true }));
+  const off = await page.evaluate(() => window.figure.snapshot({ labels: false }));
+  expect(on.startsWith('data:image/png;base64,')).toBe(true);
+  expect(await pngDiff(page, on, off), 'labels change the image').toBeGreaterThan(0.002);
+  expect(await page.locator('#labels').isVisible()).toBe(true);
+  expect(await pngDiff(page, url, on), 'the download is the labelled snapshot').toBeLessThan(0.002);
+
+  // labels switched off in the page: Save follows the toggle; snapshot({labels: true}) still draws them
+  await page.locator('#kit_c_v').selectOption('normal');
+  await page.waitForFunction(() => window.SagittalPlayer.debug().view === 'normal');
+  await page.getByLabel('Labels').uncheck();
+  const [dl2] = await Promise.all([page.waitForEvent('download'), save.click()]);
+  expect(dl2.suggestedFilename()).toBe('replaced-right-hepatic-artery-from-the-sma-normal.png');
+  const url2 = 'data:image/png;base64,' + readFileSync(await dl2.path()).toString('base64');
+  const off2 = await page.evaluate(() => window.figure.snapshot({ labels: false }));
+  const on2 = await page.evaluate(() => window.figure.snapshot({ labels: true }));
+  expect(await pngDiff(page, url2, off2)).toBeLessThan(0.002);
+  expect(await pngDiff(page, on2, off2)).toBeGreaterThan(0.002);
+  expect(await page.locator('#labels').isVisible(), 'snapshot restores the hidden labels').toBe(false);
+  writeFileSync(path.join(UI_OUT, 'snapshot-replaced-rha-normal-labels.png'), Buffer.from(on2.split(',')[1], 'base64'));
+  expect(errors).toEqual([]);
+});
+
+for (const fixture of fixtures) {
+  test(`${fixture}: figure UI at 1200 and 375 px, light and dark`, async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await serveRepo(page);
+    const errors = watchErrors(page);
+    mkdirSync(UI_OUT, { recursive: true });
+    const spec = await specOf(page, fixture);
+    await openFigure(page, fixture);
+    const name = fixture.replace(/\.json$/, '');
+
+    await expect(page.locator('h1')).toHaveText(spec.title);
+    // control row: view, one toggle per organ, labels, save
+    const bar = page.locator('.fig-bar');
+    await expect(bar.locator('#kit_c_v')).toBeVisible();
+    await expect(bar.locator('#kit_c_v option')).toHaveText(['Normal anatomy', spec.variant.label]);
+    expect(await bar.locator('.fig-organs input[type=checkbox]').count()).toBe(spec.organs.length);
+    await expect(bar.getByLabel('Labels')).toBeChecked();
+    await expect(bar.getByRole('button', { name: 'Save as image' })).toBeVisible();
+    // the orientation chip sits on the stage
+    expect(await page.locator('#stage #orient').textContent()).toMatch(EXPECT[fixture].orient);
+    // info: numbered claims, each with a link to its reference; references; provenance; credits
+    const info = page.locator('#info');
+    expect(await info.locator('.fig-claims li').count()).toBe(spec.claims.length);
+    for (let i = 0; i < spec.claims.length; i++) {
+      expect(await info.locator('.fig-claims li').nth(i).locator('a.ref').count()).toBe(spec.claims[i].refs.length);
+    }
+    expect(await info.locator('.fig-refs li a[href^="https://"]').count()).toBeGreaterThan(0);
+    expect(await info.locator('.fig-provenance li').count()).toBe(spec.provenance.length);
+    for (const li of await info.locator('.fig-provenance li').all()) await expect(li.locator('.pv-view')).toHaveText(/^(Both views|Variant)$/);
+    await expect(info.locator('.fig-credit')).toContainText('3D models:');
+    expect(await page.locator('body').innerText()).not.toContain('nreviewed');
+
+    // themes: the page follows prefers-color-scheme, [data-theme] overrides it; the stage stays dark
+    const look = () => page.evaluate(() => ({
+      bg: getComputedStyle(document.body).backgroundColor,
+      stage: getComputedStyle(document.querySelector('#stage')).backgroundColor,
+      scroll: document.documentElement.scrollWidth - window.innerWidth,
+    }));
+    const seen = {};
+    for (const width of [1200, 375]) {
+      await page.setViewportSize({ width, height: width < 600 ? 812 : 800 });
+      for (const scheme of ['light', 'dark']) {
+        await page.emulateMedia({ colorScheme: scheme });
+        await page.waitForTimeout(400);
+        const l = await look();
+        expect(l.scroll, `${name} ${width} ${scheme}: horizontal scroll`).toBeLessThanOrEqual(0);
+        expect(l.stage).toBe('rgb(15, 20, 27)');
+        seen[scheme] = l.bg;
+        await page.screenshot({ path: path.join(UI_OUT, `${name}-${width}-${scheme}.png`), fullPage: true });
+      }
+    }
+    expect(seen.light).not.toBe(seen.dark);
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    await page.emulateMedia({ colorScheme: 'light' });
+    expect((await look()).bg).toBe(seen.dark);
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+    await page.emulateMedia({ colorScheme: 'dark' });
+    expect((await look()).bg).toBe(seen.light);
+    expect(errors).toEqual([]);
+  });
+}

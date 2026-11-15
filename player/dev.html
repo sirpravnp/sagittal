@@ -4,39 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Sagittal figure (dev)</title>
+<title>Sagittal figure</title>
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="../site/style.css">
+<link rel="stylesheet" href="figure.css">
 <!--
-  Development page for player/player.js. Serve the repo root and open
-  player/dev.html?spec=tests/fixtures/figures/<name>.json  (path relative to the repo root).
+  Development page for the figure player and UI. Serve the repo root and open
+  player/dev.html?spec=tests/fixtures/figures/<name>.json  (path relative to the repo root;
+  &v=normal|variant and organ toggles as further query keys; &theme=light|dark forces a theme).
   Loads organs and meshes from organs/; make-figure (Task 6) inlines the same scripts instead.
 -->
 </head>
-<body class="viewer-page">
-<header class="top">
-  <span class="brand">Sagittal</span>
-  <h1>Figure</h1>
-</header>
-<main class="viewer">
-  <div id="stage">
-    <canvas id="cv"></canvas>
-    <div id="labels"></div>
-    <div id="orient" aria-live="polite" style="position:absolute;left:8px;top:8px;pointer-events:none;font:12px/1.4 system-ui,sans-serif;color:#dfe6ef;background:rgba(15,20,27,.75);border:1px solid #3a4a5e;border-radius:4px;padding:2px 7px"></div>
-  </div>
-  <aside>
-    <div id="controls"></div>
-    <div class="chk"><input type="checkbox" id="labels-toggle" checked><label for="labels-toggle">Labels</label></div>
-    <pre id="errors" hidden></pre>
-    <div id="info"></div>
-  </aside>
-</main>
+<body>
+<pre id="errors" class="fig-errors" hidden></pre>
 <script src="../site/vendor/three.min.js"></script>
 <script src="../site/kit/labels.js"></script>
 <script src="../site/kit/kit.js"></script>
 <script src="../organs/organs.js"></script>
 <script src="spec.js"></script>
 <script src="player.js"></script>
+<script src="ui.js"></script>
 <script>
 (function () {
   function loadScript(src) {
@@ -54,32 +40,21 @@
     var e = document.getElementById('errors');
     e.textContent = lines.join('\n'); e.hidden = false;
   }
-  var path = new URLSearchParams(location.search).get('spec');
+  var q = new URLSearchParams(location.search), path = q.get('spec');
+  if (/^(light|dark)$/.test(q.get('theme') || '')) document.documentElement.setAttribute('data-theme', q.get('theme'));
   if (!path || !/^[\w\-./]+\.json$/.test(path) || path.indexOf('..') >= 0) { fail(['Give ?spec=<path to a figure spec .json, from the repo root>']); return; }
   Promise.all([getJson('../' + path), getJson('../site/meshes/credits.json').catch(function () { return null; })]).then(function (r) {
     var res = SagittalSpec.validate(r[0], SagittalOrgans);
     if (!res.ok) { fail(res.errors); return; }
     var R = res.resolved;
-    document.title = R.title + ' · Sagittal';
-    document.querySelector('h1').textContent = R.title;
     // The player reads part bounding boxes when it registers: load the meshes first.
     var meshes = R.organs.map(function (o) { return SagittalOrgans.manifests[o.id].mesh; });
     return Promise.all(meshes.map(function (m) {
       return window.SagittalMeshes && SagittalMeshes[m] ? null : loadScript('../organs/meshes/' + encodeURIComponent(m) + '.js');
     })).then(function () {
-      var def = SagittalPlayer.register(R, { credits: r[1], orientEl: document.getElementById('orient') });
-      var viewer = Kit.createViewer({
-        canvas: document.getElementById('cv'),
-        labelsEl: document.getElementById('labels'),
-        controlsEl: document.getElementById('controls'),
-        infoEl: document.getElementById('info'),
-      });
-      window.viewer = viewer;
-      var toggle = document.getElementById('labels-toggle');
-      toggle.onchange = function () { viewer.setLabelsVisible(toggle.checked); };
       var state = {};
-      new URLSearchParams(location.search).forEach(function (v, k) { if (k !== 'spec') state[k] = v; });
-      viewer.open(def.id, state);
+      new URLSearchParams(location.search).forEach(function (v, k) { if (k !== 'spec' && k !== 'theme') state[k] = v; });
+      SagittalUI.mount({ resolved: R, credits: r[1], state: state });
     });
   }).catch(function (e) { fail([String(e && e.message || e)]); });
 })();
