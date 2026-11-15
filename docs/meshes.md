@@ -168,7 +168,7 @@ already there, with file paths, triangle counts and licences.
    bbox, size, a CREDITS entry).
 
 Python setup: `python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt`
-(numpy, fast-simplification 0.1.9, the newest that runs on Python 3.9).
+(numpy, fast-simplification 0.1.9, the newest that runs on Python 3.9; nibabel, scipy and scikit-image for `ct_to_obj.py`).
 
 ### Triangle budgets
 
@@ -187,6 +187,18 @@ A baked file must stay under **400 KB**. Each triangle costs about 16 bytes afte
 Prefer fewer, merged parts unless a scene needs to colour or hide one structure on its own.
 Loading cost on software GL is dominated by pixels, not triangles, so budgets are about file
 size first.
+
+### From a CT segmentation
+
+`tools/meshes/ct_to_obj.py` turns a NIfTI label volume (`--volume seg.nii.gz --part liver=5`) or
+binary masks (`--mask liver=liver.nii.gz`) into OBJs already in sagittal's frame (cm, +x left,
++y superior, +z anterior; bake with `"transform": {"axes": ["x", "y", "z"], "scale": 1}`).
+`--list` prints a volume's orientation, voxel size and labels. Open sources and their licences
+(TotalSegmentator's CT dataset is CC BY 4.0; its non-commercial model tasks are not allowed),
+the frame maths and the full pipeline are in `skills/sagittal-scene/reference/seed-ct.md`.
+
+The whole scene-building workflow (sourcing order, contracts, card review, checklist) is the
+Claude Code skill `skills/sagittal-scene/SKILL.md`.
 
 ## Licence rule
 

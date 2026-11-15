@@ -50,6 +50,15 @@ baked into `site/meshes/` by `tools/meshes/bake.py`. See `docs/meshes.md` for th
 the `Kit.meshPart` / `Kit.tissue` API and the licence rule, and `site/meshes/CREDITS.md`
 for attributions.
 
+## Generating new scenes with Claude
+
+`skills/sagittal-scene/SKILL.md` is a Claude Code skill that teaches an AI coding agent to build a
+new scene the way the library's scenes were built: choose the view, source real meshes
+(baked meshes, Z-Anatomy, or an open CT segmentation via `tools/meshes/ct_to_obj.py`), bake,
+write the scene and meta, render the cards and check them by eye, then test. To use it in
+Claude Code, copy or symlink the folder into `.claude/skills/` (for example
+`mkdir -p .claude/skills && ln -s ../../skills/sagittal-scene .claude/skills/sagittal-scene`).
+
 ## Licenses
 
 - Code: MIT (see `LICENSE`).
