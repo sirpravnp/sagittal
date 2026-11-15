@@ -10,11 +10,13 @@
  *     plate: the plate number (default 1), shown as "Plate I".
  *     The stage's clear colour follows the --stage token of figure.css (paper in light mode, warm
  *     dark in dark mode) and the leaders take their colours from figure.css (leaderStyle 'css').
- *   figure.snapshot({ labels? }) -> Promise<PNG data URL>
+ *   figure.snapshot({ labels?, footer? }) -> Promise<PNG data URL>
  *     The stage at its device-pixel size: the WebGL canvas, the orientation note, a footer line
  *     (Sagittal · Plate I · title · view) and, when labels is true (default: the page's Labels
  *     toggle), the anchor dots, leaders and italic captions drawn from viewer.debug() geometry in
- *     the page's computed label styles. The page is left as it was.
+ *     the page's computed label styles. The footer goes to the first free corner (bottom right,
+ *     bottom left, top right), shortened to "Sagittal · Plate I" if the full line fits nowhere,
+ *     and left out if every corner holds a label, or when footer is false. The page is left as it was.
  *   figure.save() downloads that image as <slug>-<view>.png.
  *   SagittalUI.infoHtml(ctx) is the info panel markup; the player calls it on every build.
  */
@@ -185,7 +187,7 @@
       try {
         // draw a fresh frame (and lay the labels out when they are wanted but hidden)
         viewer.setLabelsVisible(want);
-        var url = composite(want);
+        var url = composite(want, so.footer !== false);
         return Promise.resolve(url);
       } catch (e) {
         return Promise.reject(e);
@@ -194,7 +196,7 @@
       }
     }
 
-    function composite(withLabels) {
+    function composite(withLabels, withFooter) {
       var src = D.cv, W = src.width, H = src.height, k = W / (src.clientWidth || W);
       var out = document.createElement('canvas'); out.width = W; out.height = H;
       var g = out.getContext('2d');
@@ -220,18 +222,37 @@
         });
       }
 
-      // footer line, bottom right: Sagittal · Plate I · title · view
+      // footer line: Sagittal · Plate I · title · view. Bottom right, else bottom left, else top
+      // right: the first corner where it covers no label (and not the orientation note); none, no footer.
+      if (withFooter) footer();
+      if (withLabels) drawLabels(g, k, stageInk);
+      return out.toDataURL('image/png');
+
+      function footer() {
       var fs = 12.5 * k, m = 10 * k, fam = tok('--serif', 'Georgia, serif');
       g.font = 'italic 400 ' + fs + 'px ' + fam;
       var head = 'Sagittal · ' + plateName + ' · ', tail = ' · ' + viewName(), title = R.title, maxW = W - 2 * m - 10 * k;
       var foot = head + title + tail;
       while (g.measureText(foot).width > maxW && title.length > 8) { title = title.slice(0, -2); foot = head + title.replace(/\s+$/, '') + '…' + tail; }
-      var fw = g.measureText(foot).width, fh = fs * 1.55, fx = W - m - fw - 10 * k, fy = H - m - fh;
-      g.fillStyle = knock; g.fillRect(fx, fy, fw + 10 * k, fh);
-      g.fillStyle = mut; g.textBaseline = 'middle'; g.fillText(foot, fx + 5 * k, fy + fh / 2);
-
-      if (withLabels) drawLabels(g, k, stageInk);
-      return out.toDataURL('image/png');
+      var fh = fs * 1.55;
+      var busy = (withLabels ? viewer.debug().labelRects.map(function (r) { return [r.x * k, r.y * k, r.w * k, r.h * k]; }) : []);
+      if (text) { var orr = D.orient.getBoundingClientRect(); busy.push([(orr.left - sb.left) * k, (orr.top - sb.top) * k, orr.width * k, orr.height * k]); }
+      // the full line first; failing that, the short one ("Sagittal · Plate I")
+      var at = null, fw = 0;
+      [foot, 'Sagittal \u00b7 ' + plateName].some(function (t) {
+        fw = g.measureText(t).width + 10 * k;
+        var spots = [[W - m - fw, H - m - fh], [m, H - m - fh], [W - m - fw, m]];
+        for (var si = 0; si < spots.length; si++) {
+          var fx = spots[si][0], fy = spots[si][1];
+          var hit = busy.some(function (b) { return fx < b[0] + b[2] + 4 * k && fx + fw > b[0] - 4 * k && fy < b[1] + b[3] + 4 * k && fy + fh > b[1] - 4 * k; });
+          if (!hit) { at = spots[si]; foot = t; return true; }
+        }
+        return false;
+      });
+      if (!at) return;
+      g.fillStyle = knock; g.fillRect(at[0], at[1], fw, fh);
+      g.fillStyle = mut; g.textBaseline = 'middle'; g.fillText(foot, at[0] + 5 * k, at[1] + fh / 2);
+      }
 
       function wrap(t, maxw) {
         var words = t.split(' '), lines = [], cur = '';

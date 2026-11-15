@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="index-page">
-<a class="skip" href="#plates">Skip to the plates</a>
+<a class="skip" href="#examples">Skip to the examples</a>
 <div class="wrap">
   <p class="run"><span>Sagittal</span><span>Anatomy, drawn on request</span></p>
   <header class="masthead">
@@ -65,18 +65,55 @@
       </div>
     </section>
 
-    <section class="sec" id="plates" aria-labelledby="plates-h" tabindex="-1">
-      <h2 id="plates-h">The plates</h2>
+    <section class="sec" id="examples" aria-labelledby="examples-h" tabindex="-1">
+      <h2 id="examples-h">Examples</h2>
       <div class="sec-body">
-        <p class="sec-note" id="plates-note">Select a plate to open the scene.</p>
-        <div id="gallery"></div>
+        <p class="sec-note">Three variants, each a figure built from the base anatomy and saved as an image here, labels and all.</p>
+        <ol class="plates examples">
+          <!-- figure-link hook: set data-figure-href to this example's one-file interactive figure
+               (e.g. examples/replaced-rha.html) once it exists; app.js turns the title into a link. -->
+          <li class="plate example" data-example="replaced-rha" data-figure-href="">
+            <figure>
+              <div class="plate-img"><img src="examples/replaced-rha.webp" width="1120" height="840" loading="lazy" decoding="async"
+                alt="Replaced right hepatic artery arising from the superior mesenteric artery and running up behind the portal vein to the liver, with the left and proper hepatic arteries, coeliac trunk and common bile duct labelled."></div>
+              <figcaption>
+                <p class="plate-title"><span class="fig">Plate I</span><span class="t">Replaced right hepatic artery from the SMA</span></p>
+                <p class="ex-line">The right hepatic artery arises from the superior mesenteric artery instead of the proper hepatic artery.</p>
+              </figcaption>
+            </figure>
+          </li>
+          <!-- figure-link hook: set data-figure-href to this example's one-file interactive figure
+               (e.g. examples/low-cystic-duct.html) once it exists; app.js turns the title into a link. -->
+          <li class="plate example" data-example="low-cystic-duct" data-figure-href="">
+            <figure>
+              <div class="plate-img"><img src="examples/low-cystic-duct.webp" width="1120" height="840" loading="lazy" decoding="async"
+                alt="The gallbladder with a long cystic duct running beside the common hepatic duct to join the common bile duct low, above the duodenum and pancreas."></div>
+              <figcaption>
+                <p class="plate-title"><span class="fig">Plate II</span><span class="t">Low insertion of the cystic duct</span></p>
+                <p class="ex-line">The cystic duct runs alongside the common hepatic duct and joins the bile duct low, near the duodenum.</p>
+              </figcaption>
+            </figure>
+          </li>
+          <!-- figure-link hook: set data-figure-href to this example's one-file interactive figure
+               (e.g. examples/aberrant-right-subclavian.html) once it exists; app.js turns the title into a link. -->
+          <li class="plate example" data-example="aberrant-right-subclavian" data-figure-href="">
+            <figure>
+              <div class="plate-img"><img src="examples/aberrant-right-subclavian.webp" width="1120" height="840" loading="lazy" decoding="async"
+                alt="View from behind: the aberrant right subclavian artery leaves the aortic arch after the left subclavian and crosses behind the oesophagus and trachea to the right."></div>
+              <figcaption>
+                <p class="plate-title"><span class="fig">Plate III</span><span class="t">Aberrant right subclavian artery</span></p>
+                <p class="ex-line">The right subclavian artery arises last from the aortic arch and crosses behind the oesophagus.</p>
+              </figcaption>
+            </figure>
+          </li>
+        </ol>
       </div>
     </section>
 
     <section class="sec" id="decks" aria-labelledby="decks-h" hidden>
       <h2 id="decks-h">Anki decks</h2>
       <div class="sec-body">
-        <p class="sec-note">One deck per topic, made from the plates: structures unlabelled on the front of each card, labelled on the back. Import the <code>.apkg</code> file in Anki with File, Import. The standard decks use still images and work in every Anki client; the 3D decks run the scene inside the card and have only been tried on Anki desktop.</p>
+        <p class="sec-note">Ready-made decks for the topics of the scene library, one per topic: structures unlabelled on the front of each card, labelled on the back. Import the <code>.apkg</code> file in Anki with File, Import. The standard decks use still images and work in every Anki client; the 3D decks run the scene inside the card and have only been tried on Anki desktop.</p>
         <ul id="deck-list" class="decks"></ul>
       </div>
     </section>

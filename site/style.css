@@ -114,6 +114,12 @@ main{counter-reset:sec}
   .plate-title a:focus-visible{outline:none}
   .plate:has(a:focus-visible){outline:2px solid var(--acc);outline-offset:8px}
 }
+.ex-line{margin:6px 0 0;font-style:italic;font-size:1.02rem;line-height:1.45;color:var(--ink-2);max-width:30em}
+.examples{grid-template-columns:minmax(0,1fr);gap:56px}
+.examples .plate figure{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(0,1fr);column-gap:32px;align-items:end}
+.examples figcaption{padding:0 0 8px;border-bottom:1px solid var(--rule)}
+.examples .plate-img{background:var(--stage)}
+.examples .plate-title{font-size:1.45rem}
 .topic{margin:2px 0 0;font-style:italic;font-size:1rem;color:var(--mut)}
 .views{margin:8px 0 0;font-size:1rem;line-height:1.5;color:var(--ink-2)}
 .views .k{color:var(--mut)}
@@ -200,6 +206,8 @@ body.missing{height:auto}
   .masthead{padding:40px 0 44px}
   .pair{grid-template-columns:minmax(0,1fr);gap:36px}
   .plates{grid-template-columns:minmax(0,1fr);gap:48px}
+  .examples .plate figure{grid-template-columns:minmax(0,1fr)}
+  .examples figcaption{padding:16px 5px 0;border-bottom:0}
   .sec{padding-bottom:56px}
   .steps li{grid-template-columns:2.4rem minmax(0,1fr)}
   .deck{grid-template-columns:minmax(0,1fr) auto auto;row-gap:0}

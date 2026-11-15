@@ -192,11 +192,31 @@
     }
   }
 
+  // Example plates (index.html #examples): a plate whose data-figure-href is set links its title
+  // to that interactive figure; empty, the plate stays an image with a caption.
+  function wireExamples() {
+    var items = document.querySelectorAll('[data-figure-href]');
+    for (var i = 0; i < items.length; i++) {
+      var href = items[i].getAttribute('data-figure-href'), t = items[i].querySelector('.plate-title .t');
+      if (!href || !t) continue;
+      var a = el('a', null, t.textContent); a.href = href;
+      t.textContent = ''; t.appendChild(a);
+    }
+  }
+
+  // Landing page: example plates, GitHub links and the deck list (from the library's scene metas).
+  // A page with a #gallery element also gets the library plate grid.
   function initGallery() {
     wireRepoLinks();
-    renderGallery(document.getElementById('gallery')).catch(function (e) {
-      document.getElementById('gallery').textContent = 'Could not load the scene list. ' + e.message;
-    });
+    wireExamples();
+    var gallery = document.getElementById('gallery');
+    if (gallery) {
+      renderGallery(gallery).catch(function (e) { gallery.textContent = 'Could not load the scene list. ' + e.message; });
+      return;
+    }
+    getJson('scenes/index.json').then(function (ids) {
+      return Promise.all(ids.map(function (id) { return getJson('scenes/' + id + '.meta.json'); }));
+    }).then(renderDecks).catch(function () { /* no deck list */ });
   }
 
   function initViewer() {

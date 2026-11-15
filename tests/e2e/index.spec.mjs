@@ -5,12 +5,6 @@ const dir = new URL('../../site/scenes/', import.meta.url);
 const ids = JSON.parse(readFileSync(new URL('index.json', dir), 'utf8'));
 const metas = ids.map((id) => JSON.parse(readFileSync(new URL(`${id}.meta.json`, dir), 'utf8')));
 
-function roman(n) {
-  let r = '';
-  for (const [v, s] of [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]) while (n >= v) { r += s; n -= v; }
-  return r;
-}
-
 function watchErrors(page) {
   const errors = [];
   page.on('console', (m) => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
@@ -18,40 +12,47 @@ function watchErrors(page) {
   return errors;
 }
 
-test('index lists every scene in index.json as a numbered plate linking to the viewer', async ({ page, request }) => {
+test('index shows the three example figures as numbered plates (not yet links) and opens without errors', async ({ page }) => {
   const errors = watchErrors(page);
   await page.goto('index.html');
   await expect(page.locator('h1')).toHaveText('Sagittal');
-  expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   await expect(page.locator('.desc')).toHaveText('Text-to-image for anatomy');
-  const plates = page.locator('.plate');
-  await expect(plates).toHaveCount(ids.length);
-  for (let i = 0; i < metas.length; i++) {
-    const m = metas[i];
+  const plates = page.locator('#examples .plate');
+  await expect(plates).toHaveCount(3);
+  const want = [
+    ['replaced-rha', 'Plate I', 'Replaced right hepatic artery from the SMA'],
+    ['low-cystic-duct', 'Plate II', 'Low insertion of the cystic duct'],
+    ['aberrant-right-subclavian', 'Plate III', 'Aberrant right subclavian artery'],
+  ];
+  for (let i = 0; i < want.length; i++) {
+    const [slug, no, title] = want[i];
     const plate = plates.nth(i);
-    await expect(plate.locator('.fig')).toHaveText(`Plate ${roman(i + 1)}`);
-    await expect(plate.locator('a')).toHaveText(m.title);
-    await expect(plate.locator('a')).toHaveAttribute('href', `viewer.html?scene=${m.id}`);
-    await expect(plate).toContainText(m.topic);
-    for (const v of m.variants) await expect(plate).toContainText(v.label);
-    // A plate has either a loaded image or the plain text fallback, never a broken image.
+    await expect(plate).toHaveAttribute('data-example', slug);
+    await expect(plate).toHaveAttribute('data-figure-href', ''); // hook for the interactive figure
+    await expect(plate.locator('.fig')).toHaveText(no);
+    await expect(plate.locator('.plate-title .t')).toHaveText(title);
+    await expect(plate.locator('.ex-line')).not.toBeEmpty();
+    await expect(plate.locator('a')).toHaveCount(0);
     const img = plate.locator('img');
-    if (await img.count()) {
-      await img.scrollIntoViewIfNeeded();
-      await expect.poll(() => img.evaluate((e) => e.complete && e.naturalWidth > 0)).toBe(true);
-    } else {
-      await expect(plate.locator('.plate-img.empty')).toContainText(m.title);
-    }
+    await expect(img).toHaveAttribute('src', `examples/${slug}.webp`);
+    expect((await img.getAttribute('alt')).length).toBeGreaterThan(40);
+    await img.scrollIntoViewIfNeeded();
+    await expect.poll(() => img.evaluate((e) => e.complete && e.naturalWidth > 0)).toBe(true);
   }
-  // Every link resolves: the viewer opens that scene.
-  for (const m of metas) {
-    const res = await request.get(`viewer.html?scene=${m.id}`);
-    expect(res.ok()).toBe(true);
-  }
-  await plates.nth(0).locator('a').click();
-  await expect(page).toHaveURL(new RegExp(`viewer\\.html\\?scene=${ids[0]}$`));
-  await expect(page.locator('h1')).toHaveText(metas[0].title);
+  // the library plate grid is gone from the landing page
+  await expect(page.locator('#gallery')).toHaveCount(0);
   expect(errors).toEqual([]);
+});
+
+test('an example plate links its title once data-figure-href is set', async ({ page }) => {
+  await page.route('**/index.html', async (r) => {
+    const res = await r.fetch();
+    const body = (await res.text()).replace('data-example="low-cystic-duct" data-figure-href=""', 'data-example="low-cystic-duct" data-figure-href="examples/low-cystic-duct.html"');
+    await r.fulfill({ response: res, body });
+  });
+  await page.goto('index.html');
+  await expect(page.locator('[data-example="low-cystic-duct"] .plate-title a')).toHaveAttribute('href', 'examples/low-cystic-duct.html');
+  await expect(page.locator('[data-example="replaced-rha"] a')).toHaveCount(0);
 });
 
 test('comparison: the generic LLM figure and the Sagittal figure, both loaded, with alt text and captions', async ({ page }) => {
@@ -79,11 +80,11 @@ test('comparison: the generic LLM figure and the Sagittal figure, both loaded, w
 
 test('every heading is at most four words; no review disclaimer anywhere', async ({ page }) => {
   await page.goto('index.html');
-  await expect(page.locator('.plate')).toHaveCount(ids.length);
+  await expect(page.locator('#deck-list .deck').first()).toBeVisible();
   const heads = await page.locator('h1, h2, h3, h4, h5, h6').allInnerTexts();
   expect(heads.length).toBeGreaterThanOrEqual(7);
   for (const h of heads) expect(h.trim().split(/\s+/).length, `heading "${h}"`).toBeLessThanOrEqual(4);
-  for (const t of ['Same subject, two figures', 'How it works', 'Install the skill', 'The plates', 'Anki decks', 'Credits']) {
+  for (const t of ['Same subject, two figures', 'How it works', 'Install the skill', 'Examples', 'Anki decks', 'Credits']) {
     expect(heads.map((h) => h.trim())).toContain(t);
   }
   await expect(page.locator('#install pre')).toContainText('ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal');
@@ -103,16 +104,6 @@ test('index lists one deck row per topic', async ({ page }) => {
   await expect(page.locator('footer')).toContainText('Rodero et al. 2021, CC BY 4.0');
 });
 
-test('a scene without a thumbnail gets a plain text plate, not a broken image', async ({ page }) => {
-  const errors = watchErrors(page);
-  await page.route('**/thumbs/manifest.json', (r) => r.fulfill({ contentType: 'application/json', body: '{}' }));
-  await page.goto('index.html');
-  await expect(page.locator('.plate')).toHaveCount(ids.length);
-  await expect(page.locator('.plate img')).toHaveCount(0);
-  await expect(page.locator('.plate-img.empty').first()).toContainText(metas[0].title);
-  expect(errors).toEqual([]);
-});
-
 test('every committed thumbnail exists and is at most 60 KB', async ({ request }) => {
   const manifest = await (await request.get('thumbs/manifest.json')).json();
   for (const [id, t] of Object.entries(manifest)) {
@@ -130,21 +121,20 @@ test.describe('phone width', () => {
     const errors = watchErrors(page);
     await page.goto('index.html');
     await expect(page.locator('#compare img')).toHaveCount(2);
-    await expect(page.locator('.plate')).toHaveCount(ids.length);
+    await expect(page.locator('#examples .plate')).toHaveCount(3);
     const { sw, cw } = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
     expect(sw).toBeLessThanOrEqual(cw);
     expect(errors).toEqual([]);
   });
 });
 
-test('keyboard: skip link and plate links are reachable with a visible focus ring', async ({ page }) => {
+test('keyboard: the skip link is first and moves focus to the examples', async ({ page }) => {
   await page.goto('index.html');
-  await expect(page.locator('.plate')).toHaveCount(ids.length);
   await page.keyboard.press('Tab');
   await expect(page.locator('.skip')).toBeFocused();
-  await page.keyboard.press('Tab');
-  const focused = page.locator('.plate a').first();
-  await expect(focused).toBeFocused();
-  const ring = await page.locator('.plate').first().evaluate((e) => getComputedStyle(e).outlineStyle);
+  const ring = await page.locator('.skip').evaluate((e) => getComputedStyle(e).outlineStyle);
   expect(ring).toBe('solid');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#examples$/);
+  await expect(page.locator('#examples')).toBeFocused();
 });
