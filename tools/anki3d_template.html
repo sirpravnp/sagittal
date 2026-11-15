@@ -2,6 +2,7 @@
 <div id="s3d-stage"><canvas id="s3d-cv"></canvas><div id="s3d-labels"></div></div>
 <div id="s3d-fallback" style="display:none">{{Fallback}}</div>
 <div class="prompt">Drag to rotate, then identify the labelled structures</div>
+<div class="status sagittal-review">{{Status}}</div>
 <div id="s3d-status" class="status">Loading 3D...</div>
 <script>
 (function () {
@@ -13,7 +14,16 @@
     var fb = document.getElementById('s3d-fallback');
     var s = document.getElementById('s3d-status');
     if (st) st.style.display = 'none';
-    if (fb) fb.style.display = '';
+    if (fb) {
+      fb.style.display = '';
+      // unlabelled image on the front, labelled image on the back (CSS does the same)
+      var back = !!document.getElementById('sagittal-back');
+      var imgs = fb.getElementsByTagName('img');
+      for (var i = 0; i < imgs.length; i++) {
+        var c = imgs[i].className;
+        if (c === 'fb-front' || c === 'fb-back') imgs[i].style.display = (c === 'fb-back') === back ? '' : 'none';
+      }
+    }
     if (s) s.textContent = '3D unavailable — showing image';
     try { console.log('sagittal 3D fallback: ' + why); } catch (e) {}
   }

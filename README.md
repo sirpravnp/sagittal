@@ -40,6 +40,13 @@ and CI re-renders all thumbnails before deploying.
 Decks are downloadable from the live site and attached to GitHub Releases for
 `v*` tags.
 
+**Deploying:** `.github/workflows/pages.yml` builds and publishes the site on every push to
+`main`. Before the first deploy, set the repository's Settings > Pages > Build and deployment >
+Source to **GitHub Actions** (the workflow does not create the Pages site itself).
+
+Every card carries a credit line for the 3D models it shows (each deck's description lists them
+too), and every card front shows the review status.
+
 **Anki 3D compatibility:** the 3D deck is experimental. Interactive 3D cards
 were confirmed working on Anki desktop by an early spike with a test card.
 Phone and tablet clients (AnkiMobile, AnkiDroid) are unverified. The default
@@ -72,4 +79,9 @@ Claude Code, copy or symlink the folder into `.claude/skills/` (for example
 - Code: MIT (see `LICENSE`).
 - Scene content (text, metadata, claims): CC BY-SA 4.0 (see `LICENSE-CONTENT.md`).
 - Baked anatomical meshes (`site/meshes/*.js`): licence of their source, CC BY-SA 4.0 for
-  Z-Anatomy-derived meshes (see `site/meshes/CREDITS.md`).
+  Z-Anatomy-derived meshes, CC BY 4.0 for the Rodero heart (see `site/meshes/CREDITS.md`).
+- Anatomical coordinate data embedded in scene scripts (for example the Z-Anatomy centre lines
+  in `site/scenes/heart.js`, `cor.js`, `bil.js`, `plexus.js`, `portal.js` and `thyroid.js`) keeps
+  its source's licence, CC BY-SA 4.0, although the scene code around it is MIT.
+- Rendered card images, thumbnails and Anki decks are adaptations of those meshes and are
+  shared under CC BY-SA 4.0 with the attribution printed on each card.

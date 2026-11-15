@@ -92,10 +92,18 @@ test('Kit.tissue builds every documented preset; old mat() still works', async (
   expect(errors).toEqual([]);
 });
 
-test('viewer links to the model credits', async ({ page, request }) => {
+test('viewer credits the scene models and links to the credits page', async ({ page, request }) => {
   await openHeart(page);
+  const credit = page.locator('#scene-credit');
+  await expect(credit).toContainText('Rodero et al. 2021');
+  await expect(credit).toContainText('CC BY 4.0');
+  await expect(credit).toContainText('Z-Anatomy');
+  await expect(credit).toContainText('CC BY-SA 4.0');
   const link = page.getByRole('link', { name: 'Model credits' });
-  await expect(link).toHaveAttribute('href', 'meshes/CREDITS.md');
+  await expect(link).toHaveAttribute('href', 'credits.html');
+  await link.click();
+  await expect(page.locator('#credits-text')).toContainText('## zanatomy');
+  await expect(page.locator('#credits-text')).toContainText('University of Dundee');
   const res = await request.get('meshes/CREDITS.md');
   expect(res.ok()).toBe(true);
   expect(await res.text()).toContain('CC BY-SA');

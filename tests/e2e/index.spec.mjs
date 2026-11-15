@@ -55,7 +55,9 @@ test('index lists one deck row per topic', async ({ page }) => {
   await expect(page.locator('#deck-list .deck')).toHaveCount(topics.length);
   const slug = (t) => 'sagittal-' + t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   await expect(page.getByRole('link', { name: `${topics[0]} deck`, exact: true })).toHaveAttribute('href', `decks/${slug(topics[0])}.apkg`);
-  await expect(page.getByRole('link', { name: 'model credits' })).toHaveAttribute('href', 'meshes/CREDITS.md');
+  await expect(page.getByRole('link', { name: 'model credits' })).toHaveAttribute('href', 'credits.html');
+  await expect(page.locator('footer')).toContainText('CC BY-SA 4.0');
+  await expect(page.locator('footer')).toContainText('Rodero et al. 2021, CC BY 4.0');
 });
 
 test('a scene without a thumbnail gets a plain text plate, not a broken image', async ({ page }) => {

@@ -37,6 +37,23 @@
     }));
   }
 
+  // Attribution line for one scene, from meshes/credits.json (same rule as tools/build_decks.py
+  // scene_source_ids/credit_text): the credit ids of the scene's meshes plus listed extras.
+  function sceneCredit(sceneId, credits) {
+    var def = window.Kit && Kit.get(sceneId);
+    var src = credits.sources || {}, extra = credits.extra || {}, ids = [];
+    function addId(c) { if (c && src[c] && ids.indexOf(c) < 0) ids.push(c); }
+    ((def && def.meshes) || []).forEach(function (m) {
+      var info = null;
+      try { info = Kit.meshInfo(m); } catch (e) { info = null; }
+      addId(info && info.credit);
+      (extra['mesh:' + m] || []).forEach(addId);
+    });
+    (extra['scene:' + sceneId] || []).forEach(addId);
+    if (!ids.length) return credits.procedural || '';
+    return '3D models: ' + ids.map(function (c) { return src[c].text + ', ' + src[c].licence; }).join('; ') + '. ' + (credits.changes || '');
+  }
+
   // Same rule as tools/render_thumbs.mjs plateVariant(): the first view that is not the normal reference.
   function plateVariant(meta) {
     var v = meta.variants;
@@ -221,6 +238,10 @@
           meta.sources.forEach(function (s) { src.appendChild(el('li', null, s)); });
           src.parentNode.hidden = false;
         }
+        getJson('meshes/credits.json').then(function (credits) {
+          var line = sceneCredit(id, credits), p = document.getElementById('scene-credit');
+          if (p && line) { p.textContent = line; p.hidden = false; }
+        }).catch(function () { /* the Model credits link still works */ });
         var viewer = Kit.createViewer({
           canvas: document.getElementById('cv'),
           labelsEl: document.getElementById('labels'),

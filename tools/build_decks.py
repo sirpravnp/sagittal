@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import html
 import json
+import os
 import re
 import shutil
 from pathlib import Path
@@ -16,7 +17,73 @@ UNREVIEWED = "Unreviewed: verify against your textbook"
 CSS = """.card { font-family: arial; font-size: 18px; text-align: center; }
 img { max-width: 100%; height: auto; }
 .claims { text-align: left; font-size: 15px; }
-.status { font-size: 13px; color: #888; margin-top: 8px; }"""
+.status { font-size: 13px; color: #888; margin-top: 8px; }
+.credit { font-size: 11px; color: #888; margin-top: 10px; text-align: left; }"""
+
+# Where the full credits live. CI sets SAGITTAL_CREDITS_URL to the deployed credits page.
+CREDITS_REF = "site/meshes/CREDITS.md in the Sagittal repository"
+# Used when the site's credits.json is not available (e.g. unit tests with a fake site).
+FALLBACK_SOURCES = {
+    "zanatomy": {"text": "Z-Anatomy (G. Kervyn, M. Zielinski et al.), after BodyParts3D (DBCLS)",
+                 "licence": "CC BY-SA 4.0"},
+    "rodero-heart": {"text": "Rodero et al. 2021, average adult heart (doi:10.5281/zenodo.4593739)",
+                     "licence": "CC BY 4.0"},
+}
+MESH_CREDIT_RE = re.compile(r'"credit"\s*:\s*"([a-z0-9-]+)"')
+
+
+def load_credits(site_dir):
+    """site/meshes/credits.json, or a fallback that names every source."""
+    if site_dir is not None:
+        p = Path(site_dir) / "meshes" / "credits.json"
+        if p.is_file():
+            return json.loads(p.read_text(encoding="utf-8"))
+    return {"sources": FALLBACK_SOURCES, "extra": {},
+            "changes": "Models modified: extracted, simplified, re-posed and labelled for Sagittal.",
+            "content": "Sagittal card text and images: CC BY-SA 4.0.",
+            "procedural": "Model built in code by Sagittal (no third-party mesh)."}
+
+
+def mesh_credit(site_dir, mesh):
+    p = Path(site_dir) / "meshes" / f"{mesh}.js"
+    if not p.is_file():
+        return None
+    m = MESH_CREDIT_RE.search(p.read_text(encoding="utf-8")[-4000:])
+    return m.group(1) if m else None
+
+
+def scene_source_ids(scene_id, site_dir, credits):
+    """Credit ids for a scene: its meshes' credit ids plus credits.json extras. None if unknown."""
+    if site_dir is None:
+        return None
+    js = Path(site_dir) / "scenes" / f"{scene_id}.js"
+    if not js.is_file():
+        return None
+    extra = credits.get("extra", {})
+    ids = []
+    for m in scene_meshes(js.read_text(encoding="utf-8")):
+        for c in [mesh_credit(site_dir, m)] + extra.get("mesh:" + m, []):
+            if c and c not in ids:
+                ids.append(c)
+    for c in extra.get("scene:" + scene_id, []):
+        if c not in ids:
+            ids.append(c)
+    return ids
+
+
+def credit_text(ids, credits, ref=None):
+    """One plain-text attribution line (CC BY / BY-SA section 3(a)): sources, licences, changes."""
+    src = credits["sources"]
+    if ids is None:
+        ids = list(src)
+    ids = [i for i in ids if i in src]
+    ref = ref or os.environ.get("SAGITTAL_CREDITS_URL") or CREDITS_REF
+    if ids:
+        models = "3D models: " + "; ".join(f"{src[i]['text']}, {src[i]['licence']}" for i in ids) + ". "
+        models += credits["changes"] + " "
+    else:
+        models = credits["procedural"] + " "
+    return models + credits["content"] + " Full credits: " + ref
 
 
 def stable_id(text: str) -> int:
@@ -33,12 +100,13 @@ def make_model() -> genanki.Model:
     return genanki.Model(
         stable_id("sagittal-model-v1"),
         MODEL_NAME,
-        fields=[{"name": n} for n in ("Title", "Front", "Back", "Claims", "Status")],
+        fields=[{"name": n} for n in ("Title", "Front", "Back", "Claims", "Status", "Credit")],
         templates=[{
             "name": "Card 1",
-            "qfmt": "{{Front}}",
+            # Review status on the front too: it says nothing about the answer.
+            "qfmt": '{{Front}}<div class="status">{{Status}}</div>',
             "afmt": '{{FrontSide}}<hr id="answer">{{Back}}'
-                    '<div class="claims">{{Claims}}</div><div class="status">{{Status}}</div>',
+                    '<div class="claims">{{Claims}}</div><div class="credit">{{Credit}}</div>',
         }],
         css=CSS,
     )
@@ -52,11 +120,14 @@ CSS_3D = CSS + """
 #s3d-cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; touch-action: none; }
 #s3d-labels { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
 .lab { position: absolute; left: 0; top: 0; white-space: nowrap; font-size: 12px; background: rgba(15,20,27,.82); border: 1px solid #3a4a5e; border-radius: 4px; padding: 1px 6px; color: #fff; }
-.kit-fallback { padding: 24px; text-align: center; color: #888; }"""
+.kit-fallback { padding: 24px; text-align: center; color: #888; }
+#s3d-fallback .fb-back { display: none; }
+#sagittal-back ~ #s3d-fallback .fb-back { display: inline; }
+#sagittal-back ~ #s3d-fallback .fb-front { display: none; }"""
 
 
 def make_model_3d() -> genanki.Model:
-    fields = ("Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Status")
+    fields = ("Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Status", "Credit")
     return genanki.Model(
         stable_id("sagittal-model-3d-v1"),
         MODEL_3D_NAME,
@@ -65,7 +136,7 @@ def make_model_3d() -> genanki.Model:
             "name": "Card 1",
             "qfmt": TEMPLATE_3D.read_text(encoding="utf-8"),
             "afmt": '<div id="sagittal-back"></div>{{FrontSide}}<hr id="answer">{{Claims}}'
-                    '<div class="status">{{Status}}</div>',
+                    '<div class="credit">{{Credit}}</div>',
         }],
         css=CSS_3D,
     )
@@ -89,7 +160,13 @@ def scene_meshes(js: str) -> list:
 def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -> None:
     cards_dir, out = Path(cards_dir), Path(out)
     model = make_model()
-    deck = genanki.Deck(stable_id("sagittal-deck-" + topic), f"Sagittal::{topic}")
+    credits = load_credits(site_dir)
+    credit_by_scene = {sc["id"]: credit_text(scene_source_ids(sc["id"], site_dir, credits), credits)
+                       for sc in scenes}
+    description = ("Sagittal anatomy cards. Unreviewed cards are marked on the card: verify against "
+                   "your textbook.<br>" + "<br>".join(
+                       html.escape(f"{sc['title']}: {credit_by_scene[sc['id']]}") for sc in scenes))
+    deck = genanki.Deck(stable_id("sagittal-deck-" + topic), f"Sagittal::{topic}", description=description)
     media = []
     model3d = make_model_3d() if include_3d else None
     if include_3d:
@@ -126,6 +203,7 @@ def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -
             staged.append(str(dst))
     for scene in scenes:
         claims = "<ul>" + "".join(f"<li>{html.escape(c)}</li>" for c in scene["claims"]) + "</ul>"
+        credit = html.escape(credit_by_scene[scene["id"]])
         for v in scene["variants"]:
             names = {}
             for side in ("front", "back"):
@@ -142,15 +220,18 @@ def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -
             back = f'<img src="{names["back"]}">'
             deck.add_note(genanki.Note(
                 model=model,
-                fields=[html.escape(title), front, back, claims, html.escape(status_text(scene))],
+                fields=[html.escape(title), front, back, claims, html.escape(status_text(scene)), credit],
                 guid=genanki.guid_for(scene["id"], v["key"]),
             ))
             if include_3d:
-                fallback = f'<img src="{names["back"]}">'
+                # Shown when WebGL fails: the unlabelled image on the front, the labelled one on the back
+                # (CSS in CSS_3D and the template script pick by the #sagittal-back marker).
+                fallback = (f'<img class="fb-front" src="{names["front"]}">'
+                            f'<img class="fb-back" src="{names["back"]}">')
                 deck.add_note(genanki.Note(
                     model=model3d,
                     fields=[html.escape(title), scene["id"], scene.get("variantControl", ""),
-                            v["key"], fallback, claims, html.escape(status_text(scene))],
+                            v["key"], fallback, claims, html.escape(status_text(scene)), credit],
                     guid=genanki.guid_for(scene["id"], v["key"], "3d"),
                 ))
     out.parent.mkdir(parents=True, exist_ok=True)

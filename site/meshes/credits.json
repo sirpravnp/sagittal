@@ -1,0 +1,25 @@
+{
+  "about": "Short attribution lines for the sources in CREDITS.md. Used by the viewer (site/app.js) and the Anki decks (tools/build_decks.py). A scene's sources are the 'credit' ids of the meshes it declares, plus any listed under extra.",
+  "sources": {
+    "zanatomy": {
+      "text": "Z-Anatomy (G. Kervyn, M. Zielinski et al.), after BodyParts3D (DBCLS)",
+      "licence": "CC BY-SA 4.0"
+    },
+    "rodero-heart": {
+      "text": "Rodero et al. 2021, average adult heart (doi:10.5281/zenodo.4593739)",
+      "licence": "CC BY 4.0"
+    },
+    "dundee-cahid": {
+      "text": "University of Dundee CAHID, Cranial Nerves and Foramina (via Z-Anatomy)",
+      "licence": "CC BY 4.0"
+    }
+  },
+  "extra": {
+    "mesh:willis": ["dundee-cahid"],
+    "scene:heart": ["zanatomy"],
+    "scene:cor": ["zanatomy"]
+  },
+  "changes": "Models modified: extracted, simplified, re-posed and labelled for Sagittal.",
+  "content": "Sagittal card text and images: CC BY-SA 4.0.",
+  "procedural": "Model built in code by Sagittal (no third-party mesh)."
+}

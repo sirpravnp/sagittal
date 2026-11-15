@@ -29,16 +29,28 @@ Excluded: Z-Anatomy also includes parts under non-commercial licences ("Anatomy 
 University of Dundee, CC BY-NC-SA 4.0; "Kidney", Lissie Cowley, CC BY-NC 4.0). sagittal does not
 use them.
 
-Used by: `thorax.js` (sternum, ribs, costal cartilages, thoracic vertebrae and discs).
+Z-Anatomy also lists, among the models it "used as reference/included and adapted",
+**"Cranial Nerves and Foramina" by the University of Dundee, Centre for Anatomy and Human
+Identification (CAHID)**, licence [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), and
+"Brainder" and "White matter" from the University of Washington (see Z-Anatomy's `License.txt`).
+The cranial-nerve curves sagittal uses (see `willis` below) may derive from the Dundee set, so it is
+credited here; sagittal cannot tell from the Blender file which objects came from which set.
 
-## rodero-heart (available, not yet used)
+Used by: every mesh below with credit `zanatomy`: `thorax.js` (sternum, ribs, costal cartilages,
+thoracic vertebrae and discs), `airways.js`, `aorta.js`, `chest.js`, `biliary.js`, `groin.js`,
+`eye.js`, `upper-limb.js`, `hand.js`, `knee.js`, `willis.js`, `cranium.js`, `endocast.js`,
+`portal.js` and `thyroid.js`. Z-Anatomy centre-line coordinates are also embedded in the scene
+scripts `heart.js`, `cor.js`, `bil.js`, `plexus.js`, `portal.js` and `thyroid.js` (see below); that
+coordinate data stays CC BY-SA 4.0 although the surrounding scene code is MIT.
+
+## rodero-heart
 
 Rodero C, Strocchi M, Marciniak M, et al. *Linking statistical shape models and simulated function
 in the healthy adult human heart.* PLoS Comput Biol 17(4): e1008851 (2021). Data: "Virtual cohort of
 extreme and average four-chamber heart meshes from statistical shape model", Zenodo,
 doi:[10.5281/zenodo.4593739](https://doi.org/10.5281/zenodo.4593739).
 Licence: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-Add `"credit": "rodero-heart"` to a bake config that uses it.
+Used by: `heart.js` and `heart-blood.js` (scenes `heart` and `cor`); see the wave-B entry below.
 
 ## airways (mesh, credit `zanatomy`)
 
@@ -114,6 +126,18 @@ branches, venae cavae and pulmonary-vein stubs as swept tubes whose centre lines
 fit on chamber centroids and valve centres. The combined scene is shared under CC BY-SA 4.0.
 
 Used by: `heart.js`, `heart-blood.js` (scene `heart`).
+## cor (coronary arteries on the Rodero heart; scene script `site/scenes/cor.js`)
+
+The `cor` scene draws the Rodero heart above (`heart.js`, CC BY 4.0) with coronary arteries whose
+centre lines are **Z-Anatomy** curve objects (see `zanatomy` above, CC BY-SA 4.0 on BodyParts3D,
+CC BY-SA 2.1 JP): left main, LAD with diagonal and right-ventricular branches, circumflex with
+marginal and posterolateral branches, RCA with right-ventricular and acute marginal branches and
+its inferolateral branch. Changes: registered onto the Rodero heart (similarity ICP of the Z-Anatomy
+chambers onto the Rodero chamber walls), projected onto the Rodero epicardium, resampled and
+embedded as coordinates in `site/scenes/cor.js` (that data is CC BY-SA 4.0). The PDA (which Z-Anatomy
+lacks) follows the Rodero posterior interventricular groove; the SA and AV nodal branches are
+schematic. Myocardial territories are computed at build time (nearest drawn artery), an
+approximation rather than source data. The combined scene is shared under CC BY-SA 4.0.
 ## eye (Z-Anatomy right eye)
 
 `eye.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP):
@@ -179,6 +203,13 @@ Changes: curve tubes swept and decimated; centred on (0, 161, 0) cm of the Z-Ana
 `endocast.js` and `cranium.js`. Z-Anatomy's anterior communicating artery and optic chiasm objects are not
 used: the `cow` scene draws the ACom between the two A1 segments and the chiasm between the optic nerves
 and tracts. No Brainder cortex or white-matter objects are used.
+Possible further source: the oculomotor nerves, optic nerves and tracts are hand-drawn curve objects in
+Z-Anatomy, consistent with the **University of Dundee CAHID "Cranial Nerves and Foramina"** set
+(CC BY 4.0) that Z-Anatomy lists as adapted, so that work is credited for them as well (see `zanatomy`).
+Open provenance question: the pons, midbrain and medulla (mirrored `.l`/`.r` halves with equal vertex
+counts) look like Z-Anatomy remodels of BodyParts3D, but Z-Anatomy also lists "Brainder" (University of
+Washington) as a source, and the local files cannot settle which. Brainder's meshes were published under
+CC BY-SA, so the worst case is a missing attribution line, not an incompatible licence.
 Used by: `scenes/cow.js`.
 ## cranium (Z-Anatomy cranial vault, meninges, middle meningeal artery)
 

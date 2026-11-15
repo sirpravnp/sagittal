@@ -90,7 +90,7 @@ def test_note_count_media_and_escaping(tmp_path, scenes, cards):
     claims = flds[0][3]
     assert "≥" in claims and "→" in claims and "&lt; 0.05 &amp; rising" in claims
     assert "&lt;b&gt;bold&lt;/b&gt;" in claims and claims.startswith("<ul>")
-    assert "Variant A — identify the labelled structures" in flds[0][1] or "identify the labelled structures" in flds[0][1]
+    assert "Variant A — identify the labelled structures" in flds[0][1]
     assert "alpha__a__front.png" in flds[0][1]
     assert "alpha__a__back.png" in flds[0][2]
     assert any(d["name"] == "Sagittal::Test & Topic" for d in decks.values())
@@ -191,10 +191,15 @@ def test_3d_note_count_and_guids(tmp_path, scenes, cards, site3d):
     assert len({n[0] for n in na}) == 6
     import genanki
     assert genanki.guid_for("alpha", "a", "3d") in [n[0] for n in na]
-    f3 = [n[1].split("\x1f") for n in na if len(n[1].split("\x1f")) == 7]
+    f3 = [n[1].split("\x1f") for n in na if len(n[1].split("\x1f")) == 8]
     assert len(f3) == 3
     assert f3[0][1:4] == ["alpha", "d", "a"]
-    assert '<img src="alpha__a__back.png">' in f3[0][4]
+    # WebGL fallback: unlabelled image for the front, labelled image only for the back
+    assert '<img class="fb-front" src="alpha__a__front.png">' in f3[0][4]
+    assert '<img class="fb-back" src="alpha__a__back.png">' in f3[0][4]
+    css = build_decks.make_model_3d().css
+    assert "#s3d-fallback .fb-back { display: none; }" in css
+    assert "#sagittal-back ~ #s3d-fallback .fb-front { display: none; }" in css
 
 
 def test_3d_template_safe():
@@ -210,7 +215,7 @@ def test_3d_model_name_and_id():
     m = build_decks.make_model_3d()
     assert m.name == "Anatomy 3D (experimental)"
     assert m.model_id == build_decks.stable_id("sagittal-model-3d-v1")
-    assert [f["name"] for f in m.fields] == ["Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Status"]
+    assert [f["name"] for f in m.fields] == ["Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Status", "Credit"]
 
 
 def test_cli_include_3d(tmp_path, scenes, cards, site3d):
@@ -263,3 +268,56 @@ def test_3d_deck_missing_mesh_fails(tmp_path, scenes, cards, site3d):
 def test_3d_template_loads_meshes():
     t = (Path(build_decks.__file__).parent / "anki3d_template.html").read_text(encoding="utf-8")
     assert "_mesh_" in t and "def.meshes" in t
+
+
+# ---- review status on the front, attribution on every card and in the deck ----
+def test_status_shown_on_front_of_both_note_types():
+    qfmt = build_decks.make_model().templates[0]["qfmt"]
+    assert "{{Status}}" in qfmt and "{{Back}}" not in qfmt and "{{Claims}}" not in qfmt
+    t = (Path(build_decks.__file__).parent / "anki3d_template.html").read_text(encoding="utf-8")
+    assert "{{Status}}" in t and "{{Claims}}" not in t
+    assert "{{Status}}" in build_decks.make_model_3d().templates[0]["qfmt"]
+
+
+def test_credit_line_on_every_card_back_and_in_deck_description(tmp_path, scenes, cards):
+    out = tmp_path / "t.apkg"
+    build_decks.build_deck("Test & Topic", scenes, cards, out)
+    notes, decks, _ = read_apkg(out)
+    assert "{{Credit}}" in build_decks.make_model().templates[0]["afmt"]
+    assert "{{Credit}}" not in build_decks.make_model().templates[0]["qfmt"]
+    for _, flds in notes:
+        credit = flds.split("\x1f")[5]
+        assert "Z-Anatomy" in credit and "BodyParts3D" in credit and "CC BY-SA 4.0" in credit
+        assert "Rodero" in credit and "CC BY 4.0" in credit and "modified" in credit
+        assert "CREDITS.md" in credit
+    desc = next(d for d in decks.values() if d["name"] == "Sagittal::Test & Topic")["desc"]
+    assert "Z-Anatomy" in desc and "CC BY-SA 4.0" in desc and "Rodero" in desc
+
+
+def test_credit_follows_scene_meshes(tmp_path, scenes, cards, site3d):
+    (site3d / "meshes").mkdir()
+    (site3d / "meshes" / "credits.json").write_text((SITE / "meshes" / "credits.json").read_text())
+    (site3d / "meshes" / "heart.js").write_text('x = {"parts":{},"credit":"rodero-heart"};')
+    (site3d / "meshes" / "willis.js").write_text('x = {"parts":{},"credit":"zanatomy"};')
+    (site3d / "scenes" / "alpha.js").write_text("Kit.register({ id: 'alpha', meshes: ['heart'] });")
+    (site3d / "scenes" / "beta.js").write_text("Kit.register({ id: 'beta', meshes: ['willis'] });")
+    out = tmp_path / "c.apkg"
+    build_decks.build_deck("T", scenes, cards, out, include_3d=True, site_dir=site3d)
+    notes, _, _ = read_apkg(out)
+    by_id = {}
+    for _, flds in notes:
+        f = flds.split("\x1f")
+        by_id.setdefault("alpha" if "Alpha" in f[0] else "beta", []).append(f[-1])
+    assert all("Rodero" in c and "Z-Anatomy" not in c for c in by_id["alpha"])
+    assert all("Z-Anatomy" in c and "Dundee" in c and "Rodero" not in c for c in by_id["beta"])
+
+
+def test_credit_for_real_scenes():
+    credits = build_decks.load_credits(SITE)
+    for sid in ("heart", "cor"):
+        t = build_decks.credit_text(build_decks.scene_source_ids(sid, SITE, credits), credits)
+        assert "Rodero" in t and "Z-Anatomy" in t
+    t = build_decks.credit_text(build_decks.scene_source_ids("cow", SITE, credits), credits)
+    assert "Dundee" in t and "CC BY 4.0" in t
+    t = build_decks.credit_text(build_decks.scene_source_ids("fib", SITE, credits), credits)
+    assert "no third-party mesh" in t
