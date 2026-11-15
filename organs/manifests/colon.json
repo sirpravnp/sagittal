@@ -1,0 +1,92 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "colon",
+ "name": "Large intestine",
+ "system": "Gastrointestinal",
+ "mesh": "colon",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "ascending_colon",
+   "name": "Ascending colon",
+   "tissue": "bowel"
+  },
+  {
+   "id": "transverse_colon",
+   "name": "Transverse colon",
+   "tissue": "bowel"
+  },
+  {
+   "id": "descending_colon",
+   "name": "Descending colon",
+   "tissue": "bowel"
+  },
+  {
+   "id": "sigmoid_colon_rectum",
+   "name": "Sigmoid colon, rectum and anal canal (one Z-Anatomy object, 'Sigmoid colon')",
+   "tissue": "bowel"
+  },
+  {
+   "id": "appendix",
+   "name": "Vermiform appendix",
+   "tissue": "bowel"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "appendix_base": {
+   "name": "Base of the appendix (appendix surface point nearest the ascending colon)",
+   "p": [
+    -6.277,
+    94.735,
+    1.218
+   ],
+   "derived": "baked 'appendix' vertex closest to the 'colon.ascending_colon' mesh (0.04 cm gap)"
+  },
+  "appendix_tip": {
+   "name": "Tip of the appendix (appendix surface point farthest from its base)",
+   "p": [
+    -1.919,
+    94.516,
+    -1.398
+   ],
+   "derived": "baked 'appendix' vertex farthest from landmark 'appendix_base'"
+  },
+  "right_colic_flexure": {
+   "name": "Right colic (hepatic) flexure (midpoint of the closest ascending-transverse colon surface pair)",
+   "p": [
+    -7.061,
+    108.059,
+    2.823
+   ],
+   "derived": "midpoint of the closest vertex pair between baked 'ascending_colon' and 'colon.transverse_colon' (0.10 cm gap)"
+  },
+  "left_colic_flexure": {
+   "name": "Left colic (splenic) flexure (midpoint of the closest transverse-descending colon surface pair)",
+   "p": [
+    7.534,
+    108.665,
+    3.446
+   ],
+   "derived": "midpoint of the closest vertex pair between baked 'transverse_colon' and 'colon.descending_colon' (0.05 cm gap)"
+  },
+  "colon_lowest_point": {
+   "name": "Lowest point of the large intestine (anal end of the sigmoid/rectum object)",
+   "p": [
+    0.273,
+    80.406,
+    -4.826
+   ],
+   "derived": "baked 'sigmoid_colon_rectum' vertex with the smallest y"
+  },
+  "ileocolic_junction": {
+   "name": "Ileocolic junction (ascending-colon surface point nearest the ileal end of the small-intestine curve)",
+   "p": [
+    -7.334,
+    96.256,
+    2.783
+   ],
+   "derived": "baked 'ascending_colon' vertex nearest landmark 'terminal_ileum_end' (0.82 cm away)"
+  }
+ }
+}

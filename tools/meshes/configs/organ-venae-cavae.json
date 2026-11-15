@@ -1,0 +1,60 @@
+{
+  "name": "venae-cavae",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "inferior_vena_cava": {
+      "files": [
+        "Inferior_vena_cava_(abdominal_part).obj",
+        "Inferior_vena_cava_(thoracic_part).obj"
+      ],
+      "budget": 1200
+    },
+    "superior_vena_cava": {
+      "files": [
+        "Superior_vena_cava.obj"
+      ],
+      "budget": 400
+    },
+    "brachiocephalic_veins": {
+      "files": [
+        "Left_brachiocephalic_vein.obj",
+        "Right_brachiocephalic_vein.obj"
+      ],
+      "budget": 800
+    },
+    "hepatic_veins": {
+      "files": [
+        "Hepatic_veins.obj"
+      ],
+      "budget": 400
+    },
+    "renal_veins": {
+      "files": [
+        "Left_renal_vein.obj",
+        "Right_renal_vein.obj"
+      ],
+      "budget": 800
+    },
+    "iliac_veins": {
+      "files": [
+        "Common_iliac_vein.l.obj",
+        "Common_iliac_vein.r.obj",
+        "External_iliac_vein.l.obj",
+        "External_iliac_vein.r.obj",
+        "Internal_iliac_vein.l.obj",
+        "Internal_iliac_vein.r.obj"
+      ],
+      "budget": 2000
+    }
+  }
+}

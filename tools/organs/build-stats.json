@@ -1,0 +1,307 @@
+{
+ "brain": {
+  "kb": 78.7,
+  "tris": {
+   "brain": 4998
+  },
+  "credit": "totalsegmentator",
+  "license": "CC BY 4.0",
+  "landmarks": 4,
+  "centerlines": 0
+ },
+ "heart": {
+  "kb": 248.4,
+  "tris": {
+   "wall_lv": 4499,
+   "wall_rv": 3800,
+   "wall_la": 2800,
+   "wall_ra": 2800,
+   "aortic_root": 1499
+  },
+  "credit": "rodero-heart",
+  "license": "CC BY 4.0",
+  "landmarks": 9,
+  "centerlines": 0
+ },
+ "aorta": {
+  "kb": 131.2,
+  "tris": {
+   "aorta": 3200,
+   "brachiocephalic_trunk": 500,
+   "common_carotid_arteries": 1000,
+   "subclavian_arteries": 1000,
+   "renal_arteries": 600,
+   "iliac_arteries": 1998
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 29,
+  "centerlines": 17
+ },
+ "coeliac-trunk": {
+  "kb": 62.5,
+  "tris": {
+   "coeliac_trunk": 400,
+   "common_hepatic_artery": 400,
+   "proper_hepatic_artery": 1000,
+   "gastroduodenal_artery": 400,
+   "left_gastric_artery": 498,
+   "splenic_artery": 1200
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 21,
+  "centerlines": 15
+ },
+ "mesenteric-arteries": {
+  "kb": 67.2,
+  "tris": {
+   "superior_mesenteric_artery": 1200,
+   "sma_colic_branches": 1198,
+   "inferior_mesenteric_artery": 600,
+   "ima_branches": 1200
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 24,
+  "centerlines": 22
+ },
+ "venae-cavae": {
+  "kb": 88.9,
+  "tris": {
+   "inferior_vena_cava": 1200,
+   "superior_vena_cava": 400,
+   "brachiocephalic_veins": 800,
+   "hepatic_veins": 400,
+   "renal_veins": 798,
+   "iliac_veins": 2000
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 17,
+  "centerlines": 15
+ },
+ "portal-venous": {
+  "kb": 55.9,
+  "tris": {
+   "portal_vein": 500,
+   "splenic_vein": 1200,
+   "superior_mesenteric_vein": 998,
+   "inferior_mesenteric_vein": 800
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 11,
+  "centerlines": 10
+ },
+ "liver": {
+  "kb": 86.7,
+  "tris": {
+   "liver": 5500
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 5,
+  "centerlines": 0
+ },
+ "liver-segments": {
+  "kb": 167.2,
+  "tris": {
+   "segment_i": 1300,
+   "segment_ii": 1300,
+   "segment_iii": 1300,
+   "segment_iv": 1498,
+   "segment_v": 1300,
+   "segment_vi": 1300,
+   "segment_vii": 1300,
+   "segment_viii": 1300
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 8,
+  "centerlines": 0
+ },
+ "gallbladder": {
+  "kb": 55.3,
+  "tris": {
+   "gallbladder": 2888,
+   "bile_duct": 600
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 5,
+  "centerlines": 1
+ },
+ "pancreas": {
+  "kb": 99.1,
+  "tris": {
+   "pancreas": 4500,
+   "pancreatic_duct": 1200,
+   "accessory_pancreatic_duct": 500
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 5,
+  "centerlines": 2
+ },
+ "oesophagus": {
+  "kb": 19.4,
+  "tris": {
+   "oesophagus": 1200
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 2,
+  "centerlines": 1
+ },
+ "stomach": {
+  "kb": 71.5,
+  "tris": {
+   "stomach": 4500
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 4,
+  "centerlines": 0
+ },
+ "duodenum": {
+  "kb": 63.4,
+  "tris": {
+   "duodenum": 4000
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 3,
+  "centerlines": 0
+ },
+ "small-intestine": {
+  "kb": 94.4,
+  "tris": {
+   "small_intestine": 6000
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 2,
+  "centerlines": 1
+ },
+ "colon": {
+  "kb": 156.2,
+  "tris": {
+   "ascending_colon": 2156,
+   "transverse_colon": 2044,
+   "descending_colon": 2200,
+   "sigmoid_colon_rectum": 2999,
+   "appendix": 442
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 6,
+  "centerlines": 0
+ },
+ "spleen": {
+  "kb": 21.4,
+  "tris": {
+   "spleen": 1330
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 4,
+  "centerlines": 0
+ },
+ "lungs": {
+  "kb": 239.2,
+  "tris": {
+   "right_superior_lobe": 2999,
+   "right_middle_lobe": 2599,
+   "right_inferior_lobe": 3200,
+   "left_superior_lobe": 3200,
+   "left_inferior_lobe": 3199
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 4,
+  "centerlines": 0
+ },
+ "airways": {
+  "kb": 91.9,
+  "tris": {
+   "trachea": 2999,
+   "main_bronchi": 800,
+   "lobar_bronchi": 2000
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 9,
+  "centerlines": 9
+ },
+ "thyroid": {
+  "kb": 47.5,
+  "tris": {
+   "thyroid": 3000
+  },
+  "credit": "totalsegmentator",
+  "license": "CC BY 4.0",
+  "landmarks": 5,
+  "centerlines": 0
+ },
+ "adrenals": {
+  "kb": 47.6,
+  "tris": {
+   "right_suprarenal_gland": 1498,
+   "left_suprarenal_gland": 1500
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 2,
+  "centerlines": 0
+ },
+ "kidneys": {
+  "kb": 110.1,
+  "tris": {
+   "right_kidney": 3498,
+   "left_kidney": 3500
+  },
+  "credit": "totalsegmentator",
+  "license": "CC BY 4.0",
+  "landmarks": 6,
+  "centerlines": 0
+ },
+ "ureters": {
+  "kb": 25.7,
+  "tris": {
+   "right_ureter": 800,
+   "left_ureter": 798
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 4,
+  "centerlines": 2
+ },
+ "bladder": {
+  "kb": 44.9,
+  "tris": {
+   "bladder": 2024,
+   "urethra": 798
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 4,
+  "centerlines": 1
+ },
+ "male-reproductive": {
+  "kb": 119.6,
+  "tris": {
+   "prostate": 468,
+   "seminal_glands": 720,
+   "testes": 1200,
+   "epididymides": 576,
+   "ductus_deferens": 1198,
+   "ejaculatory_ducts": 398,
+   "penis": 2999
+  },
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "landmarks": 1,
+  "centerlines": 4
+ }
+}

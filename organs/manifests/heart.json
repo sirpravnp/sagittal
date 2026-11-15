@@ -1,0 +1,119 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "heart",
+ "name": "Heart",
+ "system": "Cardiovascular",
+ "mesh": "heart",
+ "credit": "rodero-heart",
+ "parts": [
+  {
+   "id": "wall_lv",
+   "name": "Left ventricle",
+   "tissue": "myocardium"
+  },
+  {
+   "id": "wall_rv",
+   "name": "Right ventricle",
+   "tissue": "myocardium"
+  },
+  {
+   "id": "wall_la",
+   "name": "Left atrium",
+   "tissue": "myocardium"
+  },
+  {
+   "id": "wall_ra",
+   "name": "Right atrium",
+   "tissue": "myocardium"
+  },
+  {
+   "id": "aortic_root",
+   "name": "Aortic root",
+   "tissue": "vessel-artery"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "mitral_valve_centre": {
+   "name": "Mitral valve centre",
+   "p": [
+    3.26,
+    129.2,
+    0.36
+   ],
+   "derived": "centroid of the Rodero mitral-valve-plane elements (tag 7), mapped by the heart registration (tools/organs/registration.json rodero_heart.valve_centres_cm.mitral)"
+  },
+  "tricuspid_valve_centre": {
+   "name": "Tricuspid valve centre",
+   "p": [
+    -0.32,
+    128.23,
+    3.2
+   ],
+   "derived": "centroid of the Rodero tricuspid-valve-plane elements (tag 8), mapped by the heart registration (tools/organs/registration.json rodero_heart.valve_centres_cm.tricuspid)"
+  },
+  "aortic_valve_centre": {
+   "name": "Aortic valve centre",
+   "p": [
+    2.15,
+    130.89,
+    2.12
+   ],
+   "derived": "centroid of the Rodero aortic-valve-plane elements (tag 9), mapped by the heart registration (tools/organs/registration.json rodero_heart.valve_centres_cm.aortic)"
+  },
+  "pulmonary_valve_centre": {
+   "name": "Pulmonary valve centre",
+   "p": [
+    3.35,
+    132.74,
+    4.49
+   ],
+   "derived": "centroid of the Rodero pulmonary-valve-plane elements (tag 10), mapped by the heart registration (tools/organs/registration.json rodero_heart.valve_centres_cm.pulmonary)"
+  },
+  "cardiac_apex": {
+   "name": "Cardiac apex (left ventricular wall point farthest from the mitral valve centre)",
+   "p": [
+    7.295,
+    124.366,
+    6.808
+   ],
+   "derived": "baked 'wall_lv' vertex farthest from landmark 'mitral_valve_centre'"
+  },
+  "left_ventricle_centroid": {
+   "name": "Left ventricle centroid",
+   "p": [
+    0.87,
+    78.39,
+    0.591
+   ],
+   "derived": "volume centroid of the baked 'wall_lv' mesh"
+  },
+  "right_ventricle_centroid": {
+   "name": "Right ventricle centroid",
+   "p": [
+    -1.001,
+    76.373,
+    0.481
+   ],
+   "derived": "volume centroid of the baked 'wall_rv' mesh"
+  },
+  "left_atrium_centroid": {
+   "name": "Left atrium centroid",
+   "p": [
+    1.718,
+    104.1,
+    -0.311
+   ],
+   "derived": "volume centroid of the baked 'wall_la' mesh"
+  },
+  "right_atrium_centroid": {
+   "name": "Right atrium centroid",
+   "p": [
+    -1.795,
+    114.502,
+    3.797
+   ],
+   "derived": "volume centroid of the baked 'wall_ra' mesh"
+  }
+ }
+}

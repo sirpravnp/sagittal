@@ -1,0 +1,1273 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "coeliac-trunk",
+ "name": "Coeliac trunk and its branches",
+ "system": "Cardiovascular",
+ "mesh": "coeliac-trunk",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "coeliac_trunk",
+   "name": "Coeliac trunk",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "common_hepatic_artery",
+   "name": "Common hepatic artery",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "proper_hepatic_artery",
+   "name": "Proper hepatic artery (continuing into the right lobe, with two short unnamed branches)",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "gastroduodenal_artery",
+   "name": "Gastroduodenal artery",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "left_gastric_artery",
+   "name": "Left gastric artery",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "splenic_artery",
+   "name": "Splenic artery with its hilar branches",
+   "tissue": "vessel-artery"
+  }
+ ],
+ "centerlines": {
+  "coeliac_trunk": {
+   "name": "Coeliac trunk",
+   "points": [
+    [
+     0.896,
+     113.868,
+     1.502
+    ],
+    [
+     0.915,
+     114.024,
+     1.719
+    ],
+    [
+     0.955,
+     114.222,
+     2.016
+    ],
+    [
+     0.984,
+     114.416,
+     2.293
+    ],
+    [
+     0.976,
+     114.655,
+     2.569
+    ],
+    [
+     0.93,
+     114.911,
+     2.776
+    ],
+    [
+     0.873,
+     115.163,
+     2.878
+    ],
+    [
+     0.794,
+     115.394,
+     2.968
+    ],
+    [
+     0.683,
+     115.559,
+     3.122
+    ],
+    [
+     0.638,
+     115.592,
+     3.199
+    ]
+   ],
+   "radius_cm": 0.4,
+   "from": "coeliac_trunk_origin"
+  },
+  "common_hepatic_artery": {
+   "name": "Common hepatic artery",
+   "points": [
+    [
+     0.638,
+     115.592,
+     3.199
+    ],
+    [
+     0.496,
+     115.612,
+     3.486
+    ],
+    [
+     0.392,
+     115.519,
+     3.744
+    ],
+    [
+     0.3,
+     115.353,
+     3.983
+    ],
+    [
+     0.197,
+     115.158,
+     4.214
+    ],
+    [
+     0.058,
+     114.975,
+     4.448
+    ],
+    [
+     -0.142,
+     114.847,
+     4.693
+    ],
+    [
+     -0.449,
+     114.739,
+     4.991
+    ],
+    [
+     -0.759,
+     114.65,
+     5.233
+    ],
+    [
+     -1.076,
+     114.591,
+     5.437
+    ],
+    [
+     -1.409,
+     114.573,
+     5.619
+    ],
+    [
+     -1.763,
+     114.609,
+     5.798
+    ],
+    [
+     -2.143,
+     114.71,
+     5.99
+    ]
+   ],
+   "radius_cm": 0.252,
+   "from": "common_hepatic_artery_origin"
+  },
+  "left_gastric_artery": {
+   "name": "Left gastric artery",
+   "points": [
+    [
+     0.638,
+     115.592,
+     3.199
+    ],
+    [
+     0.711,
+     115.795,
+     3.371
+    ],
+    [
+     0.788,
+     116.031,
+     3.578
+    ],
+    [
+     0.906,
+     116.283,
+     3.77
+    ],
+    [
+     1.046,
+     116.481,
+     3.884
+    ],
+    [
+     1.22,
+     116.657,
+     3.946
+    ],
+    [
+     1.391,
+     116.88,
+     4.049
+    ],
+    [
+     1.495,
+     117.111,
+     4.154
+    ],
+    [
+     1.574,
+     117.318,
+     4.279
+    ],
+    [
+     1.702,
+     117.497,
+     4.528
+    ],
+    [
+     1.829,
+     117.573,
+     4.819
+    ],
+    [
+     1.939,
+     117.572,
+     5.112
+    ],
+    [
+     2.053,
+     117.554,
+     5.424
+    ],
+    [
+     2.141,
+     117.562,
+     5.653
+    ]
+   ],
+   "radius_cm": 0.104,
+   "from": "left_gastric_artery_origin"
+  },
+  "left_gastric_artery_branch": {
+   "name": "Branch of the left gastric artery (unnamed in source)",
+   "points": [
+    [
+     1.652,
+     117.444,
+     4.428
+    ],
+    [
+     1.562,
+     117.599,
+     4.63
+    ],
+    [
+     1.478,
+     117.743,
+     4.817
+    ],
+    [
+     1.44,
+     117.809,
+     4.904
+    ]
+   ],
+   "radius_cm": 0.035,
+   "from": "left_gastric_artery_branch_origin"
+  },
+  "splenic_artery": {
+   "name": "Splenic artery",
+   "points": [
+    [
+     0.638,
+     115.592,
+     3.199
+    ],
+    [
+     0.893,
+     115.433,
+     3.155
+    ],
+    [
+     1.124,
+     115.278,
+     3.134
+    ],
+    [
+     1.342,
+     115.131,
+     3.116
+    ],
+    [
+     1.558,
+     114.995,
+     3.081
+    ],
+    [
+     1.784,
+     114.874,
+     3.01
+    ],
+    [
+     2.031,
+     114.771,
+     2.882
+    ],
+    [
+     2.259,
+     114.708,
+     2.695
+    ],
+    [
+     2.429,
+     114.695,
+     2.482
+    ],
+    [
+     2.591,
+     114.71,
+     2.254
+    ],
+    [
+     2.799,
+     114.731,
+     2.024
+    ],
+    [
+     3.05,
+     114.754,
+     1.796
+    ],
+    [
+     3.278,
+     114.79,
+     1.605
+    ],
+    [
+     3.518,
+     114.836,
+     1.433
+    ],
+    [
+     3.805,
+     114.887,
+     1.261
+    ],
+    [
+     4.049,
+     114.92,
+     1.148
+    ],
+    [
+     4.35,
+     114.955,
+     1.05
+    ],
+    [
+     4.661,
+     115.024,
+     0.944
+    ],
+    [
+     4.889,
+     115.124,
+     0.83
+    ],
+    [
+     5.08,
+     115.265,
+     0.708
+    ],
+    [
+     5.315,
+     115.358,
+     0.586
+    ],
+    [
+     5.563,
+     115.338,
+     0.495
+    ],
+    [
+     5.846,
+     115.348,
+     0.404
+    ],
+    [
+     6.102,
+     115.454,
+     0.3
+    ],
+    [
+     6.361,
+     115.577,
+     0.237
+    ],
+    [
+     6.663,
+     115.655,
+     0.268
+    ],
+    [
+     6.94,
+     115.695,
+     0.374
+    ],
+    [
+     7.235,
+     115.745,
+     0.45
+    ],
+    [
+     7.504,
+     115.831,
+     0.431
+    ],
+    [
+     7.759,
+     115.945,
+     0.343
+    ],
+    [
+     7.976,
+     115.991,
+     0.221
+    ],
+    [
+     8.166,
+     115.949,
+     0.048
+    ],
+    [
+     8.325,
+     115.863,
+     -0.129
+    ],
+    [
+     8.569,
+     115.815,
+     -0.25
+    ],
+    [
+     8.834,
+     115.792,
+     -0.309
+    ],
+    [
+     9.054,
+     115.712,
+     -0.429
+    ],
+    [
+     9.297,
+     115.629,
+     -0.579
+    ],
+    [
+     9.549,
+     115.582,
+     -0.72
+    ],
+    [
+     9.822,
+     115.536,
+     -0.871
+    ]
+   ],
+   "radius_cm": 0.147,
+   "from": "splenic_artery_origin"
+  },
+  "splenic_artery_hilar_branch_1": {
+   "name": "Hilar branch 1 of the splenic artery (unnamed in source)",
+   "points": [
+    [
+     7.976,
+     115.991,
+     0.221
+    ],
+    [
+     8.053,
+     116.107,
+     -0.029
+    ],
+    [
+     8.142,
+     116.202,
+     -0.281
+    ],
+    [
+     8.247,
+     116.233,
+     -0.508
+    ],
+    [
+     8.399,
+     116.277,
+     -0.739
+    ],
+    [
+     8.493,
+     116.33,
+     -0.972
+    ],
+    [
+     8.49,
+     116.393,
+     -1.23
+    ],
+    [
+     8.49,
+     116.411,
+     -1.303
+    ]
+   ],
+   "radius_cm": 0.068,
+   "from": "splenic_artery_hilar_branch_1_origin"
+  },
+  "splenic_artery_hilar_branch_2": {
+   "name": "Hilar branch 2 of the splenic artery (unnamed in source)",
+   "points": [
+    [
+     8.259,
+     116.237,
+     -0.531
+    ],
+    [
+     8.175,
+     116.392,
+     -0.755
+    ],
+    [
+     8.083,
+     116.535,
+     -0.983
+    ],
+    [
+     7.958,
+     116.633,
+     -1.208
+    ],
+    [
+     7.95,
+     116.741,
+     -1.463
+    ],
+    [
+     8.005,
+     116.838,
+     -1.69
+    ],
+    [
+     8.013,
+     116.857,
+     -1.735
+    ]
+   ],
+   "radius_cm": 0.061,
+   "from": "splenic_artery_hilar_branch_2_origin"
+  },
+  "splenic_artery_hilar_branch_3": {
+   "name": "Hilar branch 3 of the splenic artery (unnamed in source)",
+   "points": [
+    [
+     8.083,
+     116.535,
+     -0.983
+    ],
+    [
+     8.159,
+     116.58,
+     -1.235
+    ],
+    [
+     8.268,
+     116.648,
+     -1.505
+    ],
+    [
+     8.449,
+     116.765,
+     -1.667
+    ],
+    [
+     8.572,
+     116.844,
+     -1.734
+    ]
+   ],
+   "radius_cm": 0.051,
+   "from": "splenic_artery_hilar_branch_3_origin"
+  },
+  "splenic_artery_hilar_branch_4": {
+   "name": "Hilar branch 4 of the splenic artery (unnamed in source)",
+   "points": [
+    [
+     8.477,
+     116.313,
+     -0.901
+    ],
+    [
+     8.697,
+     116.334,
+     -1.019
+    ],
+    [
+     8.852,
+     116.367,
+     -1.222
+    ],
+    [
+     8.904,
+     116.383,
+     -1.316
+    ]
+   ],
+   "radius_cm": 0.049,
+   "from": "splenic_artery_hilar_branch_4_origin"
+  },
+  "splenic_artery_hilar_branch_5": {
+   "name": "Hilar branch 5 of the splenic artery (unnamed in source)",
+   "points": [
+    [
+     8.876,
+     115.783,
+     -0.325
+    ],
+    [
+     8.933,
+     115.942,
+     -0.526
+    ],
+    [
+     8.936,
+     116.105,
+     -0.722
+    ],
+    [
+     9.03,
+     116.27,
+     -0.869
+    ],
+    [
+     9.153,
+     116.354,
+     -0.912
+    ]
+   ],
+   "radius_cm": 0.064,
+   "from": "splenic_artery_hilar_branch_5_origin"
+  },
+  "splenic_artery_hilar_branch_6": {
+   "name": "Hilar branch 6 of the splenic artery (unnamed in source)",
+   "points": [
+    [
+     9.182,
+     115.66,
+     -0.513
+    ],
+    [
+     9.318,
+     115.498,
+     -0.359
+    ],
+    [
+     9.521,
+     115.326,
+     -0.318
+    ],
+    [
+     9.715,
+     115.17,
+     -0.344
+    ],
+    [
+     9.856,
+     114.969,
+     -0.293
+    ],
+    [
+     9.87,
+     114.948,
+     -0.287
+    ]
+   ],
+   "radius_cm": 0.064,
+   "from": "splenic_artery_hilar_branch_6_origin"
+  },
+  "proper_hepatic_artery": {
+   "name": "Proper hepatic artery (source curve continues into the right lobe; no left hepatic branch in source)",
+   "points": [
+    [
+     -2.143,
+     114.709,
+     5.99
+    ],
+    [
+     -2.407,
+     114.833,
+     6.113
+    ],
+    [
+     -2.623,
+     114.996,
+     6.194
+    ],
+    [
+     -2.823,
+     115.196,
+     6.254
+    ],
+    [
+     -3.037,
+     115.432,
+     6.317
+    ],
+    [
+     -3.183,
+     115.636,
+     6.366
+    ],
+    [
+     -3.318,
+     115.906,
+     6.411
+    ],
+    [
+     -3.503,
+     116.156,
+     6.436
+    ],
+    [
+     -3.714,
+     116.31,
+     6.436
+    ],
+    [
+     -3.992,
+     116.438,
+     6.397
+    ],
+    [
+     -4.292,
+     116.493,
+     6.369
+    ],
+    [
+     -4.602,
+     116.497,
+     6.397
+    ],
+    [
+     -4.851,
+     116.475,
+     6.447
+    ],
+    [
+     -5.178,
+     116.397,
+     6.547
+    ],
+    [
+     -5.483,
+     116.261,
+     6.667
+    ],
+    [
+     -5.692,
+     116.135,
+     6.754
+    ],
+    [
+     -5.917,
+     115.975,
+     6.846
+    ],
+    [
+     -6.113,
+     115.789,
+     6.936
+    ],
+    [
+     -6.273,
+     115.591,
+     7.02
+    ],
+    [
+     -6.411,
+     115.386,
+     7.101
+    ],
+    [
+     -6.543,
+     115.178,
+     7.181
+    ],
+    [
+     -6.681,
+     114.973,
+     7.262
+    ],
+    [
+     -6.842,
+     114.751,
+     7.294
+    ],
+    [
+     -6.908,
+     114.622,
+     7.084
+    ],
+    [
+     -6.963,
+     114.551,
+     6.749
+    ],
+    [
+     -7.076,
+     114.53,
+     6.415
+    ],
+    [
+     -7.237,
+     114.548,
+     6.215
+    ],
+    [
+     -7.428,
+     114.61,
+     6.033
+    ],
+    [
+     -7.618,
+     114.707,
+     5.894
+    ],
+    [
+     -7.815,
+     114.829,
+     5.79
+    ],
+    [
+     -8.03,
+     114.963,
+     5.713
+    ],
+    [
+     -8.27,
+     115.101,
+     5.655
+    ],
+    [
+     -8.546,
+     115.228,
+     5.631
+    ],
+    [
+     -8.805,
+     115.318,
+     5.714
+    ],
+    [
+     -9.049,
+     115.427,
+     5.785
+    ],
+    [
+     -9.27,
+     115.596,
+     5.723
+    ],
+    [
+     -9.402,
+     115.793,
+     5.538
+    ],
+    [
+     -9.494,
+     115.956,
+     5.354
+    ],
+    [
+     -9.612,
+     116.127,
+     5.17
+    ],
+    [
+     -9.732,
+     116.307,
+     4.955
+    ],
+    [
+     -9.911,
+     116.433,
+     4.834
+    ],
+    [
+     -10.199,
+     116.481,
+     4.842
+    ],
+    [
+     -10.484,
+     116.491,
+     4.921
+    ],
+    [
+     -10.746,
+     116.634,
+     4.9
+    ],
+    [
+     -10.941,
+     116.858,
+     4.811
+    ],
+    [
+     -11.103,
+     117.115,
+     4.697
+    ],
+    [
+     -11.206,
+     117.252,
+     4.64
+    ]
+   ],
+   "radius_cm": 0.106,
+   "from": "proper_hepatic_artery_origin"
+  },
+  "proper_hepatic_artery_branch_1": {
+   "name": "Branch 1 of the proper hepatic artery curve (unnamed in source)",
+   "points": [
+    [
+     -7.138,
+     114.534,
+     6.325
+    ],
+    [
+     -7.257,
+     114.723,
+     6.147
+    ],
+    [
+     -7.364,
+     114.889,
+     5.986
+    ],
+    [
+     -7.437,
+     115.122,
+     5.867
+    ],
+    [
+     -7.437,
+     115.42,
+     5.84
+    ],
+    [
+     -7.386,
+     115.707,
+     5.884
+    ],
+    [
+     -7.369,
+     115.839,
+     5.896
+    ]
+   ],
+   "radius_cm": 0.055,
+   "from": "proper_hepatic_artery_branch_1_origin"
+  },
+  "proper_hepatic_artery_branch_2": {
+   "name": "Branch 2 of the proper hepatic artery curve (unnamed in source)",
+   "points": [
+    [
+     -9.527,
+     116.001,
+     5.308
+    ],
+    [
+     -9.542,
+     116.265,
+     5.301
+    ],
+    [
+     -9.556,
+     116.529,
+     5.293
+    ]
+   ],
+   "radius_cm": 0.035,
+   "from": "proper_hepatic_artery_branch_2_origin"
+  },
+  "gastroduodenal_artery": {
+   "name": "Gastroduodenal artery",
+   "points": [
+    [
+     -2.143,
+     114.709,
+     5.99
+    ],
+    [
+     -2.319,
+     114.612,
+     6.261
+    ],
+    [
+     -2.485,
+     114.537,
+     6.506
+    ],
+    [
+     -2.643,
+     114.467,
+     6.736
+    ],
+    [
+     -2.792,
+     114.387,
+     6.966
+    ],
+    [
+     -2.933,
+     114.279,
+     7.207
+    ],
+    [
+     -3.066,
+     114.128,
+     7.475
+    ],
+    [
+     -3.173,
+     113.984,
+     7.686
+    ],
+    [
+     -3.277,
+     113.835,
+     7.87
+    ],
+    [
+     -3.395,
+     113.601,
+     8.12
+    ],
+    [
+     -3.419,
+     113.351,
+     8.372
+    ],
+    [
+     -3.357,
+     113.174,
+     8.56
+    ],
+    [
+     -3.161,
+     113.029,
+     8.715
+    ],
+    [
+     -2.934,
+     112.943,
+     8.803
+    ],
+    [
+     -2.888,
+     112.92,
+     8.827
+    ]
+   ],
+   "radius_cm": 0.079,
+   "from": "gastroduodenal_artery_origin"
+  }
+ },
+ "landmarks": {
+  "coeliac_trunk_origin": {
+   "name": "Origin of the coeliac trunk from the abdominal aorta",
+   "p": [
+    0.896,
+    113.868,
+    1.502
+   ],
+   "derived": "end of Z-Anatomy curve 'Coeliac trunk' nearest the 'abdominal_aorta' centre line; it lies 0.00 cm from that line"
+  },
+  "common_hepatic_artery_origin": {
+   "name": "Origin of the common hepatic artery from the coeliac trunk",
+   "p": [
+    0.638,
+    115.592,
+    3.199
+   ],
+   "derived": "end of Z-Anatomy curve 'Common hepatic artery' nearest the 'coeliac_trunk' centre line; it lies 0.00 cm from that line"
+  },
+  "left_gastric_artery_origin": {
+   "name": "Origin of the left gastric artery from the coeliac trunk",
+   "p": [
+    0.638,
+    115.592,
+    3.199
+   ],
+   "derived": "end of Z-Anatomy curve 'Left gastric artery' nearest the 'coeliac_trunk' centre line; it lies 0.00 cm from that line"
+  },
+  "left_gastric_artery_branch_origin": {
+   "name": "Origin of the branch of the left gastric artery from the left gastric artery",
+   "p": [
+    1.652,
+    117.444,
+    4.428
+   ],
+   "derived": "end of Z-Anatomy curve 'Left gastric artery' spline 1 nearest the 'left_gastric_artery' centre line; it lies 0.02 cm from that line"
+  },
+  "splenic_artery_origin": {
+   "name": "Origin of the splenic artery from the coeliac trunk",
+   "p": [
+    0.638,
+    115.592,
+    3.199
+   ],
+   "derived": "end of Z-Anatomy curve 'Splenic artery' nearest the 'coeliac_trunk' centre line; it lies 0.00 cm from that line"
+  },
+  "splenic_artery_hilar_branch_1_origin": {
+   "name": "Origin of the hilar branch 1 of the splenic artery from the splenic artery",
+   "p": [
+    7.976,
+    115.991,
+    0.221
+   ],
+   "derived": "end of Z-Anatomy curve 'Splenic artery' spline 1 nearest the 'splenic_artery' centre line; it lies 0.00 cm from that line"
+  },
+  "splenic_artery_hilar_branch_2_origin": {
+   "name": "Origin of the hilar branch 2 of the splenic artery from the hilar branch 1 of the splenic artery",
+   "p": [
+    8.259,
+    116.237,
+    -0.531
+   ],
+   "derived": "end of Z-Anatomy curve 'Splenic artery' spline 2 nearest the 'splenic_artery_hilar_branch_1' centre line; it lies 0.00 cm from that line"
+  },
+  "splenic_artery_hilar_branch_3_origin": {
+   "name": "Origin of the hilar branch 3 of the splenic artery from the hilar branch 2 of the splenic artery",
+   "p": [
+    8.083,
+    116.535,
+    -0.983
+   ],
+   "derived": "end of Z-Anatomy curve 'Splenic artery' spline 3 nearest the 'splenic_artery_hilar_branch_2' centre line; it lies 0.00 cm from that line"
+  },
+  "splenic_artery_hilar_branch_4_origin": {
+   "name": "Origin of the hilar branch 4 of the splenic artery from the hilar branch 1 of the splenic artery",
+   "p": [
+    8.477,
+    116.313,
+    -0.901
+   ],
+   "derived": "end of Z-Anatomy curve 'Splenic artery' spline 4 nearest the 'splenic_artery_hilar_branch_1' centre line; it lies 0.01 cm from that line"
+  },
+  "splenic_artery_hilar_branch_5_origin": {
+   "name": "Origin of the hilar branch 5 of the splenic artery from the splenic artery",
+   "p": [
+    8.876,
+    115.783,
+    -0.325
+   ],
+   "derived": "end of Z-Anatomy curve 'Splenic artery' spline 5 nearest the 'splenic_artery' centre line; it lies 0.01 cm from that line"
+  },
+  "splenic_artery_hilar_branch_6_origin": {
+   "name": "Origin of the hilar branch 6 of the splenic artery from the splenic artery",
+   "p": [
+    9.182,
+    115.66,
+    -0.513
+   ],
+   "derived": "end of Z-Anatomy curve 'Splenic artery' spline 6 nearest the 'splenic_artery' centre line; it lies 0.01 cm from that line"
+  },
+  "proper_hepatic_artery_origin": {
+   "name": "Origin of the proper hepatic artery from the common hepatic artery",
+   "p": [
+    -2.143,
+    114.709,
+    5.99
+   ],
+   "derived": "end of Z-Anatomy curve 'Proper hepatic artery' nearest the 'common_hepatic_artery' centre line; it lies 0.00 cm from that line"
+  },
+  "proper_hepatic_artery_branch_1_origin": {
+   "name": "Origin of the branch 1 of the proper hepatic artery curve from the proper hepatic artery",
+   "p": [
+    -7.138,
+    114.534,
+    6.325
+   ],
+   "derived": "end of Z-Anatomy curve 'Proper hepatic artery' spline 1 nearest the 'proper_hepatic_artery' centre line; it lies 0.01 cm from that line"
+  },
+  "proper_hepatic_artery_branch_2_origin": {
+   "name": "Origin of the branch 2 of the proper hepatic artery curve from the proper hepatic artery",
+   "p": [
+    -9.527,
+    116.001,
+    5.308
+   ],
+   "derived": "end of Z-Anatomy curve 'Proper hepatic artery' spline 2 nearest the 'proper_hepatic_artery' centre line; it lies 0.00 cm from that line"
+  },
+  "gastroduodenal_artery_origin": {
+   "name": "Origin of the gastroduodenal artery from the common hepatic artery",
+   "p": [
+    -2.143,
+    114.709,
+    5.99
+   ],
+   "derived": "end of Z-Anatomy curve 'Gastroduodenal artery' nearest the 'common_hepatic_artery' centre line; it lies 0.00 cm from that line"
+  },
+  "coeliac_trunk_division": {
+   "name": "Division of the coeliac trunk (common hepatic, left gastric and splenic arteries arise here)",
+   "p": [
+    0.638,
+    115.592,
+    3.199
+   ],
+   "derived": "end point of centre line 'coeliac_trunk' (Z-Anatomy curve 'Coeliac trunk')"
+  },
+  "common_hepatic_artery_division": {
+   "name": "End of the common hepatic artery: origin of the gastroduodenal and proper hepatic arteries",
+   "p": [
+    -2.143,
+    114.71,
+    5.99
+   ],
+   "derived": "end point of centre line 'common_hepatic_artery' (Z-Anatomy curve 'Common hepatic artery')"
+  },
+  "proper_hepatic_artery_end": {
+   "name": "Intrahepatic end of the proper hepatic artery curve (right lobe)",
+   "p": [
+    -11.206,
+    117.252,
+    4.64
+   ],
+   "derived": "end point of centre line 'proper_hepatic_artery' (Z-Anatomy curve 'Proper hepatic artery')"
+  },
+  "gastroduodenal_artery_end": {
+   "name": "Lower end of the gastroduodenal artery curve",
+   "p": [
+    -2.888,
+    112.92,
+    8.827
+   ],
+   "derived": "end point of centre line 'gastroduodenal_artery' (Z-Anatomy curve 'Gastroduodenal artery')"
+  },
+  "left_gastric_artery_end": {
+   "name": "Upper end of the left gastric artery curve (towards the cardia)",
+   "p": [
+    2.141,
+    117.562,
+    5.653
+   ],
+   "derived": "end point of centre line 'left_gastric_artery' (Z-Anatomy curve 'Left gastric artery')"
+  },
+  "splenic_artery_end": {
+   "name": "Splenic end of the splenic artery main curve",
+   "p": [
+    9.822,
+    115.536,
+    -0.871
+   ],
+   "derived": "end point of centre line 'splenic_artery' (Z-Anatomy curve 'Splenic artery')"
+  }
+ }
+}

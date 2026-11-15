@@ -1,0 +1,80 @@
+{
+  "name": "liver-segments",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "segment_i": {
+      "files": [
+        "Posterior_segment_of_liver_(I).obj"
+      ],
+      "budget": 1300,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "segment_ii": {
+      "files": [
+        "Left_posterior_lateral_segment_of_liver_(II).obj"
+      ],
+      "budget": 1300,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "segment_iii": {
+      "files": [
+        "Left_anterior_lateral_segment_of_liver_(III).obj"
+      ],
+      "budget": 1300,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "segment_iv": {
+      "files": [
+        "Left_medial_segment_of_liver_(IV).obj"
+      ],
+      "budget": 1500,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "segment_v": {
+      "files": [
+        "Anterior_medial_segment_of_liver_(V).obj"
+      ],
+      "budget": 1300,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "segment_vi": {
+      "files": [
+        "Anterior_lateral_segment_of_liver_(VI).obj"
+      ],
+      "budget": 1300,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "segment_vii": {
+      "files": [
+        "Posterior_lateral_segment_of_liver_(VII).obj"
+      ],
+      "budget": 1300,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "segment_viii": {
+      "files": [
+        "Posterior_medial_segment_of_liver_(VIII).obj"
+      ],
+      "budget": 1300,
+      "subdivide": 1,
+      "smooth": 6
+    }
+  }
+}

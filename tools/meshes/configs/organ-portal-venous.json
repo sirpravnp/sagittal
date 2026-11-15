@@ -1,0 +1,40 @@
+{
+  "name": "portal-venous",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "portal_vein": {
+      "files": [
+        "Hepatic_portal_vein.obj"
+      ],
+      "budget": 500
+    },
+    "splenic_vein": {
+      "files": [
+        "Splenic_vein.obj"
+      ],
+      "budget": 1200
+    },
+    "superior_mesenteric_vein": {
+      "files": [
+        "Superior_mesenteric_vein.obj"
+      ],
+      "budget": 1000
+    },
+    "inferior_mesenteric_vein": {
+      "files": [
+        "Inferior_mesenteric_vein.obj"
+      ],
+      "budget": 800
+    }
+  }
+}

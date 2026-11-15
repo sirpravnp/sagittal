@@ -1,0 +1,52 @@
+{
+  "name": "coeliac-trunk",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "coeliac_trunk": {
+      "files": [
+        "Coeliac_trunk.obj"
+      ],
+      "budget": 400
+    },
+    "common_hepatic_artery": {
+      "files": [
+        "Common_hepatic_artery.obj"
+      ],
+      "budget": 400
+    },
+    "proper_hepatic_artery": {
+      "files": [
+        "Proper_hepatic_artery.obj"
+      ],
+      "budget": 1000
+    },
+    "gastroduodenal_artery": {
+      "files": [
+        "Gastroduodenal_artery.obj"
+      ],
+      "budget": 400
+    },
+    "left_gastric_artery": {
+      "files": [
+        "Left_gastric_artery.obj"
+      ],
+      "budget": 500
+    },
+    "splenic_artery": {
+      "files": [
+        "Splenic_artery.obj"
+      ],
+      "budget": 1200
+    }
+  }
+}

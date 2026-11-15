@@ -1,0 +1,45 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "duodenum",
+ "name": "Duodenum",
+ "system": "Gastrointestinal",
+ "mesh": "duodenum",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "duodenum",
+   "name": "Duodenum",
+   "tissue": "bowel"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "minor_duodenal_papilla": {
+   "name": "Minor duodenal papilla (duodenal surface point nearest the duodenal end of the accessory pancreatic duct)",
+   "p": [
+    -5.228,
+    111.256,
+    2.788
+   ],
+   "derived": "baked 'duodenum' vertex nearest landmark 'accessory_pancreatic_duct_duodenal_end' (0.35 cm away)"
+  },
+  "major_duodenal_papilla": {
+   "name": "Major duodenal papilla (duodenal surface point nearest the lower end of the bile duct)",
+   "p": [
+    -5.777,
+    108.601,
+    2.732
+   ],
+   "derived": "baked 'duodenum' vertex nearest landmark 'bile_duct_lower_end' (0.46 cm away)"
+  },
+  "duodenojejunal_flexure": {
+   "name": "Duodenojejunal flexure (duodenal surface point nearest the duodenal end of the small-intestine curve)",
+   "p": [
+    2.643,
+    108.303,
+    3.721
+   ],
+   "derived": "baked 'duodenum' vertex nearest landmark 'small_intestine_duodenal_end' (0.41 cm away)"
+  }
+ }
+}

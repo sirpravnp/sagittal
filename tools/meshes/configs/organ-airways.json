@@ -1,0 +1,40 @@
+{
+  "name": "airways",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "trachea": {
+      "files": [
+        "Trachea.obj"
+      ],
+      "budget": 3000
+    },
+    "main_bronchi": {
+      "files": [
+        "Right_main_bronchus.obj",
+        "Left_main_bronchus.obj"
+      ],
+      "budget": 800
+    },
+    "lobar_bronchi": {
+      "files": [
+        "Right_superior_lobar_bronchus.obj",
+        "Intermediate_bronchus.r.obj",
+        "Middle_lobar_bronchus.r.obj",
+        "Right_inferior_lobar_bronchus.obj",
+        "Left_superior_lobar_bronchus.obj",
+        "Left_inferior_lobar_bronchus.obj"
+      ],
+      "budget": 2000
+    }
+  }
+}

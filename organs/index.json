@@ -1,0 +1,127 @@
+[
+ {
+  "id": "brain",
+  "name": "Brain",
+  "system": "Nervous"
+ },
+ {
+  "id": "heart",
+  "name": "Heart",
+  "system": "Cardiovascular"
+ },
+ {
+  "id": "aorta",
+  "name": "Aorta and its major branches",
+  "system": "Cardiovascular"
+ },
+ {
+  "id": "coeliac-trunk",
+  "name": "Coeliac trunk and its branches",
+  "system": "Cardiovascular"
+ },
+ {
+  "id": "mesenteric-arteries",
+  "name": "Superior and inferior mesenteric arteries",
+  "system": "Cardiovascular"
+ },
+ {
+  "id": "venae-cavae",
+  "name": "Venae cavae and their major tributaries",
+  "system": "Cardiovascular"
+ },
+ {
+  "id": "portal-venous",
+  "name": "Hepatic portal vein and its tributaries",
+  "system": "Cardiovascular"
+ },
+ {
+  "id": "liver",
+  "name": "Liver",
+  "system": "Hepatobiliary"
+ },
+ {
+  "id": "liver-segments",
+  "name": "Liver segments (Couinaud I-VIII)",
+  "system": "Hepatobiliary"
+ },
+ {
+  "id": "gallbladder",
+  "name": "Gallbladder and bile duct",
+  "system": "Hepatobiliary"
+ },
+ {
+  "id": "pancreas",
+  "name": "Pancreas and pancreatic ducts",
+  "system": "Gastrointestinal"
+ },
+ {
+  "id": "oesophagus",
+  "name": "Oesophagus",
+  "system": "Gastrointestinal"
+ },
+ {
+  "id": "stomach",
+  "name": "Stomach",
+  "system": "Gastrointestinal"
+ },
+ {
+  "id": "duodenum",
+  "name": "Duodenum",
+  "system": "Gastrointestinal"
+ },
+ {
+  "id": "small-intestine",
+  "name": "Small intestine (jejunum and ileum)",
+  "system": "Gastrointestinal"
+ },
+ {
+  "id": "colon",
+  "name": "Large intestine",
+  "system": "Gastrointestinal"
+ },
+ {
+  "id": "spleen",
+  "name": "Spleen",
+  "system": "Lymphoid"
+ },
+ {
+  "id": "lungs",
+  "name": "Lungs",
+  "system": "Respiratory"
+ },
+ {
+  "id": "airways",
+  "name": "Trachea and bronchi",
+  "system": "Respiratory"
+ },
+ {
+  "id": "thyroid",
+  "name": "Thyroid gland",
+  "system": "Endocrine"
+ },
+ {
+  "id": "adrenals",
+  "name": "Suprarenal (adrenal) glands",
+  "system": "Endocrine"
+ },
+ {
+  "id": "kidneys",
+  "name": "Kidneys",
+  "system": "Urinary"
+ },
+ {
+  "id": "ureters",
+  "name": "Ureters",
+  "system": "Urinary"
+ },
+ {
+  "id": "bladder",
+  "name": "Urinary bladder and urethra",
+  "system": "Urinary"
+ },
+ {
+  "id": "male-reproductive",
+  "name": "Male reproductive organs",
+  "system": "Reproductive"
+ }
+]

@@ -1,0 +1,30 @@
+{
+  "name": "thyroid",
+  "credit": "totalsegmentator",
+  "license": "CC BY 4.0",
+  "source": "TotalSegmentator CT dataset v2.0.1 (doi:10.5281/zenodo.10047292), subject s1304 masks; tools/meshes/ct_to_obj.py, registered by tools/organs/register.py",
+  "source_root": "${ASSETS}/organs-registered/totalseg",
+  "transform": {
+    "axes": [
+      "x",
+      "y",
+      "z"
+    ],
+    "scale": 1
+  },
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "thyroid": {
+      "files": [
+        "thyroid_gland.obj"
+      ],
+      "budget": 3000,
+      "smooth": 4
+    }
+  }
+}

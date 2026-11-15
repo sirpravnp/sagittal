@@ -1,0 +1,63 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "liver",
+ "name": "Liver",
+ "system": "Hepatobiliary",
+ "mesh": "liver",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "liver",
+   "name": "Liver",
+   "tissue": "liver"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "liver_dome": {
+   "name": "Highest point of the liver (dome)",
+   "p": [
+    -5.602,
+    125.801,
+    2.749
+   ],
+   "derived": "baked 'liver' vertex with the largest y"
+  },
+  "liver_right_lateral_point": {
+   "name": "Most lateral point of the right lobe",
+   "p": [
+    -11.502,
+    117.993,
+    2.004
+   ],
+   "derived": "baked 'liver' vertex with the smallest x"
+  },
+  "liver_left_lobe_tip": {
+   "name": "Tip of the left lobe (most left point)",
+   "p": [
+    9.232,
+    121.448,
+    4.434
+   ],
+   "derived": "baked 'liver' vertex with the largest x"
+  },
+  "liver_lowest_point": {
+   "name": "Lowest point of the liver (inferior margin of the right lobe)",
+   "p": [
+    -10.475,
+    109.041,
+    1.219
+   ],
+   "derived": "baked 'liver' vertex with the smallest y"
+  },
+  "liver_centroid": {
+   "name": "Liver centroid",
+   "p": [
+    -4.479,
+    118.966,
+    3.251
+   ],
+   "derived": "volume centroid of the baked 'liver' mesh"
+  }
+ }
+}

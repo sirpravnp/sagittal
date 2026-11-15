@@ -1,0 +1,63 @@
+{
+  "name": "aorta",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "aorta": {
+      "files": [
+        "Ascending_aorta.obj",
+        "Aortic_arch.obj",
+        "Thoracic_aorta.obj",
+        "Abdominal_aorta.obj"
+      ],
+      "budget": 3200
+    },
+    "brachiocephalic_trunk": {
+      "files": [
+        "Brachiocephalic_trunk.obj"
+      ],
+      "budget": 500
+    },
+    "common_carotid_arteries": {
+      "files": [
+        "Right_common_carotid_artery.obj",
+        "Left_common_carotid_artery.obj"
+      ],
+      "budget": 1000
+    },
+    "subclavian_arteries": {
+      "files": [
+        "Right_subclavian_artery.obj",
+        "Left_subclavian_artery.obj"
+      ],
+      "budget": 1000
+    },
+    "renal_arteries": {
+      "files": [
+        "Left_renal_artery.obj",
+        "Right_renal_artery.obj"
+      ],
+      "budget": 600
+    },
+    "iliac_arteries": {
+      "files": [
+        "Common_iliac_artery.l.obj",
+        "Common_iliac_artery.r.obj",
+        "External_iliac_artery.l.obj",
+        "External_iliac_artery.r.obj",
+        "Internal_iliac_artery.l.obj",
+        "Internal_iliac_artery.r.obj"
+      ],
+      "budget": 2000
+    }
+  }
+}

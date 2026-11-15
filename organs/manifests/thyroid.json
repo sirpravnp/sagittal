@@ -1,0 +1,63 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "thyroid",
+ "name": "Thyroid gland",
+ "system": "Endocrine",
+ "mesh": "thyroid",
+ "credit": "totalsegmentator",
+ "parts": [
+  {
+   "id": "thyroid",
+   "name": "Thyroid gland",
+   "tissue": "pancreas"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "thyroid_centroid": {
+   "name": "Thyroid centroid",
+   "p": [
+    -0.651,
+    143.131,
+    0.942
+   ],
+   "derived": "volume centroid of the baked 'thyroid' mesh"
+  },
+  "thyroid_right_lobe_upper_pole": {
+   "name": "Upper pole of the right lobe",
+   "p": [
+    -2.747,
+    147.768,
+    0.789
+   ],
+   "derived": "baked 'thyroid' vertex with the largest y among vertices on the patient's right of the part's bounding-box midline (x < -0.45)"
+  },
+  "thyroid_left_lobe_upper_pole": {
+   "name": "Upper pole of the left lobe",
+   "p": [
+    1.893,
+    146.097,
+    0.933
+   ],
+   "derived": "baked 'thyroid' vertex with the largest y among vertices on the patient's left of the part's bounding-box midline (x > -0.45)"
+  },
+  "thyroid_right_lobe_lower_pole": {
+   "name": "Lower pole of the right lobe",
+   "p": [
+    -1.545,
+    140.861,
+    -0.535
+   ],
+   "derived": "baked 'thyroid' vertex with the smallest y among vertices on the patient's right of the part's bounding-box midline (x < -0.45)"
+  },
+  "thyroid_left_lobe_lower_pole": {
+   "name": "Lower pole of the left lobe",
+   "p": [
+    0.652,
+    140.51,
+    1.904
+   ],
+   "derived": "baked 'thyroid' vertex with the smallest y among vertices on the patient's left of the part's bounding-box midline (x > -0.45)"
+  }
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "adrenals",
+ "name": "Suprarenal (adrenal) glands",
+ "system": "Endocrine",
+ "mesh": "adrenals",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "right_suprarenal_gland",
+   "name": "Right suprarenal gland",
+   "tissue": "pancreas"
+  },
+  {
+   "id": "left_suprarenal_gland",
+   "name": "Left suprarenal gland",
+   "tissue": "pancreas"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "right_suprarenal_centroid": {
+   "name": "Right suprarenal gland centroid",
+   "p": [
+    -4.178,
+    114.443,
+    -0.818
+   ],
+   "derived": "volume centroid of the baked 'right_suprarenal_gland' mesh"
+  },
+  "left_suprarenal_centroid": {
+   "name": "Left suprarenal gland centroid",
+   "p": [
+    4.842,
+    116.448,
+    -2.612
+   ],
+   "derived": "volume centroid of the baked 'left_suprarenal_gland' mesh"
+  }
+ }
+}

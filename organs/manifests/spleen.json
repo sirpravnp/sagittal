@@ -1,0 +1,54 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "spleen",
+ "name": "Spleen",
+ "system": "Lymphoid",
+ "mesh": "spleen",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "spleen",
+   "name": "Spleen",
+   "tissue": "liver"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "spleen_upper_pole": {
+   "name": "Upper pole of the spleen",
+   "p": [
+    8.167,
+    119.688,
+    -2.071
+   ],
+   "derived": "baked 'spleen' vertex with the largest y"
+  },
+  "spleen_lower_pole": {
+   "name": "Lower pole of the spleen",
+   "p": [
+    10.599,
+    112.649,
+    0.144
+   ],
+   "derived": "baked 'spleen' vertex with the smallest y"
+  },
+  "spleen_centroid": {
+   "name": "Spleen centroid",
+   "p": [
+    9.011,
+    116.033,
+    -1.228
+   ],
+   "derived": "volume centroid of the baked 'spleen' mesh"
+  },
+  "splenic_hilum": {
+   "name": "Splenic hilum (spleen surface point nearest the splenic end of the splenic artery)",
+   "p": [
+    8.757,
+    115.474,
+    -0.16
+   ],
+   "derived": "baked 'spleen' vertex nearest landmark 'splenic_artery_end' (1.28 cm away)"
+  }
+ }
+}

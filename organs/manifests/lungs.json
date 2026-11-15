@@ -1,0 +1,74 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "lungs",
+ "name": "Lungs",
+ "system": "Respiratory",
+ "mesh": "lungs",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "right_superior_lobe",
+   "name": "Superior lobe of right lung",
+   "tissue": "lung"
+  },
+  {
+   "id": "right_middle_lobe",
+   "name": "Middle lobe of right lung",
+   "tissue": "lung"
+  },
+  {
+   "id": "right_inferior_lobe",
+   "name": "Inferior lobe of right lung",
+   "tissue": "lung"
+  },
+  {
+   "id": "left_superior_lobe",
+   "name": "Superior lobe of left lung",
+   "tissue": "lung"
+  },
+  {
+   "id": "left_inferior_lobe",
+   "name": "Inferior lobe of left lung",
+   "tissue": "lung"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "right_lung_apex": {
+   "name": "Apex of the right lung",
+   "p": [
+    -3.412,
+    143.062,
+    -1.203
+   ],
+   "derived": "baked 'right_superior_lobe' vertex with the largest y"
+  },
+  "left_lung_apex": {
+   "name": "Apex of the left lung",
+   "p": [
+    3.004,
+    143.175,
+    -1.173
+   ],
+   "derived": "baked 'left_superior_lobe' vertex with the largest y"
+  },
+  "right_lung_base_lowest": {
+   "name": "Lowest point of the right lung",
+   "p": [
+    -8.887,
+    116.921,
+    -6.628
+   ],
+   "derived": "baked 'right_inferior_lobe' vertex with the smallest y"
+  },
+  "left_lung_base_lowest": {
+   "name": "Lowest point of the left lung",
+   "p": [
+    12.428,
+    116.605,
+    2.508
+   ],
+   "derived": "baked 'left_inferior_lobe' vertex with the smallest y"
+  }
+ }
+}

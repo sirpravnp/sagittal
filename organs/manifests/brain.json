@@ -1,0 +1,54 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "brain",
+ "name": "Brain",
+ "system": "Nervous",
+ "mesh": "brain",
+ "credit": "totalsegmentator",
+ "parts": [
+  {
+   "id": "brain",
+   "name": "Brain (cerebrum, cerebellum and brainstem, one surface)",
+   "tissue": "nerve"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "brain_frontal_pole": {
+   "name": "Frontal pole",
+   "p": [
+    -1.192,
+    163.41,
+    7.637
+   ],
+   "derived": "baked 'brain' vertex with the largest z"
+  },
+  "brain_occipital_pole": {
+   "name": "Occipital pole (most posterior point of the brain surface)",
+   "p": [
+    1.021,
+    161.733,
+    -9.922
+   ],
+   "derived": "baked 'brain' vertex with the smallest z"
+  },
+  "brain_vertex": {
+   "name": "Highest point of the brain",
+   "p": [
+    0.437,
+    170.093,
+    -0.404
+   ],
+   "derived": "baked 'brain' vertex with the largest y"
+  },
+  "brain_centroid": {
+   "name": "Brain centroid",
+   "p": [
+    -0.043,
+    163.294,
+    -1.617
+   ],
+   "derived": "volume centroid of the baked 'brain' mesh"
+  }
+ }
+}
