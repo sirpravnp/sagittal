@@ -103,6 +103,15 @@
     function fail() { return { ok: false, errors: errors, resolved: null }; }
 
     if (!isObj(spec)) { err('spec', 'must be an object'); return fail(); }
+    // Depth guard before serialising: JSON.stringify overflows the stack on very deep input in some
+    // engines, which would turn "too deep" into a misleading "not plain JSON". Iterative, so it cannot overflow.
+    var stack = [[spec, 0]], visited = 0;
+    while (stack.length) {
+      var top = stack.pop(), node = top[0], dep = top[1];
+      if (dep > 12) { err('spec', 'is nested too deeply'); return fail(); }
+      if (++visited > 200000) break;
+      if (node && typeof node === 'object') for (var kk in node) if (has(node, kk)) stack.push([node[kk], dep + 1]);
+    }
     var R;
     try { R = JSON.parse(JSON.stringify(spec)); } catch (e) { err('spec', 'must be plain JSON'); return fail(); }
 
