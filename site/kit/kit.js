@@ -355,6 +355,9 @@
         leadSvg.appendChild(lg);
         leadEls.push({ g: lg, halo: halo, line: ln, dot: dt });
         var e = document.createElement('div'); e.className = 'lab'; e.textContent = l.t;
+        // opt-in: a scene may give a label a class (l.cls) for its chip and leader (figures mark
+        // the structures a variant changes); library scenes set none
+        if (l.cls) { e.classList.add(l.cls); lg.classList.add(l.cls); }
         labelsEl.appendChild(e); labEls.push(e);
       });
       labSizes = labEls.map(function () { return null; });

@@ -123,7 +123,7 @@ for (const fixture of fixtures) {
     expect(d.drawn).toContain(ex.variantOnly);
     expect(d.drawn).not.toContain(ex.normalOnly);
 
-    await page.locator('#kit_c_v').selectOption('normal');
+    await page.getByRole('radio', { name: 'Normal' }).check();
     await page.waitForFunction(() => window.SagittalPlayer.debug().view === 'normal');
     d = await page.evaluate(() => window.SagittalPlayer.debug());
     expect(d.drawn).toContain(ex.normalOnly);
@@ -223,7 +223,7 @@ test('Save as image downloads <slug>-<view>.png: decodes, not blank, labels draw
   expect(await pngDiff(page, url, on), 'the download is the labelled snapshot').toBeLessThan(0.002);
 
   // labels switched off in the page: Save follows the toggle; snapshot({labels: true}) still draws them
-  await page.locator('#kit_c_v').selectOption('normal');
+  await page.getByRole('radio', { name: 'Normal' }).check();
   await page.waitForFunction(() => window.SagittalPlayer.debug().view === 'normal');
   await page.getByLabel('Labels').uncheck();
   const [dl2] = await Promise.all([page.waitForEvent('download'), save.click()]);
@@ -252,8 +252,27 @@ for (const fixture of fixtures) {
     await expect(page.locator('h1')).toHaveText(spec.title);
     // control row: view, one toggle per organ, labels, save
     const bar = page.locator('.fig-bar');
-    await expect(bar.locator('#kit_c_v')).toBeVisible();
-    await expect(bar.locator('#kit_c_v option')).toHaveText(['Normal anatomy', spec.variant.label]);
+    // the view switch: a two-option radio group, Variant first selected; the variant's full name
+    // is the plate subtitle unless the title already carries it
+    const group = bar.getByRole('radiogroup', { name: 'View' });
+    await expect(group.getByRole('radio')).toHaveCount(2);
+    await expect(group.getByRole('radio', { name: 'Variant' })).toBeChecked();
+    await expect(group.getByRole('radio', { name: 'Normal' })).not.toBeChecked();
+    if (!spec.title.toLowerCase().includes(spec.variant.label.toLowerCase())) {
+      await expect(page.locator('.fig-sub')).toHaveText('Variant shown: ' + spec.variant.label);
+    }
+    // keyboard: arrow keys move between the two views
+    await group.getByRole('radio', { name: 'Variant' }).focus();
+    await page.keyboard.press('ArrowLeft');
+    await page.waitForFunction(() => window.SagittalPlayer.debug().view === 'normal');
+    await page.keyboard.press('ArrowRight');
+    await page.waitForFunction(() => window.SagittalPlayer.debug().view === 'variant');
+    // what the variant changes is marked: clay labels for the changed structures
+    const changed = await page.evaluate(() => window.SagittalPlayer.debug().changed);
+    expect(changed.length, 'some labels mark changed structures').toBeGreaterThan(0);
+    expect(await page.locator('#labels .lab.is-variant').count()).toBe(changed.length);
+    // no plate number on a standalone figure
+    expect(await page.locator('body').innerText()).not.toMatch(/Plate [IVX]+/);
     expect(await bar.locator('.fig-organs input[type=checkbox]').count()).toBe(spec.organs.length);
     await expect(bar.getByLabel('Labels')).toBeChecked();
     await expect(bar.getByRole('button', { name: 'Save as image' })).toBeVisible();
@@ -267,13 +286,21 @@ for (const fixture of fixtures) {
     }
     expect(await info.locator('.fig-refs li a[href^="https://"]').count()).toBeGreaterThan(0);
     expect(await info.locator('.fig-provenance li').count()).toBe(spec.provenance.length);
-    for (const li of await info.locator('.fig-provenance li').all()) await expect(li.locator('.pv-view')).toHaveText(/^(Both views|Variant)$/);
+    // provenance: variant changes first under one group heading, both-view structures after;
+    // plain sentences, no internal "Centroid of" wording
+    const groups = await info.locator('.fig-provenance h3').allInnerTexts();
+    expect(groups[0]).toBe('In the variant');
+    const firstLi = info.locator('.fig-provenance li').first();
+    await expect(firstLi).toHaveAttribute('data-view', 'variant');
+    for (const li of await info.locator('.fig-provenance li').all()) await expect(li.locator('.pv-text')).not.toBeEmpty();
+    expect(await info.locator('.fig-provenance').innerText()).not.toMatch(/Centroid of| curve\b/);
     await expect(info.locator('.fig-credit')).toContainText('3D models:');
     expect(await page.locator('body').innerText()).not.toContain('nreviewed');
 
     // themes: the page follows prefers-color-scheme, [data-theme] overrides it; the stage is paper
     // in light mode and warm dark in dark mode, and the canvas is cleared to the same colour
-    const look = () => page.evaluate(() => ({
+    // (two animation frames first: a resize clears the drawing buffer until the next frame)
+    const look = () => page.evaluate(async () => (await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))), {
       bg: getComputedStyle(document.body).backgroundColor,
       stage: getComputedStyle(document.querySelector('#stage')).backgroundColor,
       // share of canvas pixels in the stage colour (the WebGL clear colour shows round the model)

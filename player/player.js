@@ -80,9 +80,20 @@
   function T(kind, opts) { return Kit.tissue(kind, Object.assign({ sheen: 0 }, opts || {})); }
   // glow: the structure is what this view changes (see build); it glows in its own colour.
   var GLOW = 0.6;
-  function styled(kind, st, glow) {
+  // clay: what the variant view changes is tinted toward the page's clay accent, the way an old
+  // atlas prints the abnormal vessel in a second colour (base structures keep their tissue colour).
+  var CLAY = 0xc0603e, CLAY_MIX = 0.45;
+  function mixHex(a, b, f) {
+    var r = ((a >> 16) & 255) * (1 - f) + ((b >> 16) & 255) * f, g = ((a >> 8) & 255) * (1 - f) + ((b >> 8) & 255) * f, bl = (a & 255) * (1 - f) + (b & 255) * f;
+    return (Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(bl);
+  }
+  function styled(kind, st, glow, clay) {
     var o = {};
     if (st && st.color) o.color = st.color;
+    if (clay) {
+      var base = o.color !== undefined ? new THREE.Color(o.color).getHex() : (function () { var m = Kit.tissue(kind), h = m.color.getHex(); m.dispose(); return h; })();
+      o.color = mixHex(base, CLAY, CLAY_MIX);
+    }
     if (st && st.opacity !== undefined && st.opacity < 1) { o.opacity = st.opacity; o.depthWrite = false; }
     if (glow) {
       if (!o.color) { var m = Kit.tissue(kind); o.emissive = m.color.getHex(); m.dispose(); } else o.emissive = o.color;
@@ -116,7 +127,17 @@
       cap.position.copy(curve.getPointAt(e)); grp.add(cap);
     });
     g.add(grp);
-    return { group: grp, tube: me };
+    return { group: grp, tube: me, geo: geo };
+  }
+  // An engraved contour round a tube: its geometry pushed out along the normals, back faces only,
+  // flat dark ink. Marks what the variant adds or moves whatever its tissue colour.
+  var CONTOUR = 0x3b1a0e;
+  function contour(d, r) {
+    var geo = d.geo.clone(), pos = geo.attributes.position, nor = geo.attributes.normal, w = Math.max(0.03, r * 0.2);
+    for (var i = 0; i < pos.count; i++) pos.setXYZ(i, pos.getX(i) + nor.getX(i) * w, pos.getY(i) + nor.getY(i) * w, pos.getZ(i) + nor.getZ(i) * w);
+    var m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: CONTOUR, side: THREE.BackSide }));
+    m.userData.contour = true;
+    d.group.add(m);
   }
 
   /* ---------- the organ model: parts, which centre lines draw which part ---------- */
@@ -266,6 +287,7 @@
       // What this view changes glows: in the variant, new and moved structures; in the normal
       // view, the structures the variant removes or moves.
       function glows(ref) { return variant ? !!moved[ref] : !!(removed[ref] || moved[ref]); }
+      var hot = {}; // ref/id -> drawn as changed by the variant (variant view only): clay tint, clay label
 
       // 1. Organs.
       listed.forEach(function (oid) {
@@ -277,7 +299,8 @@
           if (variant && removed[ref]) return;
           var tubeLines = mo.tubeParts[p.id];
           if (!tubeLines) {
-            var mesh = Kit.meshPart(body, m.mesh, p.id, styled(p.tissue, style, glows(ref)));
+            var g0 = glows(ref); if (variant && g0) hot[ref] = true;
+            var mesh = Kit.meshPart(body, m.mesh, p.id, styled(p.tissue, style, g0, variant && g0));
             objs[ref] = mesh; drawn.push(ref);
             return;
           }
@@ -291,7 +314,9 @@
             pts = dedupe(pts, 0.02);
             if (pts.length < 2) return;
             var r = cl.radius_cm || 0.1;
-            var d = duct(pg, pts, r, cl.parent ? 0.85 : 0.9, styled(kind, style, glows(lref) || glows(ref)));
+            var g1 = glows(lref) || glows(ref); if (variant && g1) hot[lref] = true;
+            var d = duct(pg, pts, r, cl.parent ? 0.85 : 0.9, styled(kind, style, g1, variant && g1));
+            if (variant && g1) contour(d, r);
             objs[lref] = d.group; lines[lref] = pts; drawn.push(lref);
           });
         });
@@ -304,7 +329,11 @@
         if (isBase && variant && moved[e.id] && moved[e.id].points) pts = smoothMoved(moved[e.id].points, moved[e.id].end);
         pts = dedupe(pts, 0.02);
         if (pts.length < 2) return;
-        var d = duct(body, pts, e.radius_cm, 1, styled(e.tissue, null, isBase ? glows(e.id) : true));
+        var g2 = isBase ? glows(e.id) : true, h2 = variant && g2;
+        if (h2) hot[e.id] = true;
+        // a structure the variant adds or moves is drawn a little heavier as well as clay-tinted
+        var d = duct(body, pts, e.radius_cm * (h2 ? 1.12 : 1), 1, styled(e.tissue, null, g2, h2));
+        if (h2) contour(d, e.radius_cm);
         objs[e.id] = d.group; lines[e.id] = pts; drawn.push(e.id);
       }
       baseRoutes.forEach(function (e) { drawRoute(e, true); });
@@ -358,13 +387,15 @@
       var labels = targets.map(function (tg) {
         var lab = { t: tg.l.text, p: sc(tg.p) };
         if (tg.on) lab.on = tg.on;
+        if (hot[tg.l.on]) lab.cls = 'is-variant';
         return lab;
       });
       if (dropped.length && window.console) {
         console.warn('Sagittal figure: not drawn in the ' + view + ' view, so not labelled: ' + dropped.join('; '));
       }
 
-      last = { view: view, drawn: drawn, labels: labels.map(function (l) { return l.t; }), dropped: dropped };
+      last = { view: view, drawn: drawn, labels: labels.map(function (l) { return l.t; }), dropped: dropped,
+        changed: labels.filter(function (l) { return l.cls; }).map(function (l) { return l.t; }) };
       return { labels: labels, info: infoHtml(view), update: orientUpdate(g) };
     }
 
@@ -417,7 +448,7 @@
       id: sceneId,
       meshes: meshIds,
       center: sc(region.c),
-      zoom: R.view && R.view.zoom ? R.view.zoom : ZOOM,
+      zoom: fitZoom(R.view && R.view.zoom ? R.view.zoom : ZOOM, opts.aspect),
       rot: R.view && R.view.rot ? R.view.rot.slice() : ROT.slice(),
       controls: controls,
       build: build,
@@ -425,9 +456,16 @@
     Kit.register(def);
     api.debug = function () {
       return last.view ? { view: last.view, drawn: last.drawn.slice(), labels: last.labels.slice(), dropped: last.dropped.slice(),
-        orientation: last.orientation || orientation(def.rot).text, scale: S } : null;
+        orientation: last.orientation || orientation(def.rot).text, scale: S, changed: (last.changed || []).slice(), zoom: def.zoom } : null;
     };
     return def;
+  }
+
+  // A figure is framed for a wide stage; on a narrow (portrait) one the camera steps back so the
+  // region of interest still fits across (opts.aspect = stage width / height). Kit clamps at 16.
+  function fitZoom(z, aspect) {
+    if (!(aspect > 0) || aspect >= 1.25) return z;
+    return Math.min(16, z * Math.min(1.7, Math.pow(1.25 / aspect, 0.85)));
   }
 
   /* ---------- orientation ---------- */

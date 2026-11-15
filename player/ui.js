@@ -1,21 +1,21 @@
 /* Sagittal figure page. Classic script: sets window.SagittalUI. Needs Kit, SagittalPlayer and
  * player/figure.css; the organ meshes must be loaded before mount() (the player reads them).
  *
- *   SagittalUI.mount({ resolved, root?, credits?, organs?, state?, plate? }) -> figure
- *     Builds the page into root (default document.body): running head, plate number and title,
+ *   SagittalUI.mount({ resolved, root?, credits?, organs?, state? }) -> figure
+ *     Builds the page into root (default document.body): running head, title (and the variant's
+ *     full name when the title does not carry it),
  *     the 3D stage with the orientation note, the control row (view, organ toggles, labels, Save
  *     as image) and the info panel (claims with their references, "Changed from base anatomy",
  *     credits). Sets window.viewer (the Kit viewer) and window.figure.
  *     credits: site/meshes/credits.json (default window.SagittalCredits); Task 6 passes it in.
- *     plate: the plate number (default 1), shown as "Plate I".
  *     The stage's clear colour follows the --stage token of figure.css (paper in light mode, warm
  *     dark in dark mode) and the leaders take their colours from figure.css (leaderStyle 'css').
  *   figure.snapshot({ labels?, footer? }) -> Promise<PNG data URL>
  *     The stage at its device-pixel size: the WebGL canvas, the orientation note, a footer line
- *     (Sagittal · Plate I · title · view) and, when labels is true (default: the page's Labels
+ *     (Sagittal · title · view) and, when labels is true (default: the page's Labels
  *     toggle), the anchor dots, leaders and italic captions drawn from viewer.debug() geometry in
  *     the page's computed label styles. The footer goes to the first free corner (bottom right,
- *     bottom left, top right), shortened to "Sagittal · Plate I" if the full line fits nowhere,
+ *     bottom left, top right), shortened to "Sagittal" if the full line fits nowhere,
  *     and left out if every corner holds a label, or when footer is false. The page is left as it was.
  *   figure.save() downloads that image as <slug>-<view>.png.
  *   SagittalUI.infoHtml(ctx) is the info panel markup; the player calls it on every build.
@@ -36,17 +36,112 @@
     return String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '') || 'figure';
   }
-  function roman(n) {
-    n = Math.max(1, Math.min(3999, Math.floor(n) || 1));
-    var r = '', t = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
-    t.forEach(function (p) { while (n >= p[0]) { r += p[1]; n -= p[0]; } });
-    return r;
-  }
   function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } }
   function uniq(a) { var out = []; a.forEach(function (x) { if (out.indexOf(x) < 0) out.push(x); }); return out; }
 
   /* ---------- info panel ---------- */
-  var OPS = { route: 'Drawn as a new path', branch: 'Drawn as a branch', duplicate: 'Duplicated', remove: 'Removed', move_insertion: 'Insertion moved' };
+  // "Changed from base anatomy" in plain anatomical language, built from the resolved spec: what
+  // the variant adds, removes or moves (first), then what is drawn from landmarks in both views.
+  // Each row says where the structure arises, which landmarks it passes and how ("behind",
+  // "to the right of", "toward segment IV"), in the library's own names for them.
+  var DIRW = { posterior: 'behind', anterior: 'in front of', superior: 'above', inferior: 'below', left: 'to the left of', right: 'to the right of' };
+  function provenanceHtml(R, nameOf) {
+    var own = {};
+    (R.base || []).concat(R.variant.edits || []).forEach(function (e) { if (e.id) own[e.id] = e.name || e.id; });
+    // A readable noun phrase for a library structure, landmark or one of the spec's own routes:
+    // source notes (after ': ' or in brackets) and "curve" wording dropped, "Centroid of segment
+    // IV" said as "segment IV".
+    function phrase(ref) {
+      var full = ref.indexOf('/') >= 0 ? nameOf(ref) : (own[ref] || ref);
+      var t = String(full).split(': ')[0].replace(/\s*\([^()]*\)/g, '').replace(/ curve\b/g, '').replace(/\s+/g, ' ').trim();
+      var seg = /^centroid of (segment .+)$/i.exec(t);
+      if (seg) return { text: seg[1], toward: true };
+      t = t.charAt(0).toLowerCase() + t.slice(1);
+      if (!/^the /.test(t)) t = 'the ' + t;
+      return { text: t, toward: false, full: full };
+    }
+    function wpRef(w) { return w.landmark || w.on; }
+    // waypoints -> "behind the portal confluence, behind and to the right of the upper end of the
+    // bile duct, along the proper hepatic artery"
+    function passes(wps, skip) {
+      var parts = [], prev = null;
+      (wps || []).forEach(function (w) {
+        var ref = wpRef(w), ph = phrase(ref), how;
+        if (w.on && !w.landmark && !w.offset && skip.indexOf(ph.text) >= 0) return; // "along" itself or its parent line
+        if (w.offset) how = DIRW[w.offset.dir] || 'near';
+        else if (w.on && !w.landmark) how = 'along';
+        else if (w.offset) how = DIRW[w.offset.dir] || 'near';
+        else how = ph.toward ? 'toward' : 'through';
+        if (prev && prev.ref === ref) {
+          if (prev.hows.indexOf(how) < 0) prev.hows.push(how);
+          return;
+        }
+        prev = { ref: ref, ph: ph, hows: [how] };
+        parts.push(prev);
+      });
+      return parts.map(function (p) {
+        var h = p.hows;
+        // to one side, behind (or in front), then to the other side: it crosses behind (in front of) it
+        var across = h.indexOf('to the left of') >= 0 && h.indexOf('to the right of') >= 0;
+        if (across && h.indexOf('behind') >= 0) return 'crosses behind ' + p.ph.text;
+        if (across && h.indexOf('in front of') >= 0) return 'crosses in front of ' + p.ph.text;
+        return h.join(' and ') + ' ' + p.ph.text;
+      }).join(', ').replace(/passes crosses/g, 'crosses');
+    }
+    function endAt(w) {
+      if (!w) return '';
+      var ph = phrase(wpRef(w));
+      if (w.offset) return (DIRW[w.offset.dir] || 'near') + ' ' + ph.text;
+      return (ph.toward ? 'toward ' : 'at ') + ph.text;
+    }
+    function startAt(w) { return w ? (w.on && !w.landmark ? phrase(w.on).text : endAt(w).replace(/^at /, '')) : ''; }
+    function editFor(pv) {
+      var list = pv.view === 'both' ? (R.base || []) : (R.variant.edits || []);
+      for (var i = 0; i < list.length; i++) {
+        var e = list[i];
+        if ((e.id || e.structure) === pv.structure && e.op === pv.op) return e;
+      }
+      return null;
+    }
+    function sentence(pv) {
+      var e = editFor(pv) || {}, out = [];
+      var self = phrase(pv.structure).text, fromLine = e.from && e.from.on && !e.from.landmark ? phrase(e.from.on).text : null;
+      var alongOnly = fromLine && (e.via || []).length && (e.via || []).every(function (w) { return w.on === e.from.on && !w.landmark; });
+      var cap = function (t) { return t.charAt(0).toUpperCase() + t.slice(1); };
+      if (pv.op === 'remove') return pv.view === 'both' ? 'Not drawn.' : 'Not present in the variant.';
+      if (pv.op === 'move_insertion') {
+        var to = pv.on && pv.on[0] ? phrase(pv.on[0]).text : '';
+        return to ? 'Arises from ' + to + ' instead.' : 'Its origin moves.';
+      }
+      if (pv.op === 'duplicate') out.push('A second ' + phrase(pv.structure).text.replace(/^the /, ''));
+      else if (pv.op === 'branch' && e.from) out.push('Arises from ' + startAt(e.from));
+      else if (alongOnly) out.push('Runs along ' + fromLine);
+      else if (e.from) out.push('Runs from ' + startAt(e.from));
+      var via = passes(e.via, [self].concat(fromLine && pv.op !== 'branch' ? [fromLine] : []));
+      if (via) out.push(/^crosses /.test(via) ? via : 'passes ' + via);
+      var toLine = e.to && e.to.on && !e.to.landmark ? phrase(e.to.on).text : null;
+      if (e.to && toLine && toLine !== self && !e.to.offset) out.push('joins ' + toLine);
+      else if (e.to && toLine !== self) out.push((pv.op === 'route' && !via && !alongOnly ? 'to ' : 'ends ') + endAt(e.to));
+      if (!out.length) return '';
+      var lead = pv.view === 'both' ? '' : (pv.op === 'duplicate' ? '' : 'Added. ');
+      return lead + cap(out.join('; ').replace(/; (to|ends) /, function (m, w) { return w === 'to' ? ' to ' : '; ends '; })) + '.';
+    }
+    var groups = [
+      { key: 'variant', title: 'In the variant', list: (R.provenance || []).filter(function (pv) { return pv.view !== 'both'; }) },
+      { key: 'both', title: 'In both views, drawn from landmarks', list: (R.provenance || []).filter(function (pv) { return pv.view === 'both'; }) },
+    ];
+    var h = '<section class="fig-provenance"><h2>Changed from base anatomy</h2>';
+    groups.forEach(function (g) {
+      if (!g.list.length) return;
+      h += '<h3 class="pv-group pv-' + g.key + '">' + g.title + '</h3><ul class="pv-list pv-' + g.key + '">';
+      g.list.forEach(function (pv) {
+        h += '<li data-structure="' + esc(pv.structure) + '" data-view="' + esc(pv.view) + '"><span class="pv-name">' + esc(pv.name || pv.structure) + '</span> ' +
+          '<span class="pv-text">' + esc(sentence(pv)) + '</span></li>';
+      });
+      h += '</ul>';
+    });
+    return h + '</section>';
+  }
 
   // ctx: { spec (resolved), references (SagittalOrgans.references), name(ref) -> library name,
   //        credit (credits line, may be empty) }
@@ -71,53 +166,23 @@
       });
       h += '</ol></section>';
     }
-    // names of the spec's own structures (route ids), for "on" lists
-    var own = {};
-    (R.provenance || []).forEach(function (pv) { if (!own[pv.structure]) own[pv.structure] = pv.name || pv.structure; });
-    function label(x) { return x.indexOf('/') >= 0 ? nameOf(x) : (own[x] || x); }
-    // Library names carry source notes after a colon or in a closing parenthesis
-    // ("Portal confluence: union of ..."; "Bile duct (common bile duct)"):
-    // the list shows the name, the note stays in the tooltip.
-    function shortName(full) { return full.split(': ')[0].replace(/\s*\([^()]*\)\s*$/, ''); }
-    function item(full) {
-      var short = shortName(full);
-      return short === full ? esc(full) : '<span title="' + esc(full) + '">' + esc(short) + '</span>';
-    }
-    function items(list) { // short names, once each
-      var seen = {}, out = [];
-      list.forEach(function (x) { var k = shortName(x); if (!seen[k]) { seen[k] = 1; out.push(item(x)); } });
-      return out.join(', ');
-    }
-    h += '<section class="fig-provenance"><h2>Changed from base anatomy</h2><ul>';
-    (R.provenance || []).forEach(function (pv) {
-      var both = pv.view === 'both';
-      var on = uniq((pv.on || []).map(label)), via = uniq((pv.via || []).map(label));
-      h += '<li data-structure="' + esc(pv.structure) + '"><div class="pv-head"><span class="pv-name">' + esc(pv.name || pv.structure) + '</span>' +
-        '<span class="pv-view' + (both ? '' : ' is-variant') + '">' + (both ? 'Both views' : 'Variant') + '</span></div>' +
-        '<p class="pv-op">' + esc(OPS[pv.op] || pv.op) + '</p>';
-      if (on.length || via.length) {
-        h += '<dl class="pv-via">';
-        if (on.length) h += '<dt>On</dt><dd>' + items(on) + '</dd>';
-        if (via.length) h += '<dt>Through</dt><dd>' + items(via) + '</dd>';
-        h += '</dl>';
-      }
-      h += '</li>';
-    });
-    h += '</ul></section>';
+    h += provenanceHtml(R, nameOf);
     if (ctx.credit) h += '<p class="fig-credit">' + esc(ctx.credit) + '</p>';
     return h;
   }
 
   /* ---------- page ---------- */
-  function build(root, R, plateName) {
+  function build(root, R) {
     var fig = el('div', 'fig');
     var run = el('p', 'fig-run');
     run.appendChild(el('span', 'fig-mark', 'Sagittal'));
-    run.appendChild(el('span', null, (R.topic ? R.topic + ' \u00b7 ' : '') + 'Anatomical variant'));
+    if (R.topic) run.appendChild(el('span', null, R.topic));
     fig.appendChild(run);
     var head = el('header', 'fig-head');
-    head.appendChild(el('p', 'fig-no', plateName));
     head.appendChild(el('h1', 'fig-title', R.title));
+    // the variant's full name, unless the title already says it
+    var vl = R.variant && R.variant.label;
+    if (vl && R.title.toLowerCase().indexOf(vl.toLowerCase()) < 0) head.appendChild(el('p', 'fig-sub', 'Variant shown: ' + vl));
     fig.appendChild(head);
 
     var plate = el('figure', 'fig-plate');
@@ -126,11 +191,24 @@
     cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', R.title + ': 3D figure, drag to rotate');
     var labels = el('div'); labels.id = 'labels';
     var orient = el('p', 'fig-orient'); orient.id = 'orient'; orient.setAttribute('aria-live', 'polite');
-    var hint = el('p', 'fig-hint', 'Drag to rotate · scroll to zoom');
+    var hint = el('p', 'fig-hint');
+    hint.appendChild(el('span', 'h-pointer', 'Drag to rotate \u00b7 scroll to zoom'));
+    hint.appendChild(el('span', 'h-touch', 'Drag to rotate \u00b7 pinch to zoom'));
     stage.append(cv, orient, labels, hint);
 
     var bar = el('div', 'fig-bar');
     var view = el('div', 'fig-view');
+    // Normal / Variant: a two-option radio group (the kit's own select stays, hidden, and is driven
+    // from here so the kit's state and URL handling are unchanged)
+    view.appendChild(el('span', 'fig-k', 'View')).id = 'fig-view-k';
+    var seg = el('div', 'fig-seg'); seg.setAttribute('role', 'radiogroup'); seg.setAttribute('aria-labelledby', 'fig-view-k');
+    var radios = {};
+    [['normal', 'Normal'], ['variant', 'Variant']].forEach(function (o) {
+      var r = el('input'); r.type = 'radio'; r.name = 'fig-v'; r.id = 'fig-v-' + o[0]; r.value = o[0];
+      var l = el('label', null, o[1]); l.htmlFor = r.id;
+      var w = el('span', 'seg'); w.append(r, l); seg.appendChild(w); radios[o[0]] = r;
+    });
+    view.appendChild(seg);
     var organs = el('fieldset', 'fig-organs');
     var lg = el('legend', 'fig-k', 'Show'); organs.appendChild(lg);
     var opts = el('div', 'opts'); organs.appendChild(opts);
@@ -150,16 +228,16 @@
     var info = el('div', 'fig-info'); info.id = 'info';
     fig.appendChild(info);
     root.appendChild(fig);
-    return { fig: fig, stage: stage, cv: cv, labels: labels, orient: orient, view: view, opts: opts, toggle: lt, save: save, info: info };
+    return { fig: fig, stage: stage, cv: cv, labels: labels, orient: orient, view: view, radios: radios, opts: opts, toggle: lt, save: save, info: info };
   }
 
   function mount(o) {
     o = o || {};
     var R = o.resolved, root = o.root || document.body;
-    var plateName = 'Plate ' + roman(o.plate || 1);
-    var D = build(root, R, plateName);
+    var D = build(root, R);
     document.title = R.title + ' · Sagittal';
-    var def = window.SagittalPlayer.register(R, { credits: o.credits || window.SagittalCredits || null, organs: o.organs, orientEl: D.orient });
+    var aspect = D.stage.clientWidth / (D.stage.clientHeight || 1);
+    var def = window.SagittalPlayer.register(R, { credits: o.credits || window.SagittalCredits || null, organs: o.organs, orientEl: D.orient, aspect: aspect });
     var staging = el('div'); // the kit builds its controls here; they are moved into the control row
     function stageColour() { return getComputedStyle(D.stage).backgroundColor; }
     var viewer = window.Kit.createViewer({ canvas: D.cv, labelsEl: D.labels, controlsEl: staging, infoEl: D.info,
@@ -173,7 +251,17 @@
     if (window.MutationObserver) new MutationObserver(retone).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
     viewer.open(def.id, o.state || {});
     Array.prototype.slice.call(staging.children).forEach(function (c) {
-      (c.classList.contains('chk') ? D.opts : D.view).appendChild(c);
+      if (c.classList.contains('chk')) { D.opts.appendChild(c); return; }
+      c.hidden = true; D.view.appendChild(c); // the kit's select: driven by the radio group
+    });
+    var sel = D.view.querySelector('select');
+    function syncRadios() { var v = viewer.getState().v === 'normal' ? 'normal' : 'variant'; D.radios[v].checked = true; }
+    syncRadios();
+    Object.keys(D.radios).forEach(function (k) {
+      D.radios[k].onchange = function () {
+        if (!D.radios[k].checked || !sel) return;
+        sel.value = k; sel.dispatchEvent(new Event('change'));
+      };
     });
     var labelsOn = true;
     D.toggle.onchange = function () { labelsOn = D.toggle.checked; viewer.setLabelsVisible(labelsOn); };
@@ -222,7 +310,7 @@
         });
       }
 
-      // footer line: Sagittal · Plate I · title · view. Bottom right, else bottom left, else top
+      // footer line: Sagittal · title · view. Bottom right, else bottom left, else top
       // right: the first corner where it covers no label (and not the orientation note); none, no footer.
       if (withFooter) footer();
       if (withLabels) drawLabels(g, k, stageInk);
@@ -231,15 +319,15 @@
       function footer() {
       var fs = 12.5 * k, m = 10 * k, fam = tok('--serif', 'Georgia, serif');
       g.font = 'italic 400 ' + fs + 'px ' + fam;
-      var head = 'Sagittal · ' + plateName + ' · ', tail = ' · ' + viewName(), title = R.title, maxW = W - 2 * m - 10 * k;
+      var head = 'Sagittal \u00b7 ', tail = ' · ' + viewName(), title = R.title, maxW = W - 2 * m - 10 * k;
       var foot = head + title + tail;
       while (g.measureText(foot).width > maxW && title.length > 8) { title = title.slice(0, -2); foot = head + title.replace(/\s+$/, '') + '…' + tail; }
       var fh = fs * 1.55;
       var busy = (withLabels ? viewer.debug().labelRects.map(function (r) { return [r.x * k, r.y * k, r.w * k, r.h * k]; }) : []);
       if (text) { var orr = D.orient.getBoundingClientRect(); busy.push([(orr.left - sb.left) * k, (orr.top - sb.top) * k, orr.width * k, orr.height * k]); }
-      // the full line first; failing that, the short one ("Sagittal · Plate I")
+      // the full line first; failing that, the short one ("Sagittal")
       var at = null, fw = 0;
-      [foot, 'Sagittal \u00b7 ' + plateName].some(function (t) {
+      [foot, 'Sagittal'].some(function (t) {
         fw = g.measureText(t).width + 10 * k;
         var spots = [[W - m - fw, H - m - fh], [m, H - m - fh], [W - m - fw, m]];
         for (var si = 0; si < spots.length; si++) {
@@ -272,28 +360,27 @@
     function drawLabels(g, k, fallbackInk) {
       var d = viewer.debug(), rects = d.labelRects, leads = d.leaders;
       function px(v, def) { var n = parseFloat(v); return isFinite(n) ? n : def; }
-      function svgStyle(sel, occluded) {
-        var e = D.labels.querySelector((occluded ? '.is-occluded ' : '.kit-leaders g:not(.is-occluded) ') + sel) ||
-          D.labels.querySelector('.kit-leaders ' + sel);
-        return e ? getComputedStyle(e) : null;
-      }
-      function look(occluded) {
-        var h = svgStyle('.kit-halo', occluded), l = svgStyle('.kit-leader', occluded), a = svgStyle('.kit-anchor', occluded);
-        var stage = getComputedStyle(D.stage).backgroundColor;
+      // the label elements and leader groups are created in the same order (kit rebuild)
+      var labs = Array.prototype.slice.call(D.labels.querySelectorAll('.lab'));
+      var groups = Array.prototype.slice.call(D.labels.querySelectorAll('.kit-leaders > g'));
+      var stage = getComputedStyle(D.stage).backgroundColor;
+      function idxOf(text) { for (var j = 0; j < labs.length; j++) if (labs[j].textContent === text) return j; return -1; }
+      function look(j) {
+        var gEl = groups[j], q = function (c) { var e = gEl && gEl.querySelector(c); return e ? getComputedStyle(e) : null; };
+        var h = q('.kit-halo'), l = q('.kit-leader'), a = q('.kit-anchor');
+        var dash = l && l.strokeDasharray && l.strokeDasharray !== 'none' ? l.strokeDasharray.split(/[\s,]+/).map(function (v) { return px(v, 0); }) : [];
         return {
           halo: h ? h.stroke : stage, haloW: h ? px(h.strokeWidth, 3) : 3,
-          line: l ? l.stroke : fallbackInk, lineW: l ? px(l.strokeWidth, 0.9) : 0.9,
-          dash: occluded ? [2.5, 2.5] : [],
-          dotR: a ? px(a.r, 2.4) : 2.4, dotFill: a ? a.fill : (occluded ? stage : fallbackInk),
+          line: l ? l.stroke : fallbackInk, lineW: l ? px(l.strokeWidth, 0.9) : 0.9, dash: dash,
+          dotR: a ? px(a.r, 2.4) : 2.4, dotFill: a ? a.fill : fallbackInk,
           dotStroke: a ? a.stroke : stage, dotW: a ? px(a.strokeWidth, 1.4) : 1.4,
         };
       }
-      var L = { false: look(false), true: look(true) };
       g.save();
       g.lineCap = 'round';
       leads.forEach(function (l) {
         if (!l) return;
-        var s = L[!!l.occluded];
+        var s = look(idxOf(l.text));
         g.setLineDash([]);
         g.strokeStyle = s.halo; g.lineWidth = s.haloW * k;
         g.beginPath(); g.moveTo(l.ax * k, l.ay * k); g.lineTo(l.x2 * k, l.y2 * k); g.stroke();
@@ -307,7 +394,6 @@
       });
       g.restore();
       function fontOf(c) { return c.fontStyle + ' ' + c.fontWeight + ' ' + parseFloat(c.fontSize) * k + 'px ' + c.fontFamily; }
-      var labs = D.labels.querySelectorAll('.lab');
       rects.forEach(function (r, i) {
         var l = leads[i];
         if (!l) return;
