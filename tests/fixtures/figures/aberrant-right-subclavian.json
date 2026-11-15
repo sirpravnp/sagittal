@@ -1,0 +1,150 @@
+{
+  "schema": "sagittal-figure/1",
+  "title": "Aberrant right subclavian artery",
+  "topic": "Thorax",
+  "organs": [
+    {
+      "id": "aorta"
+    },
+    {
+      "id": "oesophagus",
+      "parts": {
+        "oesophagus": {
+          "opacity": 0.55
+        }
+      }
+    },
+    {
+      "id": "airways",
+      "parts": {
+        "*": {
+          "opacity": 0.35
+        },
+        "lobar_bronchi": {
+          "visible": false
+        }
+      }
+    }
+  ],
+  "variant": {
+    "label": "Aberrant right subclavian artery",
+    "edits": [
+      {
+        "op": "remove",
+        "structure": "aorta/right_subclavian_artery"
+      },
+      {
+        "op": "move_insertion",
+        "structure": "aorta/right_common_carotid_artery",
+        "to": {
+          "on": "aorta/aortic_arch",
+          "t": 0.3
+        }
+      },
+      {
+        "op": "remove",
+        "structure": "aorta/brachiocephalic_trunk"
+      },
+      {
+        "op": "branch",
+        "id": "arsa",
+        "name": "Aberrant right subclavian artery",
+        "tissue": "vessel-artery",
+        "radius_cm": 0.3,
+        "from": {
+          "on": "aorta/aortic_arch",
+          "t": 0.72
+        },
+        "via": [
+          {
+            "on": "oesophagus/oesophagus",
+            "t": 0.3,
+            "offset": {
+              "dir": "posterior",
+              "cm": 1.5
+            }
+          },
+          {
+            "on": "oesophagus/oesophagus",
+            "t": 0.25,
+            "offset": {
+              "dir": "right",
+              "cm": 1.6
+            }
+          },
+          {
+            "landmark": "aorta/right_subclavian_artery_end",
+            "offset": {
+              "dir": "left",
+              "cm": 3
+            }
+          }
+        ],
+        "to": {
+          "landmark": "aorta/right_subclavian_artery_end"
+        }
+      }
+    ]
+  },
+  "labels": [
+    {
+      "text": "Aberrant right subclavian artery",
+      "on": "arsa"
+    },
+    {
+      "text": "Right subclavian artery",
+      "on": "aorta/right_subclavian_artery"
+    },
+    {
+      "text": "Brachiocephalic trunk",
+      "on": "aorta/brachiocephalic_trunk"
+    },
+    {
+      "text": "Right common carotid artery",
+      "on": "aorta/right_common_carotid_artery"
+    },
+    {
+      "text": "Left common carotid artery",
+      "on": "aorta/left_common_carotid_artery"
+    },
+    {
+      "text": "Left subclavian artery",
+      "on": "aorta/left_subclavian_artery"
+    },
+    {
+      "text": "Oesophagus",
+      "on": "oesophagus/oesophagus"
+    },
+    {
+      "text": "Trachea",
+      "on": "airways/trachea"
+    }
+  ],
+  "claims": [
+    {
+      "text": "An aberrant right subclavian artery (arteria lusoria) arises directly from the aortic arch, not from the brachiocephalic trunk; it is found in about 0.5 to 4.4% of people.",
+      "refs": [
+        "jpersmed-aberrant-right-subclavian"
+      ]
+    },
+    {
+      "text": "It passes behind the oesophagus in about 80% of cases, between the oesophagus and trachea in about 15%, and in front of the trachea in about 5%.",
+      "refs": [
+        "jpersmed-aberrant-right-subclavian"
+      ]
+    },
+    {
+      "text": "Most people with it have no symptoms; pressure on the oesophagus can cause difficulty swallowing (dysphagia lusoria).",
+      "refs": [
+        "jpersmed-aberrant-right-subclavian"
+      ]
+    }
+  ],
+  "view": {
+    "rot": [
+      0.35,
+      2.7
+    ],
+    "zoom": 9
+  }
+}

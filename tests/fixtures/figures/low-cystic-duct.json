@@ -1,0 +1,187 @@
+{
+  "schema": "sagittal-figure/1",
+  "title": "Low insertion of the cystic duct",
+  "topic": "Hepatobiliary",
+  "organs": [
+    {
+      "id": "gallbladder"
+    },
+    {
+      "id": "duodenum",
+      "parts": {
+        "duodenum": {
+          "opacity": 0.4
+        }
+      }
+    },
+    {
+      "id": "pancreas",
+      "parts": {
+        "pancreas": {
+          "opacity": 0.3
+        }
+      }
+    },
+    {
+      "id": "liver",
+      "parts": {
+        "liver": {
+          "opacity": 0.15
+        }
+      }
+    }
+  ],
+  "base": [
+    {
+      "op": "route",
+      "id": "chd",
+      "name": "Common hepatic duct",
+      "tissue": "bile-duct",
+      "radius_cm": 0.12,
+      "from": {
+        "on": "gallbladder/bile_duct",
+        "t": 0
+      },
+      "via": [
+        {
+          "landmark": "gallbladder/bile_duct_upper_end",
+          "offset": {
+            "dir": "superior",
+            "cm": 1.5
+          }
+        }
+      ],
+      "to": {
+        "landmark": "portal-venous/portal_vein_upper_end",
+        "offset": {
+          "dir": "right",
+          "cm": 1.5
+        }
+      }
+    },
+    {
+      "op": "route",
+      "id": "cystic_duct",
+      "name": "Cystic duct",
+      "tissue": "bile-duct",
+      "radius_cm": 0.12,
+      "from": {
+        "landmark": "gallbladder/gallbladder_neck",
+        "offset": {
+          "dir": "inferior",
+          "cm": 1
+        }
+      },
+      "to": {
+        "on": "gallbladder/bile_duct",
+        "t": 0
+      }
+    }
+  ],
+  "variant": {
+    "label": "Low cystic duct insertion",
+    "edits": [
+      {
+        "op": "remove",
+        "structure": "cystic_duct"
+      },
+      {
+        "op": "route",
+        "id": "cystic_duct_low",
+        "name": "Cystic duct (low insertion)",
+        "tissue": "bile-duct",
+        "radius_cm": 0.12,
+        "from": {
+          "landmark": "gallbladder/gallbladder_neck",
+          "offset": {
+            "dir": "inferior",
+            "cm": 1
+          }
+        },
+        "via": [
+          {
+            "on": "gallbladder/bile_duct",
+            "t": 0.3,
+            "offset": {
+              "dir": "anterior",
+              "cm": 0.5
+            }
+          },
+          {
+            "on": "gallbladder/bile_duct",
+            "t": 0.45,
+            "offset": {
+              "dir": "anterior",
+              "cm": 0.5
+            }
+          },
+          {
+            "on": "gallbladder/bile_duct",
+            "t": 0.6,
+            "offset": {
+              "dir": "anterior",
+              "cm": 0.5
+            }
+          }
+        ],
+        "to": {
+          "on": "gallbladder/bile_duct",
+          "t": 0.75
+        }
+      }
+    ]
+  },
+  "labels": [
+    {
+      "text": "Gallbladder",
+      "on": "gallbladder/gallbladder"
+    },
+    {
+      "text": "Cystic duct",
+      "on": "cystic_duct"
+    },
+    {
+      "text": "Cystic duct (low insertion)",
+      "on": "cystic_duct_low"
+    },
+    {
+      "text": "Common hepatic duct",
+      "on": "chd"
+    },
+    {
+      "text": "Common bile duct",
+      "on": "gallbladder/bile_duct"
+    },
+    {
+      "text": "Duodenum",
+      "on": "duodenum/duodenum"
+    }
+  ],
+  "claims": [
+    {
+      "text": "The cystic duct is usually 2 to 4 cm long. It may join the bile duct low; even then it rarely passes behind the duodenum, so a duct seen there is more likely the bile duct.",
+      "refs": [
+        "jmas-anatomy-cholecystectomy"
+      ]
+    },
+    {
+      "text": "A cystic duct joining the bile duct low, near the ampulla, can mimic distal bile duct stones or obstruction on imaging and be mistaken for the bile duct at ERCP.",
+      "refs": [
+        "jmas-vasculobiliary-anatomy"
+      ]
+    },
+    {
+      "text": "A long, parallel or spiral cystic duct makes its insertion hard to find at cholecystectomy, which risks injury to the bile duct.",
+      "refs": [
+        "jmas-vasculobiliary-anatomy"
+      ]
+    }
+  ],
+  "view": {
+    "rot": [
+      0.1,
+      -0.5
+    ],
+    "zoom": 9
+  }
+}

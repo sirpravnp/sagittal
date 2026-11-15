@@ -1,0 +1,278 @@
+{
+  "schema": "sagittal-figure/1",
+  "title": "Replaced right hepatic artery from the SMA",
+  "topic": "Hepatobiliary",
+  "organs": [
+    {
+      "id": "coeliac-trunk",
+      "parts": {
+        "proper_hepatic_artery": {
+          "visible": false
+        }
+      }
+    },
+    {
+      "id": "mesenteric-arteries"
+    },
+    {
+      "id": "aorta",
+      "parts": {
+        "brachiocephalic_trunk": {
+          "visible": false
+        },
+        "common_carotid_arteries": {
+          "visible": false
+        },
+        "subclavian_arteries": {
+          "visible": false
+        },
+        "renal_arteries": {
+          "visible": false
+        },
+        "iliac_arteries": {
+          "visible": false
+        },
+        "aorta": {
+          "opacity": 0.4
+        }
+      }
+    },
+    {
+      "id": "portal-venous",
+      "parts": {
+        "*": {
+          "opacity": 0.6
+        }
+      }
+    },
+    {
+      "id": "gallbladder",
+      "parts": {
+        "gallbladder": {
+          "visible": false
+        }
+      }
+    },
+    {
+      "id": "liver",
+      "parts": {
+        "liver": {
+          "opacity": 0.1
+        }
+      }
+    }
+  ],
+  "base": [
+    {
+      "op": "branch",
+      "id": "pha",
+      "name": "Proper hepatic artery",
+      "tissue": "vessel-artery",
+      "radius_cm": 0.14,
+      "from": {
+        "on": "coeliac-trunk/common_hepatic_artery",
+        "t": 1
+      },
+      "via": [
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.07
+        }
+      ],
+      "to": {
+        "on": "coeliac-trunk/proper_hepatic_artery",
+        "t": 0.16
+      }
+    },
+    {
+      "op": "branch",
+      "id": "rha",
+      "name": "Right hepatic artery",
+      "tissue": "vessel-artery",
+      "radius_cm": 0.11,
+      "from": {
+        "on": "pha",
+        "t": 1
+      },
+      "via": [
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.25
+        },
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.35
+        },
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.45
+        },
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.56
+        },
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.66
+        },
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.78
+        },
+        {
+          "on": "coeliac-trunk/proper_hepatic_artery",
+          "t": 0.9
+        }
+      ],
+      "to": {
+        "landmark": "coeliac-trunk/proper_hepatic_artery_end"
+      }
+    },
+    {
+      "op": "branch",
+      "id": "lha",
+      "name": "Left hepatic artery",
+      "tissue": "vessel-artery",
+      "radius_cm": 0.1,
+      "from": {
+        "on": "pha",
+        "t": 1
+      },
+      "via": [
+        {
+          "landmark": "liver-segments/liver_segment_iv_centroid",
+          "offset": {
+            "dir": "posterior",
+            "cm": 0.8
+          }
+        },
+        {
+          "landmark": "liver-segments/liver_segment_iii_centroid",
+          "offset": {
+            "dir": "posterior",
+            "cm": 1.5
+          }
+        }
+      ],
+      "to": {
+        "landmark": "liver-segments/liver_segment_ii_centroid"
+      }
+    }
+  ],
+  "variant": {
+    "label": "Replaced right hepatic artery (Michels III)",
+    "edits": [
+      {
+        "op": "remove",
+        "structure": "rha"
+      },
+      {
+        "op": "branch",
+        "id": "rrha",
+        "name": "Replaced right hepatic artery",
+        "tissue": "vessel-artery",
+        "radius_cm": 0.16,
+        "from": {
+          "on": "mesenteric-arteries/superior_mesenteric_artery",
+          "t": 0.04
+        },
+        "via": [
+          {
+            "landmark": "portal-venous/portal_confluence",
+            "offset": {
+              "dir": "posterior",
+              "cm": 1.2
+            }
+          },
+          {
+            "landmark": "gallbladder/bile_duct_upper_end",
+            "offset": {
+              "dir": "posterior",
+              "cm": 1.2
+            }
+          },
+          {
+            "on": "coeliac-trunk/proper_hepatic_artery",
+            "t": 0.45
+          },
+          {
+            "on": "coeliac-trunk/proper_hepatic_artery",
+            "t": 0.56
+          },
+          {
+            "on": "coeliac-trunk/proper_hepatic_artery",
+            "t": 0.66
+          },
+          {
+            "on": "coeliac-trunk/proper_hepatic_artery",
+            "t": 0.78
+          },
+          {
+            "on": "coeliac-trunk/proper_hepatic_artery",
+            "t": 0.9
+          }
+        ],
+        "to": {
+          "landmark": "coeliac-trunk/proper_hepatic_artery_end"
+        }
+      }
+    ]
+  },
+  "labels": [
+    {
+      "text": "Right hepatic artery",
+      "on": "rha"
+    },
+    {
+      "text": "Replaced right hepatic artery (from SMA)",
+      "on": "rrha"
+    },
+    {
+      "text": "Left hepatic artery",
+      "on": "lha"
+    },
+    {
+      "text": "Proper hepatic artery",
+      "on": "pha"
+    },
+    {
+      "text": "Superior mesenteric artery",
+      "on": "mesenteric-arteries/superior_mesenteric_artery"
+    },
+    {
+      "text": "Portal vein",
+      "on": "portal-venous/portal_vein"
+    },
+    {
+      "text": "Common bile duct",
+      "on": "gallbladder/bile_duct"
+    }
+  ],
+  "claims": [
+    {
+      "text": "A replaced right hepatic artery arises from the superior mesenteric artery (Michels type III); in a review of about 19,000 patients it was the most common hepatic artery variant (about 3.7%).",
+      "refs": [
+        "jclinmedres-hepatic-artery-variations"
+      ]
+    },
+    {
+      "text": "It usually runs to the right of and behind the portal vein, then up the posterolateral side of the common bile duct to the right lobe.",
+      "refs": [
+        "jclinmedres-hepatic-artery-variations"
+      ]
+    },
+    {
+      "text": "At cholecystectomy it enters Calot's triangle behind the portal vein and can run parallel to the cystic duct.",
+      "refs": [
+        "jmas-vasculobiliary-anatomy"
+      ]
+    }
+  ],
+  "view": {
+    "rot": [
+      -0.25,
+      0.75
+    ],
+    "zoom": 7
+  }
+}
