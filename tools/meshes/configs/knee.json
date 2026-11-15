@@ -1,0 +1,87 @@
+{
+  "name": "knee",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), right knee: femur, tibia, fibula, patella, cruciate and collateral ligaments and menisci, extracted with tools/meshes/extract_blend.py into sagittal-assets-cache/zanatomy-limb/obj. Ligament sheets and meniscus cages are subdivided and smoothed here (Z-Anatomy applies subdivision/solidify modifiers at display time).",
+  "source_root": "${ASSETS}/zanatomy-limb/obj",
+  "transform": "zanatomy",
+  "center": "none",
+  "default_budget": 800,
+  "parts": {
+    "femur": {
+      "files": [
+        "Femur.r.obj"
+      ],
+      "budget": 3600
+    },
+    "tibia": {
+      "files": [
+        "Tibia.r.obj"
+      ],
+      "budget": 1700
+    },
+    "fibula": {
+      "files": [
+        "Fibula.r.obj"
+      ],
+      "budget": 1100
+    },
+    "patella": {
+      "files": [
+        "Patella.r.obj"
+      ],
+      "budget": 1000,
+      "subdivide": 1,
+      "smooth": 3
+    },
+    "acl": {
+      "files": [
+        "Anterior_cruciate_ligament.r.obj"
+      ],
+      "budget": 1400
+    },
+    "pcl": {
+      "files": [
+        "Posterior_cruciate_ligament.r.obj"
+      ],
+      "budget": 800
+    },
+    "mcl_sup": {
+      "files": [
+        "Superficial_part_of_tibial_collateral_ligament.r.obj"
+      ],
+      "budget": 400,
+      "subdivide": 2
+    },
+    "mcl_deep": {
+      "files": [
+        "Deep_part_of_tibial_collateral_ligament.r.obj"
+      ],
+      "budget": 400,
+      "subdivide": 2
+    },
+    "lcl": {
+      "files": [
+        "Fibular_collateral_ligament.r.obj"
+      ],
+      "budget": 300,
+      "subdivide": 2
+    },
+    "med_meniscus": {
+      "files": [
+        "Medial_meniscus.r.obj"
+      ],
+      "budget": 1200,
+      "subdivide": 2,
+      "smooth": 6
+    },
+    "lat_meniscus": {
+      "files": [
+        "Lateral_meniscus.r.obj"
+      ],
+      "budget": 1400,
+      "subdivide": 2,
+      "smooth": 6
+    }
+  }
+}

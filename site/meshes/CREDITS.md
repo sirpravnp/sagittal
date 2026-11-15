@@ -130,3 +130,40 @@ Used by: `scenes/eye.js`.
 There is no open (CC BY / CC BY-SA) female pelvis mesh in the asset cache: Z-Anatomy and
 BodyParts3D are male models. The uterus, cervix, upper vagina, tubes and ovaries of
 `scenes/fib.js` are built in code from an anatomical coronal profile; no third-party model is used.
+
+## upper-limb (Z-Anatomy right shoulder girdle, neck and chest wall)
+
+`upper-limb.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP):
+`Vertebra C3`-`C7` and `T1`-`T8`, `First rib.r` to `Eighth rib.r`, `Clavicle.r`, `Scapula.r`,
+`Humerus.r`, `Scalenus anterior muscle.r`, `Scalenus medius muscle.r` and `Serratus anterior muscle.r`
+(config `tools/meshes/configs/upper-limb.json`). Changes: decimated, light Taubin smoothing of the
+scalenes; not centred (raw sagittal frame). The `plexus` scene draws the brachial plexus (roots,
+trunks, divisions, posterior cord, musculocutaneous, axillary, radial, median, ulnar, suprascapular
+and long thoracic nerves), the subclavian, axillary and brachial arteries and the cervical sympathetic
+trunk as swept tubes along **Z-Anatomy**'s own centre lines. Changes to those: the trunks and cords are
+spread apart in the coronal plane (exploded view); the lateral and medial cords, the roots of the
+median nerve, the start of the axillary nerve and the posterior division of the lower trunk are short
+drawn links to textbook topology (Z-Anatomy has no cord objects); the long thoracic nerve is moved
+behind the plexus; the sympathetic trunk is shifted 1 cm laterally.
+Used by: `scenes/plexus.js`.
+
+## hand (Z-Anatomy right forearm and hand bones)
+
+`hand.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP):
+`Radius.r`, `Ulna.r`, the eight carpal bones (merged), each metacarpal and each phalanx of the right
+hand as separate parts (config `tools/meshes/configs/hand.json`). Changes: decimated. The `plexus`
+scene poses these bones (rotations at the shoulder, elbow, wrist and finger joints) to show the
+waiter's tip, claw hand and wrist drop.
+Used by: `scenes/plexus.js`.
+
+## knee (Z-Anatomy right knee)
+
+`knee.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP):
+`Femur.r`, `Tibia.r`, `Fibula.r`, `Patella.r`, `Anterior cruciate ligament.r`,
+`Posterior cruciate ligament.r`, superficial and deep parts of the tibial collateral ligament,
+`Fibular collateral ligament.r`, `Medial meniscus.r` and `Lateral meniscus.r`
+(config `tools/meshes/configs/knee.json`). Changes: subdivision cages (menisci, ligament sheets,
+patella) subdivided and Taubin-smoothed; decimated. The `knee` scene splits the cruciate, collateral
+and meniscus meshes along planes to show tears, moves the tibia for the drawer/sag/valgus signs, and
+adds a drawn patellar ligament (Z-Anatomy has only its attachment areas).
+Used by: `scenes/knee.js`.

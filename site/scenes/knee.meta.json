@@ -1,0 +1,39 @@
+{
+  "id": "knee",
+  "title": "Knee ligaments and menisci",
+  "topic": "Orthopedics",
+  "variantControl": "v",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal knee"
+    },
+    {
+      "key": "triad",
+      "label": "Unhappy triad (ACL + MCL + medial meniscus)"
+    },
+    {
+      "key": "pcl",
+      "label": "PCL tear (dashboard injury)"
+    }
+  ],
+  "claims": [
+    "The ACL runs from the anterior intercondylar area of the tibia to the medial side of the lateral femoral condyle and prevents anterior translation of the tibia on the femur.",
+    "The PCL runs from the posterior intercondylar area of the tibia to the lateral side of the medial femoral condyle and prevents posterior translation of the tibia.",
+    "The MCL (tibial collateral ligament) resists valgus stress; the LCL (fibular collateral ligament) resists varus stress.",
+    "The medial meniscus is C-shaped and attached to the joint capsule and deep MCL, so it is less mobile and injured more often than the more circular lateral meniscus.",
+    "The unhappy (O'Donoghue) triad is classically ACL + MCL + medial meniscus injury from a lateral blow to a planted, flexed knee (valgus with rotation); acute studies find the lateral meniscus torn more often.",
+    "ACL tear: a pop, rapid haemarthrosis and instability; Lachman test (most sensitive) and anterior drawer show increased anterior tibial translation.",
+    "MCL tear: medial pain and laxity on valgus stress at 30 degrees of flexion.",
+    "Meniscal tear: joint-line tenderness, locking or catching; McMurray test. MRI is the imaging test of choice for ligament and meniscal tears.",
+    "PCL tear: a posterior force on the proximal tibia with the knee flexed (dashboard injury, fall on the flexed knee); posterior drawer test and posterior sag sign."
+  ],
+  "sources": [
+    "StatPearls (NCBI Bookshelf): Anterior Cruciate Ligament Knee Injury",
+    "StatPearls (NCBI Bookshelf): Posterior Cruciate Ligament Knee Injuries",
+    "StatPearls (NCBI Bookshelf): Medial Collateral Knee Ligament Injury",
+    "StatPearls (NCBI Bookshelf): Meniscus Tear",
+    "Z-Anatomy, the libre 3D atlas of anatomy (CC BY-SA 4.0), based on BodyParts3D (DBCLS, CC BY-SA 2.1 JP). https://github.com/Z-Anatomy/Models-of-human-anatomy"
+  ],
+  "status": "unreviewed"
+}
