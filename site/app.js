@@ -219,12 +219,37 @@
     }).then(renderDecks).catch(function () { /* no deck list */ });
   }
 
+  // Claim text: "→" becomes a drawn arrow (read as "to"), "↑X" / "↓X" become "raised X" / "low X".
+  var ARROW = '<svg class="i-arrow" viewBox="0 0 16 10" width="16" height="10" aria-hidden="true" focusable="false"><path d="M1 5h13M10 1.5 14 5l-4 3.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function claimNode(text) {
+    var li = el('li');
+    text = text.replace(/↑\s*/g, 'raised ').replace(/↓\s*/g, 'low ');
+    text.split(/\s*→\s*/).forEach(function (part, i) {
+      if (i) {
+        var a = el('span', 'arrow'); a.innerHTML = ARROW;
+        a.appendChild(el('span', 'visually-hidden', ' to '));
+        li.appendChild(document.createTextNode(' ')); li.appendChild(a); li.appendChild(document.createTextNode(' '));
+      }
+      li.appendChild(document.createTextNode(part));
+    });
+    return li;
+  }
+
+  // Site viewer (not embed=1): the figures' paper stage and italic, CSS-styled labels. The embed
+  // path (card renders, thumbnails, Anki) passes none of the opt-in options, so those images stay
+  // exactly as before.
+  function siteStageOptions() {
+    var stage = document.getElementById('stage');
+    return { background: getComputedStyle(stage).backgroundColor, leaderStyle: 'css' };
+  }
+
   function initViewer() {
     var params = new URLSearchParams(location.search);
     var id = params.get('scene') || '';
     var state = {};
     params.forEach(function (v, k) { if (k !== 'scene' && k !== 'embed') state[k] = v; });
-    if (params.get('embed') === '1') document.body.classList.add('embed');
+    var embed = params.get('embed') === '1';
+    if (embed) document.body.classList.add('embed'); else document.body.classList.add('site-stage');
 
     function notFound() {
       document.body.classList.add('missing');
@@ -244,9 +269,11 @@
         document.title = meta.title + ' · Sagittal';
         document.querySelector('h1').textContent = meta.title;
         var fig = document.getElementById('fig');
-        if (fig) fig.textContent = 'Plate ' + roman(ids.indexOf(id) + 1);
         var claims = document.getElementById('claims');
-        meta.claims.forEach(function (c) { claims.appendChild(el('li', null, c)); });
+        meta.claims.forEach(function (c) { claims.appendChild(claimNode(c)); });
+        var def = Kit.get(id);
+        var sch = document.getElementById('schematic');
+        if (sch) sch.hidden = !!(def && def.meshes && def.meshes.length); // drawn from primitives, not reconstructed meshes
         if (meta.sources.length) {
           var src = document.getElementById('sources');
           meta.sources.forEach(function (s) { src.appendChild(el('li', null, s)); });
@@ -256,16 +283,31 @@
           var line = sceneCredit(id, credits), p = document.getElementById('scene-credit');
           if (p && line) { p.textContent = line; p.hidden = false; }
         }).catch(function () { /* the Model credits link still works */ });
-        var viewer = Kit.createViewer({
+        // The site's italic labels use the web font: measure them only once it has loaded
+        // (the kit sizes each label once). embed=1 keeps the system-font chips and does not wait.
+        var fontsReady = !embed && document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+        return fontsReady.then(function () {
+        // (#info is not passed: the scene's per-view notes repeat the claims listed below)
+        var vopts = {
           canvas: document.getElementById('cv'),
           labelsEl: document.getElementById('labels'),
           controlsEl: document.getElementById('controls'),
-          infoEl: document.getElementById('info'),
-        });
+        };
+        if (!embed) Object.assign(vopts, siteStageOptions());
+        var viewer = Kit.createViewer(vopts);
+        if (!embed) {
+          var retone = function () { viewer.setBackground(siteStageOptions().background); };
+          if (window.matchMedia) {
+            var mq = window.matchMedia('(prefers-color-scheme: dark)');
+            if (mq.addEventListener) mq.addEventListener('change', retone);
+          }
+          if (window.MutationObserver) new MutationObserver(retone).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        }
         window.viewer = viewer;
         var toggle = document.getElementById('labels-toggle');
         toggle.onchange = function () { viewer.setLabelsVisible(toggle.checked); };
         if (!viewer.open(id, state)) return notFound();
+        });
       });
     }).catch(function (e) {
       document.getElementById('info').textContent = 'Could not load this scene. ' + e.message;

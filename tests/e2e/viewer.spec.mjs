@@ -25,7 +25,12 @@ test('heart scene loads cleanly and renders', async ({ page }) => {
   expect(nonBlank).toBe(true);
   const text = await page.locator('body').innerText();
   expect(text).not.toContain('nreviewed');
-  expect(text).toContain(heartMeta.claims[0]);
+  // claims are shown once, arrows drawn as icons (read as "to")
+  const norm = (t) => t.replace(/\s*→\s*/g, ' to ').replace(/\s+/g, ' ');
+  expect(norm(text)).toContain(norm(heartMeta.claims[0]));
+  expect(await page.locator('#claims svg.i-arrow').count()).toBeGreaterThan(0);
+  expect(await page.locator('#claims').innerText()).not.toMatch(/[→↑↓]/);
+  expect(await page.locator('#info').innerText()).toBe('');
   // controls rendered from the scene definition
   await expect(page.locator('select')).toHaveCount(1);
   expect(errors).toEqual([]);
@@ -73,6 +78,31 @@ test('gallery lists scenes with title and link', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('site viewer uses the paper stage and CSS leaders; embed=1 (cards, Anki) does not', async ({ page }) => {
+  const look = () => page.evaluate(() => {
+    const ln = document.querySelector('.kit-leader');
+    return { site: document.body.classList.contains('site-stage'), bg: getComputedStyle(document.querySelector('#stage')).backgroundColor,
+      inlineStroke: ln && ln.getAttribute('stroke'), nonBlank: window.viewer.debug().nonBlank };
+  });
+  await openHeart(page);
+  let l = await look();
+  expect(l.site).toBe(true);
+  expect(l.bg).toBe('rgb(238, 231, 216)');
+  expect(l.inlineStroke, 'leader colours come from the stylesheet').toBeNull();
+  expect(l.nonBlank).toBe(true);
+  await openHeart(page, '&embed=1');
+  l = await look();
+  expect(l.site).toBe(false);
+  expect(l.bg).toBe('rgb(15, 20, 27)');
+  expect(l.inlineStroke, 'the kit\'s own leader colours, as before').toBe('#f2f5fa');
+  // the canvas is cleared to the kit's dark colour, not the paper
+  const px = await page.evaluate(() => {
+    const c = document.querySelector('#cv'), gl = c.getContext('webgl2') || c.getContext('webgl');
+    const p = new Uint8Array(4); gl.readPixels(1, 1, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, p); return [p[0], p[1], p[2]];
+  });
+  expect(px).toEqual([15, 20, 27]);
+});
+
 test('WebGL off shows fallback text without uncaught errors', async () => {
   const browser = await chromium.launch({ channel: 'chrome', args: ['--disable-gpu', '--disable-webgl', '--disable-3d-apis'] });
   try {
@@ -81,7 +111,7 @@ test('WebGL off shows fallback text without uncaught errors', async () => {
     page.on('pageerror', (e) => uncaught.push(e.message));
     await page.goto('viewer.html?scene=heart');
     await expect(page.locator('body')).toContainText('3D is not available');
-    await expect(page.locator('body')).toContainText(heartMeta.claims[0]);
+    await expect(page.locator('#claims li').first()).toContainText('RA');
     expect(uncaught).toEqual([]);
   } finally {
     await browser.close();

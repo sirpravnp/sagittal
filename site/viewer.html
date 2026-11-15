@@ -21,21 +21,21 @@
   <div id="stage">
     <canvas id="cv"></canvas>
     <div id="labels"></div>
-    <div id="hint">drag to rotate · scroll or pinch to zoom</div>
+    <div id="hint"><span class="h-pointer">Drag to rotate · scroll to zoom</span><span class="h-touch">Drag to rotate · pinch to zoom</span></div>
   </div>
   <aside>
     <div id="controls"></div>
     <div class="chk"><input type="checkbox" id="labels-toggle" checked><label for="labels-toggle">Labels</label></div>
     <div id="info"></div>
     <section class="claims">
-      <h2>Claims in this scene</h2>
+      <h2>Notes</h2>
       <ul id="claims"></ul>
     </section>
-    <section class="claims" hidden>
+    <section class="claims sources" hidden>
       <h2>Sources</h2>
       <ul id="sources"></ul>
     </section>
-    <p class="note">Stylized teaching schematics, not to scale.</p>
+    <p class="note" id="schematic" hidden>Schematic drawing, not to scale.</p>
     <p class="note" id="scene-credit" hidden></p>
     <p class="note"><a id="model-credits" href="credits.html">Model credits</a></p>
   </aside>
