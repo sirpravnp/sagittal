@@ -44,8 +44,8 @@ artery reviews).
 Expect: normal view with a short cystic duct from the gallbladder neck joining the common hepatic
 duct to form the CBD; variant with the cystic duct running alongside the CBD and joining it low,
 near the duodenum (above the papilla). The cystic duct starts on the gallbladder neck in both
-views. Gallbladder, CBD, common hepatic duct and duodenum visible. Cites
-`statpearls-biliary-ducts` and/or the cholecystectomy anatomy papers.
+views. Gallbladder, CBD, common hepatic duct and duodenum visible. Cites only
+`jmas-vasculobiliary-anatomy` and/or `jmas-anatomy-cholecystectomy`.
 
 ## 3. Aberrant right subclavian artery
 
