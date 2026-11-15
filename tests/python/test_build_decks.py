@@ -36,7 +36,6 @@ def scene(sid, title, variants, claims, **extra):
         "variants": [{"key": k, "label": l} for k, l in variants],
         "claims": claims,
         "sources": [],
-        "status": "unreviewed",
     }
     d.update(extra)
     return d
@@ -47,8 +46,7 @@ def scenes():
     return [
         scene("alpha", "Alpha", [("a", "Variant A"), ("b", "Variant B")],
               ["EF ≥ 50% → normal", "P < 0.05 & rising", "<b>bold</b>"]),
-        scene("beta", "Beta", [("x", "Variant X")], ["one"],
-              status="reviewed", reviewer="Dr Who", reviewedOn="2026-01-02"),
+        scene("beta", "Beta", [("x", "Variant X")], ["one"]),
     ]
 
 
@@ -96,13 +94,13 @@ def test_note_count_media_and_escaping(tmp_path, scenes, cards):
     assert any(d["name"] == "Sagittal::Test & Topic" for d in decks.values())
 
 
-def test_status_values(tmp_path, scenes, cards):
+def test_no_unreviewed_text_on_any_card(tmp_path, scenes, cards):
     out = tmp_path / "t.apkg"
     build_decks.build_deck("Test & Topic", scenes, cards, out)
-    notes, _, _ = read_apkg(out)
-    flds = [n[1].split("\x1f") for n in notes]
-    assert flds[0][4] == "Unreviewed: verify against your textbook"
-    assert flds[2][4] == "Reviewed by Dr Who on 2026-01-02"
+    notes, decks, _ = read_apkg(out)
+    for _, flds in notes:
+        assert "nreviewed" not in flds
+    assert all("nreviewed" not in d.get("desc", "") for d in decks.values())
 
 
 def test_deterministic_guids_and_ids(tmp_path, scenes, cards):
@@ -191,7 +189,7 @@ def test_3d_note_count_and_guids(tmp_path, scenes, cards, site3d):
     assert len({n[0] for n in na}) == 6
     import genanki
     assert genanki.guid_for("alpha", "a", "3d") in [n[0] for n in na]
-    f3 = [n[1].split("\x1f") for n in na if len(n[1].split("\x1f")) == 8]
+    f3 = [n[1].split("\x1f") for n in na if len(n[1].split("\x1f")) == 7]
     assert len(f3) == 3
     assert f3[0][1:4] == ["alpha", "d", "a"]
     # WebGL fallback: unlabelled image for the front, labelled image only for the back
@@ -215,7 +213,7 @@ def test_3d_model_name_and_id():
     m = build_decks.make_model_3d()
     assert m.name == "Anatomy 3D (experimental)"
     assert m.model_id == build_decks.stable_id("sagittal-model-3d-v1")
-    assert [f["name"] for f in m.fields] == ["Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Status", "Credit"]
+    assert [f["name"] for f in m.fields] == ["Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Credit"]
 
 
 def test_cli_include_3d(tmp_path, scenes, cards, site3d):
@@ -270,13 +268,14 @@ def test_3d_template_loads_meshes():
     assert "_mesh_" in t and "def.meshes" in t
 
 
-# ---- review status on the front, attribution on every card and in the deck ----
-def test_status_shown_on_front_of_both_note_types():
-    qfmt = build_decks.make_model().templates[0]["qfmt"]
-    assert "{{Status}}" in qfmt and "{{Back}}" not in qfmt and "{{Claims}}" not in qfmt
+# ---- attribution on every card and in the deck ----
+def test_no_status_field_or_placeholder_in_either_note_type():
     t = (Path(build_decks.__file__).parent / "anki3d_template.html").read_text(encoding="utf-8")
-    assert "{{Status}}" in t and "{{Claims}}" not in t
-    assert "{{Status}}" in build_decks.make_model_3d().templates[0]["qfmt"]
+    assert "{{Status}}" not in t
+    for m in (build_decks.make_model(), build_decks.make_model_3d()):
+        assert "Status" not in [f["name"] for f in m.fields]
+        assert "{{Status}}" not in m.templates[0]["qfmt"]
+        assert "{{Status}}" not in m.templates[0]["afmt"]
 
 
 def test_credit_line_on_every_card_back_and_in_deck_description(tmp_path, scenes, cards):
@@ -286,7 +285,7 @@ def test_credit_line_on_every_card_back_and_in_deck_description(tmp_path, scenes
     assert "{{Credit}}" in build_decks.make_model().templates[0]["afmt"]
     assert "{{Credit}}" not in build_decks.make_model().templates[0]["qfmt"]
     for _, flds in notes:
-        credit = flds.split("\x1f")[5]
+        credit = flds.split("\x1f")[4]
         assert "Z-Anatomy" in credit and "BodyParts3D" in credit and "CC BY-SA 4.0" in credit
         assert "Rodero" in credit and "CC BY 4.0" in credit and "modified" in credit
         assert "CREDITS.md" in credit

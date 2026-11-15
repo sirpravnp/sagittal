@@ -62,15 +62,13 @@ no `import`: everything must work from `file`-less Anki media.
   "variantControl": "p",
   "variants": [{ "key": "norm", "label": "Normal anatomy" }, { "key": "gb", "label": "Cholelithiasis" }],
   "claims": ["One short, exact, board-relevant fact per string."],
-  "sources": ["Author. Title. StatPearls (year). https://www.ncbi.nlm.nih.gov/books/NBK.../"],
-  "status": "unreviewed"
+  "sources": ["Author. Title. StatPearls (year). https://www.ncbi.nlm.nih.gov/books/NBK.../"]
 }
 ```
 
 `validateMeta` requires: `id` `[a-z0-9-]+`; non-empty `title`, `topic`, `variantControl`;
 non-empty `variants` with string `key` and `label`; non-empty `claims` of non-empty strings;
-`sources` an array of strings (may be empty, but fill it); `status` `unreviewed` (or `reviewed`
-with `reviewer` and ISO `reviewedOn`, which only a human reviewer sets). Tests also require
+`sources` an array of strings (may be empty, but fill it); no `status` field (it is rejected). Tests also require
 `<id>.js` + `<id>.meta.json` for every id in `site/scenes/index.json`.
 
 ## Kit (window.Kit)
@@ -87,7 +85,6 @@ with `reviewer` and ISO `reviewedOn`, which only a human reviewer sets). Tests a
 | `Kit.helpers.dot(g, p, col?, r?)` | emissive sphere marker |
 | `Kit.helpers.tube(g, pts, r, mat, n?)` / `seg(g, a, b, r, mat)` | Catmull-Rom tube / straight cylinder |
 | `Kit.helpers.ell, add, mat, sector, disk, V` | primitive helpers from the original prototype; prefer real meshes |
-| `Kit.BADGE_TEXT` | "Unreviewed: verify against your textbook" |
 
 Rendering: ACES tone mapping, sRGB output, hex colours are sRGB, background `#0f141b`, hemisphere
 + key + rim lights fixed to the camera, a small PMREM studio environment. No shadows, no

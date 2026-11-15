@@ -1,7 +1,5 @@
 // Page glue for index.html (gallery) and viewer.html. Classic script, loaded after kit/kit.js.
 (function () {
-  var BADGE = 'Unreviewed: verify against your textbook';
-
   function getJson(url) {
     return fetch(url).then(function (r) {
       if (!r.ok) throw new Error(url + ': HTTP ' + r.status);
@@ -13,9 +11,6 @@
     if (cls) e.className = cls;
     if (text != null) e.textContent = text;
     return e;
-  }
-  function badge(meta) {
-    return meta.status === 'unreviewed' ? el('span', 'badge', BADGE) : null;
   }
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
@@ -107,7 +102,6 @@
     });
     views.appendChild(document.createTextNode('.'));
     cap.appendChild(views);
-    var b = badge(meta); if (b) cap.appendChild(b);
     fig.appendChild(cap);
     li.appendChild(fig);
     return li;
@@ -225,12 +219,6 @@
         document.querySelector('h1').textContent = meta.title;
         var fig = document.getElementById('fig');
         if (fig) fig.textContent = 'Fig. ' + (ids.indexOf(id) + 1);
-        var b = badge(meta);
-        if (b) {
-          document.getElementById('badge').appendChild(b);
-          // overlay copy inside the stage, shown in embed mode where the header is hidden
-          document.getElementById('stage-badge').appendChild(badge(meta));
-        }
         var claims = document.getElementById('claims');
         meta.claims.forEach(function (c) { claims.appendChild(el('li', null, c)); });
         if (meta.sources.length) {

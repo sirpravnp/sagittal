@@ -140,9 +140,8 @@ Two files plus one index entry. Exact contracts in `reference/kit-api.md`.
   center, zoom, rot, controls, build })`. Keep `meshes:` a literal array of string literals
   (the Anki 3D packer finds it with a regex). `build(g, st)` returns `{ labels, info }`.
 - `site/scenes/<id>.meta.json`: `id, title, topic, variantControl, variants[{key,label}],
-  claims[], sources[], status: "unreviewed"`. It must pass `lib/validateMeta.mjs`. Variant keys
-  and labels must equal the `opts` of the control named by `variantControl`. No `reviewed`
-  status: only a human reviewer sets that.
+  claims[], sources[]`. It must pass `lib/validateMeta.mjs` (no `status` field). Variant keys
+  and labels must equal the `opts` of the control named by `variantControl`.
 - Append `<id>` to the end of `site/scenes/index.json`.
 - `topic` becomes an Anki deck: reuse Cardiology, Gastroenterology, Obstetrics & Gynecology,
   Ophthalmology, Pulmonology, Surgery, Trauma where they fit (or e.g. Orthopedics, Neurology).
@@ -176,7 +175,6 @@ did: tapered tubes, editable clones, section caps, per-frame clip planes) and sa
   canvas at 1200 px and at 375 px (e2e checks both). Fewer, better labels beat a crowded card.
 - `info` (HTML per variant) and `meta.claims` say the same facts; claims are short, exact,
   board-relevant, one fact each. Put real references in `sources` (title + URL).
-- The "Unreviewed: verify against your textbook" badge stays; never claim a review.
 
 ## 8. Render the cards and LOOK at them
 
@@ -229,7 +227,7 @@ do not commit the copy.
 - [ ] No NC/ND/unclear parts; CREDITS section appended; `credit` heading matches.
 - [ ] Each baked file ≤ 400 KB, scene total ≤ 800 KB; organs smoothed; `center` pinned if coordinates are hard-coded.
 - [ ] Frame correct: patient's left is +x (screen right in anterior view), superior +y, anterior +z. Sidedness checked on the card.
-- [ ] Meta passes validation; variant keys/labels equal the control's `opts`; id appended to `index.json`; `status: "unreviewed"`.
+- [ ] Meta passes validation; variant keys/labels equal the control's `opts`; id appended to `index.json`.
 - [ ] Every variant's front card shows its finding without labels; back card labels name the structures, no overlap, every leader dot on the named structure and none hidden.
 - [ ] `site/thumbs/<id>.webp` and `manifest.json` rendered and committed.
 - [ ] Cards compared against the reference cards and atlas anatomy; honest verdict per variant written down.

@@ -43,7 +43,7 @@ export async function renderThumbs({ siteDir, outDir, ids }) {
       const v = plateVariant(meta);
       const q = `scene=${encodeURIComponent(id)}&${encodeURIComponent(meta.variantControl)}=${encodeURIComponent(v.key)}&embed=1`;
       await page.goto(`${origin}viewer.html?${q}`);
-      await page.addStyleTag({ content: '#stage-badge,#hint{display:none !important}' });
+      await page.addStyleTag({ content: '#hint{display:none !important}' });
       await page.waitForFunction(() => window.viewer && window.viewer.debug().labelRects.length > 0);
       await page.evaluate(async () => {
         window.viewer.setLabelsVisible(false);

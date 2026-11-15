@@ -691,6 +691,5 @@
     meshPart: meshPart,
     meshParts: meshParts,
     meshInfo: meshInfo,
-    BADGE_TEXT: 'Unreviewed: verify against your textbook',
   };
 })();

@@ -24,9 +24,6 @@ code{font:.88em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .skip{position:absolute;left:16px;top:-48px;background:var(--ink);color:var(--paper);padding:6px 10px;font:14px var(--sans);z-index:5}
 .skip:focus{top:8px}
 
-/* "Unreviewed: verify against your textbook" */
-.badge{display:inline-block;font:12.5px/1.35 var(--sans);color:var(--acc);border:1px solid currentColor;border-radius:2px;padding:1px 6px}
-
 /* ---------- index ---------- */
 .wrap{max-width:1160px;margin:0 auto;padding:0 40px}
 .masthead{display:grid;grid-template-columns:11rem minmax(0,1fr);column-gap:3rem;padding:72px 0 56px}
@@ -63,8 +60,6 @@ code{font:.88em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .views{margin:8px 0 10px;font-size:.92rem;line-height:1.5;color:var(--ink-2)}
 .views .k{font:12.5px var(--sans);color:var(--mut)}
 .views em{font-style:italic;color:var(--ink)}
-.plate .badge{border:0;padding:0;color:var(--mut)}
-.plate .badge::before{content:"";display:inline-block;width:.55em;height:.55em;margin-right:.45em;background:var(--acc);vertical-align:.05em}
 
 .decks{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule);max-width:44rem}
 .deck{display:grid;grid-template-columns:minmax(0,1fr) 6.5rem 4rem 4.5rem;align-items:baseline;column-gap:16px;padding:11px 0;border-bottom:1px solid var(--rule)}
@@ -86,7 +81,6 @@ code{font:.88em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .top h1{margin:0;font:400 1.25rem/1.3 var(--serif)}
 .top .fig{font:600 12.5px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--acc);margin-right:-8px;white-space:nowrap}
 .top .fig:empty{display:none}
-#badge{margin-left:auto}
 .viewer{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 360px}
 #stage{position:relative;min-height:320px;overflow:hidden;background:var(--stage)}
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
@@ -111,10 +105,7 @@ aside h2{margin:22px 0 6px;font:400 1rem/1.4 var(--serif);font-variant-caps:all-
 .claims li{margin:5px 0}
 #info li::marker,.claims li::marker{color:var(--acc)}
 .note{color:var(--mut);font:13px var(--sans);margin:14px 0 0}
-#stage-badge{display:none;position:absolute;left:8px;top:8px;pointer-events:none}
-#stage-badge .badge{background:rgba(15,20,27,.85);color:#f5c26b;border-color:#f5c26b;border-radius:4px}
 body.embed .top,body.embed aside{display:none}
-body.embed #stage-badge{display:block}
 body.embed .viewer{grid-template-columns:1fr}
 body.viewer-page #gallery{display:none}
 body.missing .viewer{display:none}
@@ -142,7 +133,6 @@ body.missing{height:auto}
   .viewer-page{height:auto;display:block}
   .viewer{display:block}
   .top{padding:12px 16px}
-  #badge{margin-left:0;flex-basis:100%}
   #stage{height:60vh;height:60svh}
   aside{border-left:0;border-top:1px solid var(--rule);padding:16px 16px 28px}
   body.embed #stage{height:100vh;height:100dvh}

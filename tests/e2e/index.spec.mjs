@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
-const BADGE = 'Unreviewed: verify against your textbook';
 const dir = new URL('../../site/scenes/', import.meta.url);
 const ids = JSON.parse(readFileSync(new URL('index.json', dir), 'utf8'));
 const metas = ids.map((id) => JSON.parse(readFileSync(new URL(`${id}.meta.json`, dir), 'utf8')));
@@ -17,6 +16,7 @@ test('index lists every scene in index.json as a numbered plate linking to the v
   const errors = watchErrors(page);
   await page.goto('index.html');
   await expect(page.locator('h1')).toHaveText('Sagittal');
+  expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   await expect(page.locator('.desc')).toHaveText('Medical image generation');
   const plates = page.locator('.plate');
   await expect(plates).toHaveCount(ids.length);
@@ -28,7 +28,6 @@ test('index lists every scene in index.json as a numbered plate linking to the v
     await expect(plate.locator('a')).toHaveAttribute('href', `viewer.html?scene=${m.id}`);
     await expect(plate).toContainText(m.topic);
     for (const v of m.variants) await expect(plate).toContainText(v.label);
-    if (m.status === 'unreviewed') await expect(plate).toContainText(BADGE);
     // A plate has either a loaded image or the plain text fallback, never a broken image.
     const img = plate.locator('img');
     if (await img.count()) {

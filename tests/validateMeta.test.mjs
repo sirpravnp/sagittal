@@ -10,7 +10,6 @@ const valid = () => ({
   variants: [{ key: 'a', label: 'A' }],
   claims: ['The heart has four chambers.'],
   sources: [],
-  status: 'unreviewed',
 });
 
 test('valid meta passes', () => {
@@ -31,23 +30,17 @@ test('empty claims fails', () => {
   assert.ok(r.errors.some(e => e.includes('claims')));
 });
 
-test('reviewed without reviewer fails', () => {
-  const r = validateMeta({ ...valid(), status: 'reviewed', reviewedOn: '2026-01-02' });
-  assert.equal(r.ok, false);
-  assert.ok(r.errors.some(e => e.includes('reviewer')));
+test('a meta with no status passes', () => {
+  assert.equal('status' in valid(), false);
+  assert.equal(validateMeta(valid()).ok, true);
 });
 
-test('reviewed without reviewedOn or with bad date fails', () => {
-  const base = { ...valid(), status: 'reviewed', reviewer: 'Dr X' };
-  assert.ok(validateMeta(base).errors.some(e => e.includes('reviewedOn')));
-  assert.ok(validateMeta({ ...base, reviewedOn: '01/02/2026' }).errors.some(e => e.includes('reviewedOn')));
-  assert.equal(validateMeta({ ...base, reviewedOn: '2026-01-02' }).ok, true);
-});
-
-test('bogus status fails', () => {
-  const r = validateMeta({ ...valid(), status: 'bogus' });
-  assert.equal(r.ok, false);
-  assert.ok(r.errors.some(e => e.includes('status')));
+test('any status value is rejected', () => {
+  for (const status of ['unreviewed', 'reviewed', 'bogus', '', null]) {
+    const r = validateMeta({ ...valid(), status });
+    assert.equal(r.ok, false, String(status));
+    assert.ok(r.errors.includes('status is no longer used'), String(status));
+  }
 });
 
 test('bad ids fail', () => {

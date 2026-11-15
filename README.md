@@ -7,9 +7,6 @@ static files, with no server.
 
 ![Fig. 4, tension pneumothorax: the scene's plate image](site/thumbs/tension.webp)
 
-**Review status:** every visual is currently marked "Unreviewed: verify
-against your textbook". Do not treat any scene as authoritative.
-
 **Educational use only.** sagittal is not clinical advice and must not be used
 for diagnosis or treatment decisions.
 
@@ -45,7 +42,7 @@ Decks are downloadable from the live site and attached to GitHub Releases for
 Source to **GitHub Actions** (the workflow does not create the Pages site itself).
 
 Every card carries a credit line for the 3D models it shows (each deck's description lists them
-too), and every card front shows the review status.
+too).
 
 **Anki 3D compatibility:** the 3D deck is experimental. Interactive 3D cards
 were confirmed working on Anki desktop by an early spike with a test card.

@@ -12,7 +12,6 @@ from pathlib import Path
 import genanki
 
 MODEL_NAME = "Anatomy Visual"
-UNREVIEWED = "Unreviewed: verify against your textbook"
 
 CSS = """.card { font-family: arial; font-size: 18px; text-align: center; }
 img { max-width: 100%; height: auto; }
@@ -100,11 +99,10 @@ def make_model() -> genanki.Model:
     return genanki.Model(
         stable_id("sagittal-model-v1"),
         MODEL_NAME,
-        fields=[{"name": n} for n in ("Title", "Front", "Back", "Claims", "Status", "Credit")],
+        fields=[{"name": n} for n in ("Title", "Front", "Back", "Claims", "Credit")],
         templates=[{
             "name": "Card 1",
-            # Review status on the front too: it says nothing about the answer.
-            "qfmt": '{{Front}}<div class="status">{{Status}}</div>',
+            "qfmt": "{{Front}}",
             "afmt": '{{FrontSide}}<hr id="answer">{{Back}}'
                     '<div class="claims">{{Claims}}</div><div class="credit">{{Credit}}</div>',
         }],
@@ -127,7 +125,7 @@ CSS_3D = CSS + """
 
 
 def make_model_3d() -> genanki.Model:
-    fields = ("Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Status", "Credit")
+    fields = ("Title", "SceneId", "VariantControl", "VariantKey", "Fallback", "Claims", "Credit")
     return genanki.Model(
         stable_id("sagittal-model-3d-v1"),
         MODEL_3D_NAME,
@@ -140,12 +138,6 @@ def make_model_3d() -> genanki.Model:
         }],
         css=CSS_3D,
     )
-
-
-def status_text(scene: dict) -> str:
-    if scene.get("status") == "reviewed":
-        return f"Reviewed by {scene.get('reviewer', '')} on {scene.get('reviewedOn', '')}"
-    return UNREVIEWED
 
 
 MESHES_RE = re.compile(r"\bmeshes\s*:\s*\[([^\]]*)\]")
@@ -163,8 +155,7 @@ def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -
     credits = load_credits(site_dir)
     credit_by_scene = {sc["id"]: credit_text(scene_source_ids(sc["id"], site_dir, credits), credits)
                        for sc in scenes}
-    description = ("Sagittal anatomy cards. Unreviewed cards are marked on the card: verify against "
-                   "your textbook.<br>" + "<br>".join(
+    description = ("Sagittal anatomy cards.<br>" + "<br>".join(
                        html.escape(f"{sc['title']}: {credit_by_scene[sc['id']]}") for sc in scenes))
     deck = genanki.Deck(stable_id("sagittal-deck-" + topic), f"Sagittal::{topic}", description=description)
     media = []
@@ -220,7 +211,7 @@ def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -
             back = f'<img src="{names["back"]}">'
             deck.add_note(genanki.Note(
                 model=model,
-                fields=[html.escape(title), front, back, claims, html.escape(status_text(scene)), credit],
+                fields=[html.escape(title), front, back, claims, credit],
                 guid=genanki.guid_for(scene["id"], v["key"]),
             ))
             if include_3d:
@@ -231,7 +222,7 @@ def build_deck(topic, scenes, cards_dir, out, include_3d=False, site_dir=None) -
                 deck.add_note(genanki.Note(
                     model=model3d,
                     fields=[html.escape(title), scene["id"], scene.get("variantControl", ""),
-                            v["key"], fallback, claims, html.escape(status_text(scene)), credit],
+                            v["key"], fallback, claims, credit],
                     guid=genanki.guid_for(scene["id"], v["key"], "3d"),
                 ))
     out.parent.mkdir(parents=True, exist_ok=True)

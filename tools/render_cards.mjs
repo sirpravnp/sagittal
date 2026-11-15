@@ -43,8 +43,7 @@ export async function renderCards({ siteDir, outDir, ids }) {
       for (const v of meta.variants) {
         const q = `scene=${encodeURIComponent(id)}&${encodeURIComponent(meta.variantControl)}=${encodeURIComponent(v.key)}&embed=1`;
         await page.goto(`${origin}viewer.html?${q}`);
-        // The Anki card carries its own Status field, so hide the in-stage badge.
-        await page.addStyleTag({ content: '#stage-badge,#hint{display:none !important}' });
+        await page.addStyleTag({ content: '#hint{display:none !important}' });
         await page.waitForFunction(() => window.viewer && window.viewer.debug().labelRects.length > 0);
         const stage = page.locator('#stage');
         const out = {};

@@ -1,7 +1,6 @@
 import { test, expect, chromium } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
-const BADGE = 'Unreviewed: verify against your textbook';
 const sceneIds = JSON.parse(readFileSync(new URL('../../site/scenes/index.json', import.meta.url), 'utf8'));
 const heartMeta = JSON.parse(readFileSync(new URL('../../site/scenes/heart.meta.json', import.meta.url), 'utf8'));
 
@@ -25,7 +24,7 @@ test('heart scene loads cleanly and renders', async ({ page }) => {
   const nonBlank = await page.evaluate(() => window.viewer.debug().nonBlank);
   expect(nonBlank).toBe(true);
   const text = await page.locator('body').innerText();
-  expect(text).toContain(BADGE);
+  expect(text).not.toContain('nreviewed');
   expect(text).toContain(heartMeta.claims[0]);
   // controls rendered from the scene definition
   await expect(page.locator('select')).toHaveCount(1);
@@ -51,7 +50,7 @@ test('labels toggle hides labels', async ({ page }) => {
 test('embed=1 hides the side panel', async ({ page }) => {
   await openHeart(page, '&embed=1');
   await expect(page.locator('aside')).toBeHidden();
-  await expect(page.locator('#stage').getByText(BADGE)).toBeVisible();
+  expect(await page.locator('body').innerText()).not.toContain('nreviewed');
 });
 
 test('unknown scene shows the gallery with "Scene not found"', async ({ page }) => {
@@ -67,7 +66,7 @@ test('gallery lists scenes with title and badge', async ({ page }) => {
   const errors = watchErrors(page);
   await page.goto('index.html');
   const card = page.locator('.card', { hasText: heartMeta.title });
-  await expect(card).toContainText(BADGE);
+  expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   await expect(card.locator('a')).toHaveAttribute('href', 'viewer.html?scene=heart');
   expect(errors).toEqual([]);
 });
