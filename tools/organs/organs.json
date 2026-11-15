@@ -2433,27 +2433,27 @@
    "id": "adrenals",
    "name": "Suprarenal (adrenal) glands",
    "system": "Endocrine",
-   "src": "zanatomy",
+   "src": "totalseg",
    "parts": [
     {
      "id": "right_suprarenal_gland",
      "name": "Right suprarenal gland",
      "tissue": "pancreas",
      "files": [
-      "Suprarenal_gland.r.obj"
+      "adrenal_gland_right.obj"
      ],
      "budget": 1500,
-     "smooth": 2
+     "smooth": 4
     },
     {
      "id": "left_suprarenal_gland",
      "name": "Left suprarenal gland",
      "tissue": "pancreas",
      "files": [
-      "Suprarenal_gland.l.obj"
+      "adrenal_gland_left.obj"
      ],
      "budget": 1500,
-     "smooth": 2
+     "smooth": 4
     }
    ],
    "landmarks": [
@@ -2553,86 +2553,6 @@
       "type": "mesh_extreme",
       "part": "left_kidney",
       "axis": "-y"
-     }
-    }
-   ]
-  },
-  {
-   "id": "ureters",
-   "name": "Ureters",
-   "system": "Urinary",
-   "src": "zanatomy",
-   "parts": [
-    {
-     "id": "right_ureter",
-     "name": "Right ureter",
-     "tissue": "bowel",
-     "files": [
-      "Ureter.r.obj"
-     ],
-     "budget": 800
-    },
-    {
-     "id": "left_ureter",
-     "name": "Left ureter",
-     "tissue": "bowel",
-     "files": [
-      "Ureter.l.obj"
-     ],
-     "budget": 800
-    }
-   ],
-   "centerlines": [
-    {
-     "id": "right_ureter",
-     "name": "Right ureter (renal end to bladder)",
-     "curve": "Ureter.r",
-     "from": "right_ureter_upper_end",
-     "orient": "down"
-    },
-    {
-     "id": "left_ureter",
-     "name": "Left ureter (renal end to bladder)",
-     "curve": "Ureter.l",
-     "from": "left_ureter_upper_end",
-     "orient": "down"
-    }
-   ],
-   "landmarks": [
-    {
-     "id": "right_ureter_upper_end",
-     "name": "Upper (renal pelvis) end of the right ureter curve",
-     "rule": {
-      "type": "curve_end",
-      "curve": "Ureter.r",
-      "end": "highest"
-     }
-    },
-    {
-     "id": "left_ureter_upper_end",
-     "name": "Upper (renal pelvis) end of the left ureter curve",
-     "rule": {
-      "type": "curve_end",
-      "curve": "Ureter.l",
-      "end": "highest"
-     }
-    },
-    {
-     "id": "right_ureter_lower_end",
-     "name": "Lower (bladder) end of the right ureter curve",
-     "rule": {
-      "type": "line_point",
-      "line": "right_ureter",
-      "at": "end"
-     }
-    },
-    {
-     "id": "left_ureter_lower_end",
-     "name": "Lower (bladder) end of the left ureter curve",
-     "rule": {
-      "type": "line_point",
-      "line": "left_ureter",
-      "at": "end"
      }
     }
    ]

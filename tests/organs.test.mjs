@@ -115,10 +115,14 @@ test('organs sit in the right relations in the shared frame (+x left, +y superio
   // abdominal aortic branches from top to bottom: coeliac, SMA, renals, IMA, bifurcation
   const ys = ['coeliac_trunk_origin', 'superior_mesenteric_artery_origin', 'left_renal_artery_origin', 'inferior_mesenteric_artery_origin', 'aortic_bifurcation'].map((k) => P(k)[1]);
   for (let i = 1; i < ys.length; i++) assert.ok(ys[i] < ys[i - 1], `aortic branch heights ${ys}`);
-  // kidneys posterior to the pancreas head region and on their own sides; right kidney lower than left
+  // kidneys posterior to the pancreas head region and on their own sides
   assert.ok(P('left_renal_hilum')[0] > 0 && P('right_renal_hilum')[0] < 0);
-  assert.ok(P('right_kidney_upper_pole')[1] < P('left_kidney_upper_pole')[1]);
+  // right renal hilum lower than the left (set by Z-Anatomy's renal vessels; the poles are about level)
+  assert.ok(P('right_renal_hilum')[1] < P('left_renal_hilum')[1]);
   assert.ok(P('left_renal_hilum')[2] < P('pancreas_head_lowest_point')[2]);
+  // adrenals above their kidneys, on their own sides
+  assert.ok(P('left_suprarenal_centroid')[0] > 0 && P('right_suprarenal_centroid')[0] < 0);
+  assert.ok(P('left_suprarenal_centroid')[1] > P('left_renal_hilum')[1] && P('right_suprarenal_centroid')[1] > P('right_renal_hilum')[1]);
   // portal vein posterior to the proper hepatic artery origin and the bile duct
   assert.ok(P('portal_confluence')[2] < P('proper_hepatic_artery_origin')[2]);
   // heart below the arch, brain above the thyroid

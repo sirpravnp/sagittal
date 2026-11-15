@@ -268,11 +268,12 @@ Subject used: **s1304** (CT polytrauma, male, 67, meta.csv pathology "no_patholo
 range requests). Changes made for sagittal: masks meshed with `tools/meshes/ct_to_obj.py` (largest
 component, Gaussian blur 1 mm, marching cubes, Taubin smoothing), mapped into the organ library's body
 frame by `tools/organs/register.py` (similarity transforms fitted on the vertebrae or, for the brain,
-on Z-Anatomy's cranial cavity; each kidney then translated to meet Z-Anatomy's renal vessels and
-ureter; residuals in `tools/organs/registration.json`), smoothed and decimated by
+on Z-Anatomy's cranial cavity; each kidney then translated to meet Z-Anatomy's renal artery and
+vein, each adrenal moved vertically with its kidney; residuals in `tools/organs/registration.json`), smoothed and decimated by
 `tools/meshes/bake.py`.
 
-Used by: `organs/meshes/kidneys.js`, `organs/meshes/thyroid.js`, `organs/meshes/brain.js`.
+Used by: `organs/meshes/kidneys.js`, `organs/meshes/adrenals.js`, `organs/meshes/thyroid.js`,
+`organs/meshes/brain.js`.
 
 ## organ library (organs/, credits `zanatomy`, `rodero-heart`, `totalsegmentator`)
 
@@ -282,15 +283,16 @@ The base organ library in `organs/` (meshes `organs/meshes/<id>.js`, manifests
 - **zanatomy** (Z-Anatomy, CC BY-SA 4.0 on BodyParts3D, CC BY-SA 2.1 JP): `aorta`, `coeliac-trunk`,
   `mesenteric-arteries`, `venae-cavae`, `portal-venous`, `liver`, `liver-segments`, `gallbladder`,
   `pancreas`, `oesophagus`, `stomach`, `duodenum`, `small-intestine`, `colon`, `spleen`, `lungs`,
-  `airways`, `adrenals`, `ureters`, `bladder`, `male-reproductive`. Objects extracted with
+  `airways`, `bladder`, `male-reproductive`. Objects extracted with
   `tools/meshes/extract_blend.py` into the asset cache's `zanatomy-organs/obj/`; vessels, ducts,
-  airways, oesophagus, small intestine and ureters are Z-Anatomy centre-line curves swept into tubes,
+  airways, oesophagus, small intestine and urethra are Z-Anatomy centre-line curves swept into tubes,
   and the manifests' centre lines are the same curves' points (dumped by `tools/organs/dump_curves.py`),
   converted to centimetres. Z-Anatomy's kidney, renal pelvis and intrarenal vessels (credited by
-  Z-Anatomy to a CC BY-NC model) are not used.
+  Z-Anatomy to a CC BY-NC model) are not used, nor its ureters and suprarenal glands (they may come
+  from the same model; licence unclear).
 - **rodero-heart** (CC BY 4.0): `heart` (chamber walls and aortic root of the average heart), mapped
   onto the Z-Anatomy heart by a similarity fit on chamber centroids and valve centres.
-- **totalsegmentator** (CC BY 4.0): `kidneys`, `thyroid`, `brain` (see above).
+- **totalsegmentator** (CC BY 4.0): `kidneys`, `adrenals`, `thyroid`, `brain` (see above).
 
 Landmarks in the manifests are computed from this geometry (curve end points, branch points, mesh
 extremes, centroids, nearest points); the rule for each is stated in its `derived` field. All organs

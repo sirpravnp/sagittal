@@ -4,7 +4,7 @@
  "name": "Suprarenal (adrenal) glands",
  "system": "Endocrine",
  "mesh": "adrenals",
- "credit": "zanatomy",
+ "credit": "totalsegmentator",
  "parts": [
   {
    "id": "right_suprarenal_gland",
@@ -22,18 +22,18 @@
   "right_suprarenal_centroid": {
    "name": "Right suprarenal gland centroid",
    "p": [
-    -4.178,
-    114.443,
-    -0.818
+    -4.072,
+    116.346,
+    0.156
    ],
    "derived": "volume centroid of the baked 'right_suprarenal_gland' mesh"
   },
   "left_suprarenal_centroid": {
    "name": "Left suprarenal gland centroid",
    "p": [
-    4.842,
-    116.448,
-    -2.612
+    3.749,
+    116.399,
+    1.728
    ],
    "derived": "volume centroid of the baked 'left_suprarenal_gland' mesh"
   }

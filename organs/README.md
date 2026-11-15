@@ -26,7 +26,8 @@ Organs from other sources were mapped into this frame by similarity transforms
 | organ | source | fitted on | residual |
 |---|---|---|---|
 | heart | Rodero average heart | 4 chamber centroids + aortic and pulmonary valve centres of the Z-Anatomy heart | RMS 0.49 cm (max 0.79) |
-| kidneys | TotalSegmentator s1304 | vertebrae T10-L4 (ICP), then each kidney translated so its hilum meets Z-Anatomy's renal artery, renal vein and ureter ends | vertebra centroids RMS 0.79 cm; vessel ends 0.3-1.5 cm from the kidney surface |
+| kidneys | TotalSegmentator s1304 | vertebrae T10-L4 (ICP), then each kidney translated so its hilum meets Z-Anatomy's renal artery and renal vein ends | vertebra centroids RMS 0.79 cm; vessel ends 1.0-1.25 cm from the kidney surface |
+| adrenals | TotalSegmentator s1304 | same vertebra fit, then the vertical component of the same-side kidney's translation | 0.5 (right) / 1.8 (left) cm above the kidney; >= 1.1 cm clear of aorta and IVC walls |
 | thyroid | TotalSegmentator s1304 | vertebrae C3-T3 (ICP) | vertebra centroids RMS 0.22 cm |
 | brain | TotalSegmentator s1304 | Z-Anatomy cranial-cavity endocast (ICP) | surface RMS 0.32 cm, p95 0.65 cm |
 
@@ -74,9 +75,9 @@ Organs from other sources were mapped into this frame by similarity transforms
 | spleen | Lymphoid | Z-Anatomy | |
 | lungs, airways | Respiratory | Z-Anatomy | five lobes; trachea, main, intermediate and lobar bronchi |
 | thyroid | Endocrine | TotalSegmentator | |
-| adrenals | Endocrine | Z-Anatomy | |
+| adrenals | Endocrine | TotalSegmentator | |
 | kidneys | Urinary | TotalSegmentator | |
-| ureters, bladder | Urinary | Z-Anatomy | bladder with the (male) urethra |
+| bladder | Urinary | Z-Anatomy | bladder with the (male) urethra |
 | male-reproductive | Reproductive | Z-Anatomy | prostate, seminal glands, testes, epididymides, ductus deferens, ejaculatory ducts, penis |
 
 Credits: `site/meshes/CREDITS.md` (`zanatomy`, `rodero-heart`, `totalsegmentator`, and the "organ
@@ -84,6 +85,10 @@ library" section). Any figure that includes a Z-Anatomy organ is CC BY-SA 4.0.
 
 ## Gaps (not in any source used; do not draw them from memory)
 
+- **Ureters**: Z-Anatomy's ureter curves are not used (they may come from the CC BY-NC kidney model
+  Z-Anatomy credits; licence unclear), and TotalSegmentator's open `total` task and dataset have no
+  ureter class (s1304 has none). Z-Anatomy's suprarenal glands are excluded for the same reason
+  (adrenals come from TotalSegmentator).
 - **Cystic duct, common hepatic duct, right and left hepatic ducts**: Z-Anatomy has only the bile
   duct (CBD); TotalSegmentator has no biliary classes. `bile_duct_upper_end` marks where the CBD
   begins, i.e. where the cystic and common hepatic ducts would join.
@@ -119,6 +124,7 @@ S=$SAGITTAL_ASSETS/ct-totalseg/raw/s1304/segmentations
 .venv/bin/python tools/meshes/ct_to_obj.py --out $SAGITTAL_ASSETS/ct-totalseg/obj \
   --mask kidney_left=$S/kidney_left.nii.gz --mask kidney_right=$S/kidney_right.nii.gz \
   --mask thyroid_gland=$S/thyroid_gland.nii.gz --mask brain=$S/brain.nii.gz \
+  --mask adrenal_gland_left=$S/adrenal_gland_left.nii.gz --mask adrenal_gland_right=$S/adrenal_gland_right.nii.gz \
   $(for v in C3 C4 C5 C6 C7 T1 T2 T3 T10 T11 T12 L1 L2 L3 L4; do echo --mask vertebrae_$v=$S/vertebrae_$v.nii.gz; done)
 # 3. register non-Z-Anatomy organs into the body frame (writes tools/organs/registration.json)
 .venv/bin/python tools/organs/register.py

@@ -120,7 +120,9 @@
   "source": "TotalSegmentator CT dataset v2.0.1 subject s1304 (doi:10.5281/zenodo.10047292)",
   "parts": [
    "kidney_left",
-   "kidney_right"
+   "kidney_right",
+   "adrenal_gland_left",
+   "adrenal_gland_right"
   ],
   "kidney_hilum_translation": {
    "kidney_left": {
@@ -130,21 +132,20 @@
      2.2
     ],
     "target_cm": [
-     3.23,
-     111.0,
-     -0.28
+     2.8,
+     111.29,
+     0.28
     ],
     "translation_cm": [
-     -2.32,
-     5.03,
-     -2.49
+     -2.75,
+     5.33,
+     -1.92
     ],
-    "translation_length_cm": 6.07,
+    "translation_length_cm": 6.29,
     "lid_facets": 46,
     "distance_to_kidney_surface_cm": {
-     "renal_artery_end": 1.47,
-     "renal_vein_end": 1.4,
-     "ureter_upper_end": 0.28
+     "renal_artery_end": 1.25,
+     "renal_vein_end": 1.15
     }
    },
    "kidney_right": {
@@ -154,22 +155,55 @@
      1.06
     ],
     "target_cm": [
-     -3.09,
-     109.74,
-     -0.07
+     -2.9,
+     110.31,
+     0.12
     ],
     "translation_cm": [
-     1.86,
-     3.14,
-     -1.12
+     2.05,
+     3.7,
+     -0.94
     ],
-    "translation_length_cm": 3.82,
+    "translation_length_cm": 4.33,
     "lid_facets": 34,
     "distance_to_kidney_surface_cm": {
-     "renal_artery_end": 1.14,
-     "renal_vein_end": 1.31,
-     "ureter_upper_end": 0.38
+     "renal_artery_end": 1.01,
+     "renal_vein_end": 1.23
     }
+   }
+  },
+  "adrenal": {
+   "adrenal_gland_left": {
+    "translation_cm": [
+     -0.0,
+     5.33,
+     -0.0
+    ],
+    "gap_to_aorta_wall_cm": 1.12,
+    "gap_to_ivc_wall_cm": 2.8,
+    "min_gap_to_kidney_cm": 1.79,
+    "median_gap_to_kidney_cm": 2.7,
+    "centroid_cm": [
+     3.84,
+     116.4,
+     1.67
+    ]
+   },
+   "adrenal_gland_right": {
+    "translation_cm": [
+     0.0,
+     3.7,
+     -0.0
+    ],
+    "gap_to_aorta_wall_cm": 3.01,
+    "gap_to_ivc_wall_cm": 1.21,
+    "min_gap_to_kidney_cm": 0.54,
+    "median_gap_to_kidney_cm": 1.48,
+    "centroid_cm": [
+     -4.13,
+     116.31,
+     0.11
+    ]
    }
   }
  },

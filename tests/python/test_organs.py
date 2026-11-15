@@ -50,3 +50,8 @@ def test_spec_ids_are_unique_and_parts_have_tissue():
     # never the Z-Anatomy kidney model (CC BY-NC) or its renal pelvis / intrarenal vessels
     files = " ".join(f for o in spec["organs"] if o["src"] == "zanatomy" for p in o["parts"] for f in p["files"])
     assert "Kidney" not in files and "Renal_pelvis" not in files and "Intrarenal" not in files
+    # nor its ureters and suprarenal glands (possible overlap with that model: licence unclear)
+    assert "Ureter" not in files and "Suprarenal" not in files
+    match = (ROOT / "tools" / "organs" / "zanatomy_organs.txt").read_text()
+    rules = [l for l in match.splitlines() if l.strip() and not l.lstrip().startswith("#")]
+    assert not any(k in r for r in rules for k in ("Kidney", "Renal pelvis", "Intrarenal", "Ureter", "Suprarenal"))

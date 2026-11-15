@@ -245,13 +245,13 @@
   "centerlines": 0
  },
  "adrenals": {
-  "kb": 47.6,
+  "kb": 47.7,
   "tris": {
-   "right_suprarenal_gland": 1498,
+   "right_suprarenal_gland": 1500,
    "left_suprarenal_gland": 1500
   },
-  "credit": "zanatomy",
-  "license": "CC BY-SA 4.0",
+  "credit": "totalsegmentator",
+  "license": "CC BY 4.0",
   "landmarks": 2,
   "centerlines": 0
  },
@@ -265,17 +265,6 @@
   "license": "CC BY 4.0",
   "landmarks": 6,
   "centerlines": 0
- },
- "ureters": {
-  "kb": 25.7,
-  "tris": {
-   "right_ureter": 800,
-   "left_ureter": 798
-  },
-  "credit": "zanatomy",
-  "license": "CC BY-SA 4.0",
-  "landmarks": 4,
-  "centerlines": 2
  },
  "bladder": {
   "kb": 44.9,

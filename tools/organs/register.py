@@ -11,7 +11,8 @@ only needs the identity transform:
           (4 chamber centroids, aortic and pulmonary valve centres)
   abdomen TotalSegmentator s1304 vertebrae T10-L4 -> Z-Anatomy T10-L4: centroid fit then
           similarity ICP on the vertebra surfaces; then each kidney is translated so its hilum
-          opening meets the hilar ends of Z-Anatomy's renal artery, renal vein and ureter (kidneys)
+          opening meets the hilar ends of Z-Anatomy's renal artery and renal vein; each adrenal
+          gets the vertical component of its same-side kidney's translation (kidneys, adrenals)
   neck    TotalSegmentator s1304 vertebrae C3-T3 -> Z-Anatomy C3-T3: same method (thyroid)
   brain   TotalSegmentator s1304 brain -> Z-Anatomy cranial-cavity endocast: similarity ICP
 
@@ -183,7 +184,8 @@ def hilum_lid(v):
 
 def kidney_hilum_shift(assets, part, v):
     """Translate a vertebra-registered CT kidney so its hilum opening sits at the mean of the hilar ends
-    of Z-Anatomy's renal artery, renal vein and ureter (the vessels the kidney must connect to)."""
+    of Z-Anatomy's renal artery and renal vein (the vessels the kidney must connect to). Z-Anatomy's
+    ureter is not used: its licence is unclear (possible overlap with a CC BY-NC kidney model)."""
     curves = json.load(open(os.path.join(assets, "zanatomy-organs", "all_curves.json")))
     side, L = ("l", "Left") if part.endswith("left") else ("r", "Right")
 
@@ -196,9 +198,7 @@ def kidney_hilum_shift(assets, part, v):
         return a if abs(a[0]) > abs(b[0]) else b
 
     ra, rv = far_end(L + " renal artery"), far_end(L + " renal vein")
-    ua, ub = ends("Ureter." + side)
-    ur = ua if ua[1] > ub[1] else ub  # upper end
-    target = np.mean([ra, rv, ur], 0)
+    target = np.mean([ra, rv], 0)
     hil, nlid = hilum_lid(v)
     shift = target - hil
     v2 = v + shift
@@ -207,9 +207,8 @@ def kidney_hilum_shift(assets, part, v):
            "translation_cm": np.round(shift, 2).tolist(), "translation_length_cm": round(float(np.linalg.norm(shift)), 2),
            "lid_facets": nlid,
            "distance_to_kidney_surface_cm": {"renal_artery_end": round(float(t.query(ra)[0]), 2),
-                                             "renal_vein_end": round(float(t.query(rv)[0]), 2),
-                                             "ureter_upper_end": round(float(t.query(ur)[0]), 2)}}
-    return v2, rep
+                                             "renal_vein_end": round(float(t.query(rv)[0]), 2)}}
+    return v2, rep, shift
 
 
 def tdict(T):
@@ -221,10 +220,11 @@ def tdict(T):
 
 def register_ct(assets, out, report):
     to = os.path.join(assets, "ct-totalseg", "obj")
-    groups = {"abdomen": (VERT_ABDOMEN, ["kidney_left", "kidney_right"]),
+    groups = {"abdomen": (VERT_ABDOMEN, ["kidney_left", "kidney_right", "adrenal_gland_left", "adrenal_gland_right"]),
               "neck": (VERT_NECK, ["thyroid_gland"])}
     for g, (levels, parts) in groups.items():
         T, rep = vertebra_fit(assets, levels)
+        shifts, kidneys = {}, {}
         rep["transform"] = tdict(T)
         rep["source"] = "TotalSegmentator CT dataset v2.0.1 subject s1304 (doi:10.5281/zenodo.10047292)"
         rep["parts"] = parts
@@ -233,10 +233,33 @@ def register_ct(assets, out, report):
             v = apply(T, v)
             note = []
             if p.startswith("kidney_"):
-                v, kr = kidney_hilum_shift(assets, p, v)
+                v, kr, shifts[p.split("_")[1]] = kidney_hilum_shift(assets, p, v)
                 rep.setdefault("kidney_hilum_translation", {})[p] = kr
+                kidneys[p.split("_")[1]] = v
                 note = ["then translated so its hilum (convex-hull lid over the renal sinus) meets the ends of",
-                        "Z-Anatomy's renal artery, renal vein and ureter (see registration.json)"]
+                        "Z-Anatomy's renal artery and renal vein (see registration.json)"]
+            elif p.startswith("adrenal_gland_"):
+                side = p.split("_")[-1]
+                # Only the vertical component of the same-side kidney's translation: the full vector
+                # (which also moves the kidney 2-2.8 cm medially to reach Z-Anatomy's short renal vessels)
+                # drove the left adrenal 0.78 cm into the aorta. Vertebra fit + vertical shift keeps the
+                # CT adrenal's position beside the spine and its height above its kidney.
+                sh = shifts[side] * np.array([0.0, 1.0, 0.0])
+                v = v + sh
+                kt = cKDTree(kidneys[side])
+                d = kt.query(v)[0]
+                curves = json.load(open(os.path.join(assets, "zanatomy-organs", "all_curves.json")))
+                ao = np.array(curves["Abdominal aorta"]["splines"][0]["points"] + curves["Thoracic aorta"]["splines"][0]["points"])
+                ivc = np.array(curves["Inferior vena cava (abdominal part)"]["splines"][0]["points"]
+                               + curves["Inferior vena cava (thoracic part)"]["splines"][0]["points"])
+                rep.setdefault("adrenal", {})[p] = {
+                    "translation_cm": np.round(sh, 2).tolist(),
+                    "gap_to_aorta_wall_cm": round(float(cKDTree(ao).query(v)[0].min() - 0.9), 2),  # aorta / IVC radius ~0.9 cm
+                    "gap_to_ivc_wall_cm": round(float(cKDTree(ivc).query(v)[0].min() - 0.9), 2),
+                    "min_gap_to_kidney_cm": round(float(d.min()), 2),
+                    "median_gap_to_kidney_cm": round(float(np.median(d)), 2),
+                    "centroid_cm": np.round(v.mean(0), 2).tolist()}
+                note = ["then translated vertically by the %s kidney's vertical shift (see registration.json)" % side]
             write_obj(os.path.join(out, "totalseg", p + ".obj"), v, f,
                       ["TotalSegmentator s1304 %s, registered to the sagittal organ body frame (cm)" % p,
                        "similarity fit '%s' on vertebrae %s, see tools/organs/registration.json" % (g, ",".join(levels))] + note)

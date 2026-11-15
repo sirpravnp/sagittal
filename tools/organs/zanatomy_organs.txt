@@ -3,12 +3,13 @@
 #     --out <cache>/zanatomy-organs/obj --sides 16 --match-file tools/organs/zanatomy_organs.txt
 # Never add: Kidney.l/.r, Renal pelvis, Intrarenal arteries/veins (Z-Anatomy credits a CC BY-NC kidney
 # model), inner-ear objects (CC BY-NC-SA), Brainder cortex / white matter (licence unclear).
+# Also never: Ureter.l/.r and Suprarenal gland.l/.r (may come from that same CC BY-NC kidney model;
+# licence unclear, so not used; adrenals come from TotalSegmentator instead).
 # --- organ meshes
 ^(Liver|Gallbladder|Stomach|Spleen|Pancreas|Duodenum|Trachea|Prostate|Glans penis|Urinary bladder|Vermiform appendix)$
 ^(Ascending|Transverse|Descending|Sigmoid) colon$
 ^(Superior|Middle|Inferior) lobe of (left|right) lung$
 ^(Left|Right) (atrium|ventricle)$
-^Suprarenal gland\.(l|r)$
 ^Seminal gland\.(l|r)$
 ^(Testis|Epididymis)\.(l|r)$
 ^Corpus (cavernosum|spongiosum) of penis$
@@ -26,7 +27,6 @@ segment of liver \((I|II|III|IV|V|VI|VII|VIII)\)$
 ^Inferior vena cava \((abdominal|thoracic) part\)$
 ^(Superior vena cava|(Left|Right) brachiocephalic vein)$
 ^(Bile duct|Pancreatic duct|Accessory pancreatic duct)$
-^Ureter\.(l|r)$
 ^(Oesophagus|Jejunum)$
 ^(Left|Right) main bronchus$
 ^Intermediate bronchus\.r$

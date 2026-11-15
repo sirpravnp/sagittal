@@ -110,11 +110,6 @@
   "system": "Urinary"
  },
  {
-  "id": "ureters",
-  "name": "Ureters",
-  "system": "Urinary"
- },
- {
   "id": "bladder",
   "name": "Urinary bladder and urethra",
   "system": "Urinary"

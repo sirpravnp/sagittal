@@ -22,54 +22,54 @@
   "right_renal_hilum": {
    "name": "Right renal hilum (centre of the convex-hull lid over the renal sinus)",
    "p": [
-    -3.162,
-    109.725,
-    -0.084
+    -2.974,
+    110.287,
+    0.103
    ],
    "derived": "area centroid of the 19 convex-hull facets of baked 'right_kidney' whose centres lie > 4 mm from the kidney surface (the lid over the renal sinus)"
   },
   "left_renal_hilum": {
    "name": "Left renal hilum (centre of the convex-hull lid over the renal sinus)",
    "p": [
-    3.434,
-    110.699,
-    -0.445
+    3.062,
+    110.938,
+    0.199
    ],
    "derived": "area centroid of the 26 convex-hull facets of baked 'left_kidney' whose centres lie > 4 mm from the kidney surface (the lid over the renal sinus)"
   },
   "right_kidney_upper_pole": {
    "name": "Upper pole of the right kidney",
    "p": [
-    -4.406,
-    115.357,
-    -2.669
+    -4.219,
+    115.919,
+    -2.482
    ],
    "derived": "baked 'right_kidney' vertex with the largest y"
   },
   "right_kidney_lower_pole": {
    "name": "Lower pole of the right kidney",
    "p": [
-    -6.096,
-    104.588,
-    0.424
+    -5.908,
+    105.149,
+    0.611
    ],
    "derived": "baked 'right_kidney' vertex with the smallest y"
   },
   "left_kidney_upper_pole": {
    "name": "Upper pole of the left kidney",
    "p": [
-    3.87,
-    115.403,
-    -2.664
+    3.438,
+    115.695,
+    -2.097
    ],
    "derived": "baked 'left_kidney' vertex with the largest y"
   },
   "left_kidney_lower_pole": {
    "name": "Lower pole of the left kidney",
    "p": [
-    6.826,
-    105.054,
-    0.015
+    6.394,
+    105.345,
+    0.582
    ],
    "derived": "baked 'left_kidney' vertex with the smallest y"
   }
