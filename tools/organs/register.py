@@ -121,6 +121,11 @@ def mask_centroid_cm(path):
     return np.array([-ras[0], ras[2], ras[1]]) / 10.0
 
 
+def rodero_frame(v):
+    """Rodero LPS mm -> sagittal axes cm (no centring); the heart transform in registration.json maps on from here."""
+    return np.stack([v[:, 0], v[:, 2], -v[:, 1]], 1) * 0.1
+
+
 def mesh_centroid(v, f):
     """Volume centroid of a closed triangle mesh (falls back to area centroid)."""
     a, b, c = v[f[:, 0]], v[f[:, 1]], v[f[:, 2]]
@@ -289,8 +294,7 @@ def register_heart(assets, out, report):
     zo = os.path.join(assets, "zanatomy-organs", "obj")
     rw = os.path.join(assets, "rodero", "work")
 
-    def rframe(v):  # Rodero LPS mm -> sagittal axes cm (no centring)
-        return np.stack([v[:, 0], v[:, 2], -v[:, 1]], 1) * 0.1
+    rframe = rodero_frame
 
     d = np.load(os.path.join(rw, "average.npz"))
     P, Tt, tag = d["pts"].astype(np.float64), d["tets"], d["tag"]

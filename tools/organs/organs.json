@@ -198,34 +198,50 @@
     },
     {
      "id": "left_ventricle_centroid",
-     "name": "Left ventricle centroid",
+     "name": "Left ventricle cavity centroid (centre of the blood pool)",
      "rule": {
-      "type": "mesh_centroid",
-      "part": "wall_lv"
+      "type": "registered_centroid",
+      "file": "rodero/work/parts/cav_lv.obj",
+      "frame": "rodero",
+      "transform": "rodero_heart.transform",
+      "what": "Rodero left-ventricular cavity (blood pool)",
+      "note": "the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
      }
     },
     {
      "id": "right_ventricle_centroid",
-     "name": "Right ventricle centroid",
+     "name": "Right ventricle cavity centroid (centre of the blood pool)",
      "rule": {
-      "type": "mesh_centroid",
-      "part": "wall_rv"
+      "type": "registered_centroid",
+      "file": "rodero/work/parts/cav_rv.obj",
+      "frame": "rodero",
+      "transform": "rodero_heart.transform",
+      "what": "Rodero right-ventricular cavity (blood pool)",
+      "note": "the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
      }
     },
     {
      "id": "left_atrium_centroid",
-     "name": "Left atrium centroid",
+     "name": "Left atrium cavity centroid (centre of the blood pool)",
      "rule": {
-      "type": "mesh_centroid",
-      "part": "wall_la"
+      "type": "registered_centroid",
+      "file": "rodero/work/parts/cav_la.obj",
+      "frame": "rodero",
+      "transform": "rodero_heart.transform",
+      "what": "Rodero left-atrial cavity (blood pool)",
+      "note": "the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
      }
     },
     {
      "id": "right_atrium_centroid",
-     "name": "Right atrium centroid",
+     "name": "Right atrium cavity centroid (centre of the blood pool)",
      "rule": {
-      "type": "mesh_centroid",
-      "part": "wall_ra"
+      "type": "registered_centroid",
+      "file": "rodero/work/parts/cav_ra.obj",
+      "frame": "rodero",
+      "transform": "rodero_heart.transform",
+      "what": "Rodero right-atrial cavity (blood pool)",
+      "note": "the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
      }
     }
    ]
@@ -2384,7 +2400,8 @@
      "name": "Thyroid centroid",
      "rule": {
       "type": "mesh_centroid",
-      "part": "thyroid"
+      "part": "thyroid",
+      "outside": "the gland is a horseshoe around the trachea, so its centroid falls between the lobes, at the front of the trachea"
      }
     },
     {

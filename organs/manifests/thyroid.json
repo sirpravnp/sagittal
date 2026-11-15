@@ -21,7 +21,7 @@
     143.131,
     0.942
    ],
-   "derived": "volume centroid of the baked 'thyroid' mesh"
+   "derived": "volume centroid of the baked 'thyroid' mesh; it lies outside the mesh: the gland is a horseshoe around the trachea, so its centroid falls between the lobes, at the front of the trachea"
   },
   "thyroid_right_lobe_upper_pole": {
    "name": "Upper pole of the right lobe",

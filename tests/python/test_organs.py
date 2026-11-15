@@ -55,3 +55,70 @@ def test_spec_ids_are_unique_and_parts_have_tissue():
     match = (ROOT / "tools" / "organs" / "zanatomy_organs.txt").read_text()
     rules = [l for l in match.splitlines() if l.strip() and not l.lstrip().startswith("#")]
     assert not any(k in r for r in rules for k in ("Kidney", "Renal pelvis", "Intrarenal", "Ureter", "Suprarenal"))
+
+
+def _cube(offset):
+    v = np.array([[x, y, z] for x in (0, 1) for y in (0, 1) for z in (0, 1)], float) * 2 + offset
+    f = np.array([[0, 1, 3], [0, 3, 2], [4, 6, 7], [4, 7, 5], [0, 4, 5], [0, 5, 1],
+                  [2, 3, 7], [2, 7, 6], [0, 2, 6], [0, 6, 4], [1, 5, 7], [1, 7, 3]])
+    return v, f
+
+
+def test_volume_centroid_does_not_depend_on_the_frame_origin():
+    # The organ frame's origin is 1-1.6 m from the organs. With the signed tetrahedra taken from the
+    # origin, an open surface (the heart walls) gave a 'centroid' 25-50 cm outside the heart.
+    off = np.array([3.0, 130.0, -2.0])
+    v, f = _cube(off)
+    c, kind = build.volume_centroid(v, f)
+    assert kind == "volume centroid" and np.allclose(c, off + 1)
+    assert build.boundary_edges(f) == 0 and abs(build.winding_number(off + 1, v, f) - 1) < 1e-9
+    open_f = f[2:]  # one face of the cube removed
+    assert build.boundary_edges(open_f) == 4
+    c2, _ = build.volume_centroid(v, open_f)
+    assert np.linalg.norm(c2 - (off + 1)) < 1.0  # stays near the solid, not pulled towards the origin
+    assert abs(build.winding_number(off + [10, 0, 0], v, f)) < 1e-9
+
+
+def _baked(organ):
+    return build.load_baked(str(ROOT / "organs" / "meshes" / (organ + ".js")), organ)[1]
+
+
+def _landmarks(organ):
+    return {k: np.array(l["p"]) for k, l in json.loads((ROOT / "organs" / "manifests" / (organ + ".json")).read_text())["landmarks"].items()}
+
+
+def _ray_hits(p, d, v, f):
+    a, b, c = v[f[:, 0]], v[f[:, 1]], v[f[:, 2]]
+    e1, e2 = b - a, c - a
+    h = np.cross(d, e2)
+    det = np.einsum("ij,ij->i", e1, h)
+    ok = np.abs(det) > 1e-12
+    inv = np.where(ok, 1 / np.where(ok, det, 1), 0)
+    s = p - a
+    u = inv * np.einsum("ij,ij->i", s, h)
+    q = np.cross(s, e1)
+    w = inv * (q @ d)
+    t = inv * np.einsum("ij,ij->i", e2, q)
+    return bool(np.any(ok & (u >= 0) & (w >= 0) & (u + w <= 1) & (t > 0)))
+
+
+def test_heart_chamber_centroids_lie_inside_the_heart():
+    parts = _baked("heart")
+    lm = _landmarks("heart")
+    dirs = np.array([[i, j, k] for i in (-1, 0, 1) for j in (-1, 0, 1) for k in (-1, 0, 1) if (i, j, k) != (0, 0, 0)], float)
+    dirs /= np.linalg.norm(dirs, axis=1)[:, None]
+    for ch, wall in (("left_ventricle", "wall_lv"), ("right_ventricle", "wall_rv"), ("left_atrium", "wall_la"), ("right_atrium", "wall_ra")):
+        p = lm[ch + "_centroid"]
+        v, _ = parts[wall]
+        assert np.all(p > v.min(0)) and np.all(p < v.max(0)), ch  # inside its own chamber's bounding box
+        # enclosed by the heart: a ray hits a heart part in (almost) every direction (the atria open to the veins)
+        hits = sum(any(_ray_hits(p, d, *parts[k]) for k in parts) for d in dirs)
+        assert hits >= 25, (ch, hits)
+    # inflow valves between their atrium and ventricle; centroids on the expected sides
+    assert lm["left_ventricle_centroid"][0] > lm["right_ventricle_centroid"][0]
+    assert lm["right_ventricle_centroid"][2] > lm["left_ventricle_centroid"][2]  # RV anterior
+    assert lm["left_atrium_centroid"][2] < lm["left_ventricle_centroid"][2]  # LA posterior
+    for v_, a_, b_ in (("mitral", "left_atrium", "left_ventricle"), ("tricuspid", "right_atrium", "right_ventricle")):
+        a, b, m = lm[a_ + "_centroid"], lm[b_ + "_centroid"], lm[v_ + "_valve_centre"]
+        t = (m - a) @ (b - a) / ((b - a) @ (b - a))
+        assert 0 < t < 1, v_

@@ -143,5 +143,9 @@ npm test && npm run test:py
 
 To add or change an organ, edit `tools/organs/organs.json` (parts, centre lines with `curve`,
 `spline`, `parent`; landmark rules: `curve_end`, `line_point`, `curve_ends_meet`, `mesh_extreme`,
-`mesh_centroid`, `mesh_nearest`, `mesh_farthest`, `mesh_contact`, `hilum_lid`, `registration`) and
-rerun step 4. `tests/organs.test.mjs` checks every manifest.
+`mesh_centroid`, `registered_centroid`, `mesh_nearest`, `mesh_farthest`, `mesh_contact`, `hilum_lid`,
+`registration`) and rerun step 4. `mesh_centroid` takes the volume centroid about the part's vertex mean
+(not the frame origin, which is 1-1.6 m away) and refuses a centroid outside the part unless the rule
+says why in `outside` (the horseshoe thyroid). The heart chamber centroids are `registered_centroid`:
+the centroid of the closed Rodero cavity (blood pool) surface mapped by the heart registration, because
+the baked chamber walls are open at the valve rings (until Task 0b they were 12-48 cm outside the heart). `tests/organs.test.mjs` checks every manifest.

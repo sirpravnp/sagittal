@@ -53,11 +53,11 @@
   "liver_centroid": {
    "name": "Liver centroid",
    "p": [
-    -4.479,
-    118.966,
-    3.251
+    -4.529,
+    119.468,
+    3.248
    ],
-   "derived": "volume centroid of the baked 'liver' mesh"
+   "derived": "volume centroid of the baked 'liver' mesh (20 open boundary edges)"
   }
  }
 }

@@ -80,40 +80,40 @@
    "derived": "baked 'wall_lv' vertex farthest from landmark 'mitral_valve_centre'"
   },
   "left_ventricle_centroid": {
-   "name": "Left ventricle centroid",
+   "name": "Left ventricle cavity centroid (centre of the blood pool)",
    "p": [
-    0.87,
-    78.39,
-    0.591
+    5.142,
+    127.528,
+    2.699
    ],
-   "derived": "volume centroid of the baked 'wall_lv' mesh"
+   "derived": "volume centroid of the closed Rodero left-ventricular cavity (blood pool) surface (asset cache rodero/work/parts/cav_lv.obj), mapped into the body frame by the registration (tools/organs/registration.json rodero_heart.transform): the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
   },
   "right_ventricle_centroid": {
-   "name": "Right ventricle centroid",
+   "name": "Right ventricle cavity centroid (centre of the blood pool)",
    "p": [
-    -1.001,
-    76.373,
-    0.481
+    1.876,
+    128.109,
+    5.525
    ],
-   "derived": "volume centroid of the baked 'wall_rv' mesh"
+   "derived": "volume centroid of the closed Rodero right-ventricular cavity (blood pool) surface (asset cache rodero/work/parts/cav_rv.obj), mapped into the body frame by the registration (tools/organs/registration.json rodero_heart.transform): the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
   },
   "left_atrium_centroid": {
-   "name": "Left atrium centroid",
+   "name": "Left atrium cavity centroid (centre of the blood pool)",
    "p": [
-    1.718,
-    104.1,
-    -0.311
+    1.591,
+    131.204,
+    -0.876
    ],
-   "derived": "volume centroid of the baked 'wall_la' mesh"
+   "derived": "volume centroid of the closed Rodero left-atrial cavity (blood pool) surface (asset cache rodero/work/parts/cav_la.obj), mapped into the body frame by the registration (tools/organs/registration.json rodero_heart.transform): the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
   },
   "right_atrium_centroid": {
-   "name": "Right atrium centroid",
+   "name": "Right atrium cavity centroid (centre of the blood pool)",
    "p": [
-    -1.795,
-    114.502,
-    3.797
+    -1.558,
+    129.807,
+    2.167
    ],
-   "derived": "volume centroid of the baked 'wall_ra' mesh"
+   "derived": "volume centroid of the closed Rodero right-atrial cavity (blood pool) surface (asset cache rodero/work/parts/cav_ra.obj), mapped into the body frame by the registration (tools/organs/registration.json rodero_heart.transform): the baked chamber wall is open at the valve rings, so it has no volume centroid of its own"
   }
  }
 }

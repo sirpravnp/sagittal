@@ -79,20 +79,20 @@
   "liver_segment_iv_centroid": {
    "name": "Centroid of segment IV",
    "p": [
-    -1.861,
-    116.771,
-    6.277
+    -1.903,
+    120.178,
+    6.615
    ],
-   "derived": "volume centroid of the baked 'segment_iv' mesh"
+   "derived": "volume centroid of the baked 'segment_iv' mesh (24 open boundary edges)"
   },
   "liver_segment_v_centroid": {
    "name": "Centroid of segment V",
    "p": [
-    -6.372,
-    115.656,
-    5.884
+    -6.393,
+    115.894,
+    5.881
    ],
-   "derived": "volume centroid of the baked 'segment_v' mesh"
+   "derived": "volume centroid of the baked 'segment_v' mesh (4 open boundary edges)"
   },
   "liver_segment_vi_centroid": {
    "name": "Centroid of segment VI",

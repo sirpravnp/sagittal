@@ -28,6 +28,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(REPO, "tools", "meshes"))
 import bake  # noqa: E402
+import register  # noqa: E402
 
 SCHEMA = "sagittal-organ/0"
 CONFIG_DIR = os.path.join(REPO, "tools", "meshes", "configs")
@@ -74,13 +75,32 @@ def tri_count(parts):
     return {k: int(len(f)) for k, (v, f) in parts.items()}
 
 
+def boundary_edges(f):
+    """Number of edges used by only one triangle (0 for a closed surface)."""
+    e = np.sort(np.concatenate([f[:, [0, 1]], f[:, [1, 2]], f[:, [2, 0]]]), 1)
+    return int((np.unique(e, axis=0, return_counts=True)[1] == 1).sum())
+
+
 def volume_centroid(v, f):
-    a, b, c = v[f[:, 0]], v[f[:, 1]], v[f[:, 2]]
+    """Volume centroid of a closed surface. The signed tetrahedra are taken from the vertex mean, not the
+    frame origin: the body-frame origin is 1-1.6 m away, and on an open surface (the heart walls, open at
+    the valve rings) the far apex put the 'centroid' 25-50 cm outside the heart (Task 0b)."""
+    o = v.mean(0)
+    a, b, c = v[f[:, 0]] - o, v[f[:, 1]] - o, v[f[:, 2]] - o
     vol = np.einsum("ij,ij->i", a, np.cross(b, c)) / 6.0
     if abs(vol.sum()) > 1e-6:
-        return ((a + b + c) / 4.0 * vol[:, None]).sum(0) / vol.sum(), "volume centroid"
+        return ((a + b + c) / 4.0 * vol[:, None]).sum(0) / vol.sum() + o, "volume centroid"
     area = np.linalg.norm(np.cross(b - a, c - a), axis=1)
-    return ((a + b + c) / 3.0 * area[:, None]).sum(0) / area.sum(), "surface-area centroid (mesh is open)"
+    return ((a + b + c) / 3.0 * area[:, None]).sum(0) / area.sum() + o, "surface-area centroid (mesh is open)"
+
+
+def winding_number(p, v, f):
+    """Generalised winding number of point p for surface (v, f): ~1 inside a closed surface, ~0 outside."""
+    a, b, c = v[f[:, 0]] - p, v[f[:, 1]] - p, v[f[:, 2]] - p
+    la, lb, lc = (np.linalg.norm(x, axis=1) for x in (a, b, c))
+    num = np.einsum("ij,ij->i", a, np.cross(b, c))
+    den = la * lb * lc + np.einsum("ij,ij->i", a, b) * lc + np.einsum("ij,ij->i", b, c) * la + np.einsum("ij,ij->i", c, a) * lb
+    return float(np.arctan2(num, den).sum() / (2 * np.pi))
 
 
 # ---------------------------------------------------------------- centre lines
@@ -112,8 +132,8 @@ def dist_to_line(p, pts):
 
 
 class Library:
-    def __init__(self, spec, curves, registration, baked):
-        self.spec, self.curves, self.reg, self.baked = spec, curves, registration, baked
+    def __init__(self, spec, curves, registration, baked, assets=None):
+        self.spec, self.curves, self.reg, self.baked, self.assets = spec, curves, registration, baked, assets
         self.lines = {}       # id -> dict(points ndarray, organ, ...)
         self.landmarks = {}   # id -> dict(p, name, derived, organ)
         self.warnings = []
@@ -158,6 +178,21 @@ class Library:
             for k in r["key"].split("."):
                 obj = obj[k]
             return np.array(obj, np.float64), r["note"] + " (tools/organs/registration.json %s)" % r["key"]
+        if t == "registered_centroid":
+            # a closed source surface (e.g. a Rodero cavity), centroid taken in the source frame and mapped
+            # by the stored registration transform (a similarity maps centroids to centroids)
+            sv, sf = bake.read_obj(os.path.join(self.assets, r["file"]))
+            sv = {"rodero": register.rodero_frame}[r["frame"]](sv.astype(np.float64))
+            nb = boundary_edges(sf)
+            if nb:
+                raise SystemExit("%s: %s is not closed (%d boundary edges)" % (lm["id"], r["file"], nb))
+            c, kind = volume_centroid(sv, sf)
+            obj = self.reg
+            for k in r["transform"].split("."):
+                obj = obj[k]
+            T = (obj["scale"], np.array(obj["rotation"]), np.array(obj["translation_cm"]))
+            return register.apply(T, c)[0], "%s of the closed %s surface (asset cache %s), mapped into the body frame by the registration (tools/organs/registration.json %s)%s" % (
+                kind, r["what"], r["file"], r["transform"], (": " + r["note"]) if r.get("note") else "")
         v, f = self.part(organ["id"], r["part"])
         if t == "mesh_extreme":
             ax = {"x": 0, "y": 1, "z": 2}[r["axis"][1]]
@@ -173,7 +208,15 @@ class Library:
             return v[idx], "baked '%s' vertex with the %s %s%s" % (r["part"], "largest" if sgn > 0 else "smallest", r["axis"][1], note)
         if t == "mesh_centroid":
             c, kind = volume_centroid(v, f)
-            return c, "%s of the baked '%s' mesh" % (kind, r["part"])
+            note = "%s of the baked '%s' mesh" % (kind, r["part"])
+            nb = boundary_edges(f)
+            if nb:
+                note += " (%d open boundary edges)" % nb
+            if winding_number(c, v, f) < 0.5:
+                if not r.get("outside"):
+                    raise SystemExit("%s: centroid of '%s' lies outside the mesh; use another rule or state why in 'outside'" % (lm["id"], r["part"]))
+                note += "; it lies outside the mesh: %s" % r["outside"]
+            return c, note
         if t == "mesh_nearest":
             q = self.landmarks.get(r["to"])
             if q is None:
@@ -339,7 +382,7 @@ def main(argv=None):
                           "license": cfg["license"]}
     curves = json.load(open(os.path.join(a.assets, "zanatomy-organs", "all_curves.json")))
     reg = json.load(open(os.path.join(HERE, "registration.json")))
-    lib = Library(spec, curves, reg, baked)
+    lib = Library(spec, curves, reg, baked, a.assets)
     resolve_all(lib, organs)
     # landmark ids are global: make sure no clash between organs
     index = []
