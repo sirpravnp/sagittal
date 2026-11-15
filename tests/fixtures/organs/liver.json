@@ -1,0 +1,36 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "liver",
+ "name": "Liver (fixture)",
+ "system": "Hepatobiliary",
+ "mesh": "liver",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "liver",
+   "name": "Liver",
+   "tissue": "liver"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "right_lobe_hilum": {
+   "name": "Right lobe hilum",
+   "p": [
+    -6,
+    100,
+    4
+   ],
+   "derived": "fixture"
+  },
+  "left_lobe_hilum": {
+   "name": "Left lobe hilum",
+   "p": [
+    3,
+    100,
+    4
+   ],
+   "derived": "fixture"
+  }
+ }
+}

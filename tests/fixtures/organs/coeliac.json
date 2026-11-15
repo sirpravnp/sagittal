@@ -1,0 +1,209 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "coeliac",
+ "name": "Coeliac trunk (fixture)",
+ "system": "Cardiovascular",
+ "mesh": "coeliac",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "coeliac_trunk",
+   "name": "coeliac trunk",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "common_hepatic_artery",
+   "name": "common hepatic artery",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "gastroduodenal_artery",
+   "name": "gastroduodenal artery",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "proper_hepatic_artery",
+   "name": "proper hepatic artery",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "right_hepatic_artery",
+   "name": "right hepatic artery",
+   "tissue": "vessel-artery"
+  },
+  {
+   "id": "left_hepatic_artery",
+   "name": "left hepatic artery",
+   "tissue": "vessel-artery"
+  }
+ ],
+ "centerlines": {
+  "coeliac_trunk": {
+   "name": "Coeliac trunk",
+   "points": [
+    [
+     0,
+     95,
+     0
+    ],
+    [
+     0,
+     95,
+     2
+    ]
+   ],
+   "radius_cm": 0.4,
+   "from": "coeliac_trunk_origin"
+  },
+  "common_hepatic_artery": {
+   "name": "Common hepatic artery",
+   "points": [
+    [
+     0,
+     95,
+     2
+    ],
+    [
+     -4,
+     95,
+     2
+    ]
+   ],
+   "radius_cm": 0.25,
+   "from": "common_hepatic_artery_origin"
+  },
+  "gastroduodenal_artery": {
+   "name": "Gastroduodenal artery",
+   "points": [
+    [
+     -4,
+     95,
+     2
+    ],
+    [
+     -4,
+     90,
+     2
+    ]
+   ],
+   "radius_cm": 0.1,
+   "from": "gastroduodenal_artery_origin"
+  },
+  "proper_hepatic_artery": {
+   "name": "Proper hepatic artery",
+   "points": [
+    [
+     -4,
+     95,
+     2
+    ],
+    [
+     -4,
+     98,
+     2
+    ]
+   ],
+   "radius_cm": 0.15,
+   "from": "proper_hepatic_artery_origin"
+  },
+  "right_hepatic_artery": {
+   "name": "Right hepatic artery",
+   "points": [
+    [
+     -4,
+     98,
+     2
+    ],
+    [
+     -6,
+     99,
+     3
+    ]
+   ],
+   "radius_cm": 0.1,
+   "from": "right_hepatic_artery_origin"
+  },
+  "left_hepatic_artery": {
+   "name": "Left hepatic artery",
+   "points": [
+    [
+     -4,
+     98,
+     2
+    ],
+    [
+     -2,
+     99,
+     3
+    ]
+   ],
+   "radius_cm": 0.1,
+   "from": "left_hepatic_artery_origin"
+  }
+ },
+ "landmarks": {
+  "coeliac_trunk_origin": {
+   "name": "Coeliac trunk origin",
+   "p": [
+    0,
+    95,
+    0
+   ],
+   "derived": "fixture"
+  },
+  "common_hepatic_artery_origin": {
+   "name": "CHA origin",
+   "p": [
+    0,
+    95,
+    2
+   ],
+   "derived": "fixture"
+  },
+  "common_hepatic_artery_division": {
+   "name": "CHA division",
+   "p": [
+    -4,
+    95,
+    2
+   ],
+   "derived": "fixture"
+  },
+  "gastroduodenal_artery_origin": {
+   "name": "GDA origin",
+   "p": [
+    -4,
+    95,
+    2
+   ],
+   "derived": "fixture"
+  },
+  "proper_hepatic_artery_origin": {
+   "name": "PHA origin",
+   "p": [
+    -4,
+    95,
+    2
+   ],
+   "derived": "fixture"
+  },
+  "right_hepatic_artery_origin": {
+   "name": "RHA origin",
+   "p": [
+    -4,
+    98,
+    2
+   ],
+   "derived": "fixture"
+  },
+  "left_hepatic_artery_origin": {
+   "name": "LHA origin",
+   "p": [
+    -4,
+    98,
+    2
+   ],
+   "derived": "fixture"
+  }
+ }
+}

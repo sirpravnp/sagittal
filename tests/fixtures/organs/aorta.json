@@ -1,0 +1,45 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "aorta",
+ "name": "Aorta (fixture)",
+ "system": "Cardiovascular",
+ "mesh": "aorta",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "abdominal_aorta",
+   "name": "Abdominal aorta",
+   "tissue": "vessel-artery"
+  }
+ ],
+ "centerlines": {
+  "abdominal_aorta": {
+   "name": "Abdominal aorta",
+   "points": [
+    [
+     0,
+     105,
+     0
+    ],
+    [
+     0,
+     80,
+     0
+    ]
+   ],
+   "radius_cm": 0.9,
+   "from": null
+  }
+ },
+ "landmarks": {
+  "abdominal_aorta_start": {
+   "name": "Upper end of abdominal aorta",
+   "p": [
+    0,
+    105,
+    0
+   ],
+   "derived": "fixture"
+  }
+ }
+}

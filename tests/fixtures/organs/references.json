@@ -1,0 +1,10 @@
+{
+ "hepatic-artery-variants": {
+  "title": "Hepatic artery variants (fixture)",
+  "url": "https://example.org/hav"
+ },
+ "cystic-duct": {
+  "title": "Cystic duct anatomy (fixture)",
+  "url": "https://example.org/cd"
+ }
+}

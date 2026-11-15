@@ -1,0 +1,59 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "biliary",
+ "name": "Bile duct (fixture)",
+ "system": "Hepatobiliary",
+ "mesh": "biliary",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "gallbladder",
+   "name": "Gallbladder",
+   "tissue": "gallbladder"
+  },
+  {
+   "id": "bile_duct",
+   "name": "Bile duct",
+   "tissue": "bile-duct"
+  }
+ ],
+ "centerlines": {
+  "bile_duct": {
+   "name": "Bile duct",
+   "points": [
+    [
+     -3,
+     97,
+     5
+    ],
+    [
+     -3,
+     87,
+     5
+    ]
+   ],
+   "radius_cm": 0.2,
+   "from": "bile_duct_upper_end"
+  }
+ },
+ "landmarks": {
+  "bile_duct_upper_end": {
+   "name": "Upper end of bile duct",
+   "p": [
+    -3,
+    97,
+    5
+   ],
+   "derived": "fixture"
+  },
+  "gallbladder_neck": {
+   "name": "Gallbladder neck",
+   "p": [
+    -7,
+    96,
+    7
+   ],
+   "derived": "fixture"
+  }
+ }
+}

@@ -1,0 +1,54 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "portal",
+ "name": "Portal vein (fixture)",
+ "system": "Cardiovascular",
+ "mesh": "portal",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "portal_vein",
+   "name": "Portal vein",
+   "tissue": "vessel-vein"
+  }
+ ],
+ "centerlines": {
+  "portal_vein": {
+   "name": "Portal vein",
+   "points": [
+    [
+     -2,
+     90,
+     3
+    ],
+    [
+     -2,
+     98,
+     3
+    ]
+   ],
+   "radius_cm": 0.3,
+   "from": "portal_confluence"
+  }
+ },
+ "landmarks": {
+  "portal_confluence": {
+   "name": "Portal confluence",
+   "p": [
+    -2,
+    90,
+    3
+   ],
+   "derived": "fixture"
+  },
+  "portal_vein_bifurcation": {
+   "name": "Portal vein bifurcation",
+   "p": [
+    -2,
+    98,
+    3
+   ],
+   "derived": "fixture"
+  }
+ }
+}

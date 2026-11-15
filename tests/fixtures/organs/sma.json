@@ -1,0 +1,45 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "sma",
+ "name": "Superior mesenteric artery (fixture)",
+ "system": "Cardiovascular",
+ "mesh": "sma",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "sma",
+   "name": "Superior mesenteric artery",
+   "tissue": "vessel-artery"
+  }
+ ],
+ "centerlines": {
+  "sma": {
+   "name": "Superior mesenteric artery",
+   "points": [
+    [
+     0,
+     93,
+     0
+    ],
+    [
+     0,
+     83,
+     0
+    ]
+   ],
+   "radius_cm": 0.3,
+   "from": "sma_origin"
+  }
+ },
+ "landmarks": {
+  "sma_origin": {
+   "name": "SMA origin",
+   "p": [
+    0,
+    93,
+    0
+   ],
+   "derived": "fixture"
+  }
+ }
+}
