@@ -1,0 +1,42 @@
+{
+  "id": "cor",
+  "title": "Coronary territories and STEMI localisation",
+  "topic": "Cardiology",
+  "variantControl": "v",
+  "variants": [
+    { "key": "norm", "label": "Normal coronary anatomy (right-dominant)" },
+    { "key": "lad", "label": "LAD occlusion (anterior STEMI)" },
+    { "key": "lcx", "label": "Circumflex occlusion (lateral STEMI)" },
+    { "key": "rca", "label": "RCA occlusion (inferior STEMI)" }
+  ],
+  "claims": [
+    "The left main coronary artery divides into the LAD (anterior interventricular groove) and the circumflex (left AV groove).",
+    "The LAD supplies the anterior LV wall, the apex and the anterior 2/3 of the interventricular septum (septal perforators); diagonal branches supply the anterolateral wall.",
+    "The circumflex supplies the lateral LV wall through its obtuse marginal branches.",
+    "The RCA runs in the right AV groove and supplies the RV free wall (acute marginal branch), the SA node in about 60% and the AV node in about 80-90%.",
+    "Coronary dominance is defined by which artery gives the posterior descending artery (PDA); about 70-80% of people are right-dominant.",
+    "The PDA supplies the inferior LV wall and the posterior 1/3 of the septum.",
+    "The LAD is the most commonly occluded coronary artery.",
+    "Anterior (anteroseptal) STEMI from LAD occlusion: ST elevation in V1-V4.",
+    "Lateral STEMI from circumflex occlusion: ST elevation in I, aVL, V5-V6.",
+    "Posterior MI (often circumflex or RCA) shows ST depression with tall R waves in V1-V3; confirm with posterior leads V7-V9.",
+    "Inferior STEMI from RCA occlusion: ST elevation in II, III and aVF, with reciprocal ST depression in I and aVL.",
+    "In inferior STEMI, ST elevation greater in III than in II favours the RCA over the circumflex.",
+    "Proximal RCA occlusion can cause RV infarction: ST elevation in V4R, hypotension, raised JVP and clear lungs.",
+    "RV infarction is preload dependent: give IV fluids and avoid nitrates.",
+    "Inferior MI often causes bradycardia and AV block at the AV node (AV nodal artery from the RCA); it is usually transient and treated with atropine, pacing if unstable.",
+    "The posteromedial papillary muscle has a single blood supply (PDA), so it is the one that ruptures after an inferior MI, causing acute mitral regurgitation.",
+    "The anterolateral papillary muscle has a dual supply (LAD and circumflex) and rarely ruptures.",
+    "STEMI reperfusion: primary PCI within 90 minutes of first medical contact, or fibrinolysis when PCI cannot be done within 120 minutes."
+  ],
+  "sources": [
+    "Ogobuiro I, Wehrle CJ, Tuma F. Anatomy, Thorax, Heart Coronary Arteries. StatPearls (PMID 30521211). https://pubmed.ncbi.nlm.nih.gov/30521211/",
+    "Akbar H, Sharma S, et al. Acute ST-Segment Elevation Myocardial Infarction (STEMI). StatPearls. https://www.ncbi.nlm.nih.gov/books/NBK532281/",
+    "Tivakaran VS, et al. Inferior Myocardial Infarction. StatPearls. https://www.ncbi.nlm.nih.gov/books/NBK470572/",
+    "Thygesen K, et al. Fourth Universal Definition of Myocardial Infarction (2018). Circulation 2018;138:e618-e651. https://doi.org/10.1161/CIR.0000000000000617",
+    "O'Gara PT, et al. 2013 ACCF/AHA Guideline for the Management of ST-Elevation Myocardial Infarction. Circulation 2013;127:e362-e425. https://doi.org/10.1161/CIR.0b013e3182742cf6",
+    "Rodero C, et al. Linking statistical shape models and simulated function in the healthy adult human heart. PLoS Comput Biol 2021;17(4):e1008851 (heart mesh). https://doi.org/10.1371/journal.pcbi.1008851",
+    "Z-Anatomy (Gauthier Kervyn), coronary artery centre lines, CC BY-SA 4.0. https://www.z-anatomy.com/"
+  ],
+  "status": "unreviewed"
+}
