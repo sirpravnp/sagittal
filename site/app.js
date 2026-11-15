@@ -204,7 +204,7 @@
     }
   }
 
-  // Landing page: example plates, GitHub links and the deck list (from the library's scene metas).
+  // Landing page: example plates and GitHub links.
   // A page with a #gallery element also gets the library plate grid.
   function initGallery() {
     wireRepoLinks();
@@ -214,9 +214,6 @@
       renderGallery(gallery).catch(function (e) { gallery.textContent = 'Could not load the scene list. ' + e.message; });
       return;
     }
-    getJson('scenes/index.json').then(function (ids) {
-      return Promise.all(ids.map(function (id) { return getJson('scenes/' + id + '.meta.json'); }));
-    }).then(renderDecks).catch(function () { /* no deck list */ });
   }
 
   // Claim text: "→" becomes a drawn arrow (read as "to"), "↑X" / "↓X" become "raised X" / "low X".

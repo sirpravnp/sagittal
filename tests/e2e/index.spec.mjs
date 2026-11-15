@@ -78,11 +78,11 @@ test('comparison: the generic LLM figure and the Sagittal figure, both loaded, w
 
 test('every heading is at most four words; no review disclaimer anywhere', async ({ page }) => {
   await page.goto('index.html');
-  await expect(page.locator('#deck-list .deck').first()).toBeVisible();
+  await expect(page.locator('h1')).toBeVisible();
   const heads = await page.locator('h1, h2, h3, h4, h5, h6').allInnerTexts();
   expect(heads.length).toBeGreaterThanOrEqual(7);
   for (const h of heads) expect(h.trim().split(/\s+/).length, `heading "${h}"`).toBeLessThanOrEqual(4);
-  for (const t of ['Same subject, two figures', 'How it works', 'Install the skill', 'Examples', 'Anki decks', 'Credits']) {
+  for (const t of ['Same subject, two figures', 'How it works', 'Install the skill', 'Examples', 'Credits']) {
     expect(heads.map((h) => h.trim())).toContain(t);
   }
   // install: prerequisite, then the steps in order, and where the skills folder is
@@ -130,14 +130,10 @@ test('first viewport at 1440 px shows a typed request and the figure it produced
   expect(['none', 'normal']).toContain(before);
 });
 
-test('index lists one deck row per topic', async ({ page }) => {
+test('index has no Anki decks section (on hold) and credits the models', async ({ page }) => {
   await page.goto('index.html');
-  const topics = [...new Set(metas.map((m) => m.topic))];
-  // the section is rendered visible (no hidden attribute waiting for the script)
-  expect(await page.locator('#decks').getAttribute('hidden')).toBeNull();
-  await expect(page.locator('#deck-list .deck')).toHaveCount(topics.length);
-  const slug = (t) => 'sagittal-' + t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  await expect(page.getByRole('link', { name: `${topics[0]} deck`, exact: true })).toHaveAttribute('href', `decks/${slug(topics[0])}.apkg`);
+  await expect(page.locator('#decks')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('Anki');
   await expect(page.getByRole('link', { name: 'model credits' })).toHaveAttribute('href', 'credits.html');
   await expect(page.locator('footer')).toContainText('CC BY-SA 4.0');
   await expect(page.locator('footer')).toContainText('Rodero et al. 2021, CC BY 4.0');
