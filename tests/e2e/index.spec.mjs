@@ -60,16 +60,20 @@ test('comparison: the generic LLM figure and the Sagittal figure, both loaded, w
   const figs = page.locator('#compare figure');
   await expect(figs).toHaveCount(2);
   await expect(page.locator('#compare')).toContainText('the hepatobiliary tree');
-  for (const [i, src] of [[0, 'compare/generic-llm.png'], [1, 'compare/sagittal-hepatobiliary.png']]) {
+  for (const [i, src] of [[0, 'compare/generic-llm.webp'], [1, 'compare/sagittal-hepatobiliary.webp']]) {
     const img = figs.nth(i).locator('img');
     await expect(img).toHaveAttribute('src', src);
     expect((await img.getAttribute('alt')).length, src).toBeGreaterThan(40);
     await img.scrollIntoViewIfNeeded();
     await expect.poll(() => img.evaluate((e) => e.complete && e.naturalWidth > 0)).toBe(true);
   }
-  // the caption names the generic figure's errors
+  // the first caption names the generic figure's errors (the structures involved, not exact wording)
   const cap = (await figs.nth(0).locator('figcaption').innerText()).toLowerCase();
-  for (const w of ['cloud of points', 'corkscrew', 'tube', 'labels float']) expect(cap).toContain(w);
+  for (const w of ['liver', 'cystic duct', 'gallbladder', 'pancreas', 'duodenum', 'label']) expect(cap).toContain(w);
+  // the second does not claim the skill produced it from that prompt
+  const cap2 = (await figs.nth(1).locator('figcaption').innerText()).toLowerCase();
+  expect(cap2).toContain('sagittal');
+  expect(cap2).not.toMatch(/prompt|skill/);
   expect(errors).toEqual([]);
 });
 
@@ -79,7 +83,7 @@ test('every heading is at most four words; no review disclaimer anywhere', async
   const heads = await page.locator('h1, h2, h3, h4, h5, h6').allInnerTexts();
   expect(heads.length).toBeGreaterThanOrEqual(7);
   for (const h of heads) expect(h.trim().split(/\s+/).length, `heading "${h}"`).toBeLessThanOrEqual(4);
-  for (const t of ['Same prompt, two figures', 'How it works', 'Install the skill', 'The plates', 'Anki decks', 'Credits']) {
+  for (const t of ['Same subject, two figures', 'How it works', 'Install the skill', 'The plates', 'Anki decks', 'Credits']) {
     expect(heads.map((h) => h.trim())).toContain(t);
   }
   await expect(page.locator('#install pre')).toContainText('ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal');

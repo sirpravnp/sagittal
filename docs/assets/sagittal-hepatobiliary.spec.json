@@ -31,7 +31,7 @@
    "id": "liver",
    "parts": {
     "liver": {
-     "opacity": 0.22
+     "opacity": 0.2
     }
    }
   }
@@ -82,7 +82,7 @@
     }
    ],
    "to": {
-    "landmark": "gallbladder/bile_duct_lower_end"
+    "landmark": "duodenum/major_duodenal_papilla"
    }
   },
   {
@@ -134,6 +134,42 @@
    "to": {
     "on": "cbd",
     "t": 0
+   }
+  },
+  {
+   "op": "branch",
+   "id": "rhd",
+   "name": "Right hepatic duct",
+   "tissue": "bile-duct",
+   "radius_cm": 0.1,
+   "from": {
+    "on": "chd",
+    "t": 1
+   },
+   "to": {
+    "landmark": "liver-segments/liver_segment_viii_centroid",
+    "offset": {
+     "dir": "inferior",
+     "cm": 1
+    }
+   }
+  },
+  {
+   "op": "branch",
+   "id": "lhd",
+   "name": "Left hepatic duct",
+   "tissue": "bile-duct",
+   "radius_cm": 0.1,
+   "from": {
+    "on": "chd",
+    "t": 1
+   },
+   "to": {
+    "landmark": "liver-segments/liver_segment_ii_centroid",
+    "offset": {
+     "dir": "inferior",
+     "cm": 2
+    }
    }
   }
  ],
@@ -188,6 +224,10 @@
  },
  "labels": [
   {
+   "text": "Liver",
+   "on": "liver/liver"
+  },
+  {
    "text": "Gallbladder",
    "on": "gallbladder/gallbladder"
   },
@@ -200,20 +240,28 @@
    "on": "chd"
   },
   {
+   "text": "Right hepatic duct",
+   "on": "rhd"
+  },
+  {
+   "text": "Left hepatic duct",
+   "on": "lhd"
+  },
+  {
    "text": "Common bile duct",
    "on": "cbd"
+  },
+  {
+   "text": "Pancreas",
+   "on": "pancreas/pancreas"
   },
   {
    "text": "Duodenum",
    "on": "duodenum/duodenum"
   },
   {
-   "text": "Liver",
-   "on": "liver/liver"
-  },
-  {
-   "text": "Pancreas",
-   "on": "pancreas/pancreas"
+   "text": "Major duodenal papilla",
+   "on": "duodenum/major_duodenal_papilla"
   }
  ],
  "claims": [
@@ -222,18 +270,6 @@
    "refs": [
     "jmas-anatomy-cholecystectomy"
    ]
-  },
-  {
-   "text": "A cystic duct joining the bile duct low, near the ampulla, can mimic distal bile duct stones or obstruction on imaging and be mistaken for the bile duct at ERCP.",
-   "refs": [
-    "jmas-vasculobiliary-anatomy"
-   ]
-  },
-  {
-   "text": "A long, parallel or spiral cystic duct makes its insertion hard to find at cholecystectomy, which risks injury to the bile duct.",
-   "refs": [
-    "jmas-vasculobiliary-anatomy"
-   ]
   }
  ],
  "view": {
@@ -241,6 +277,6 @@
    0.12,
    -0.25
   ],
-  "zoom": 12.5
+  "zoom": 13
  }
 }

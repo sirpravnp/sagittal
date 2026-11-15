@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Sagittal: text-to-image anatomy</title>
-<meta name="description" content="Ask your LLM for an anatomical variant and get an accurate, labelled, interactive 3D figure built from real reconstructed anatomy.">
+<meta name="description" content="Ask Claude Code for an anatomical variant and get an accurate, labelled, interactive 3D figure built from real reconstructed anatomy.">
 <!-- Optional: the GitHub repository URL, e.g. https://github.com/OWNER/sagittal. Left empty, it is
      worked out from an OWNER.github.io/REPO address; the GitHub links are hidden if neither is known. -->
 <meta name="sagittal-repo" content="">
@@ -22,24 +22,24 @@
   <header class="masthead">
     <h1>Sagittal</h1>
     <p class="desc">Text-to-image for anatomy</p>
-    <p class="intro">Ask your LLM for an anatomical variant and get back an accurate, labelled, interactive 3D figure, built from real reconstructed anatomy rather than drawn from memory.</p>
+    <p class="intro">Ask Claude Code for an anatomical variant and get back an accurate, labelled, interactive 3D figure. Accurate because it is built from reconstructed CT and open-atlas anatomy, new vessels and ducts are drawn only through named landmarks, and every claim cites its source.</p>
   </header>
 
   <main>
     <section class="sec" id="compare" aria-labelledby="compare-h">
-      <h2 id="compare-h">Same prompt, two figures</h2>
+      <h2 id="compare-h">Same subject, two figures</h2>
       <div class="sec-body">
-        <p class="prompt">Prompt: <q>the hepatobiliary tree</q></p>
+        <p class="prompt">Subject: <q>the hepatobiliary tree</q></p>
         <div class="pair">
           <figure class="cmp">
-            <div class="cmp-img"><img src="compare/generic-llm.png" width="811" height="776" loading="lazy" decoding="async"
-              alt="A general LLM's 3D hepatobiliary figure: the liver is a cloud of red dots, the cystic duct a green corkscrew, the duodenum a bent brown tube, with labels on lines that end in empty space."></div>
-            <figcaption><span class="fig">Fig. 1</span> <span class="who">A general LLM.</span> The liver is a cloud of points, the cystic duct a corkscrew and the duodenum a bent tube; several labels float off the structures they name.</figcaption>
+            <div class="cmp-img"><img src="compare/generic-llm.webp" width="811" height="776" loading="lazy" decoding="async"
+              alt="A general LLM's 3D hepatobiliary figure: the liver is a cloud of red dots, the cystic duct a green corkscrew, the gallbladder hangs below the liver, the pancreas lies outside the C-loop of a duodenum drawn as a bent brown tube, and the Liver label points at empty space."></div>
+            <figcaption><span class="fig">Fig. 1</span> <span class="who">A general LLM, asked for the hepatobiliary tree.</span> The liver is a cloud of points, the cystic duct a corkscrew, the gallbladder hangs free of the liver, the pancreas sits outside the duodenal C-loop, the duodenum is a bent tube, and the <span class="nb">“Liver”</span> label points off its structure.</figcaption>
           </figure>
           <figure class="cmp">
-            <div class="cmp-img"><img src="compare/sagittal-hepatobiliary.png" width="940" height="940" loading="lazy" decoding="async"
-              alt="Sagittal's figure of the same prompt: a translucent liver over the gallbladder, cystic duct, common hepatic and common bile ducts, with the pancreas in the C-loop of the duodenum, each labelled in italic with a leader to a dot on the structure."></div>
-            <figcaption><span class="fig">Fig. 2</span> <span class="who">Sagittal.</span> Liver, gallbladder, ducts, duodenum and pancreas from reconstructed organ models, each label pinned to the structure it names.</figcaption>
+            <div class="cmp-img"><img src="compare/sagittal-hepatobiliary.webp" width="940" height="940" loading="lazy" decoding="async"
+              alt="Sagittal's figure of the same subject: a translucent liver over the gallbladder; right and left hepatic ducts joining the common hepatic duct; the cystic duct; the common bile duct passing behind the head of the pancreas to the major duodenal papilla in the C-loop of the duodenum; each labelled in italic with a leader to a dot on the structure."></div>
+            <figcaption><span class="fig">Fig. 2</span> <span class="who">The same subject, drawn by Sagittal from reconstructed anatomy.</span> Hepatic ducts drawn through named liver landmarks; the common bile duct ends at the major duodenal papilla; each label sits on the structure it names.</figcaption>
           </figure>
         </div>
       </div>
@@ -49,8 +49,8 @@
       <h2 id="how-h">How it works</h2>
       <div class="sec-body">
         <ol class="steps">
-          <li><h3>Ask</h3><p>Name a structure or a variant in your own words, in Claude Code: <q>replaced right hepatic artery off the SMA</q>.</p></li>
-          <li><h3>Build</h3><p>The skill starts from base organs reconstructed from open CT data and atlases. A variant may only reroute vessels and ducts through named landmarks, and every claim cites a source.</p></li>
+          <li><h3>Ask</h3><p>Ask Claude Code for a structure or a variant in your own words: <q>replaced right hepatic artery off the SMA</q>.</p></li>
+          <li><h3>Build</h3><p>The skill starts from base organs reconstructed from open CT data and atlases. New vessels and ducts are drawn only through named landmarks, and every claim cites a source.</p></li>
           <li><h3>Study</h3><p>Open the figure it saves. Rotate it, switch between normal anatomy and the variant, read the claims, and save the labelled plate as an image.</p></li>
         </ol>
       </div>

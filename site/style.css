@@ -7,9 +7,9 @@
 
 :root{
   color-scheme:light;
-  --bg:#f4efe4;--surface:#fbf8f1;--ink:#211e19;--ink-2:#3d382f;--mut:#665e50;--rule:#cdc3af;
+  --bg:#f4efe4;--surface:#fbf8f1;--ink:#211e19;--ink-2:#3d382f;--mut:#665e50;--rule:#cdc3af;--rule-ctl:#877c68;
   --acc:#a8492a;--acc-ink:#fbf8f1;
-  --stage:#eee7d8;--stage-ink:#2a251e;--stage-mut:#6a6152;
+  --stage:#eee7d8;--stage-ink:#2a251e;--stage-mut:#5f5748;
   --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L",P052,"Book Antiqua",Georgia,serif;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   /* site only */
@@ -20,17 +20,17 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;
+    --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;--rule-ctl:#776d5c;
     --acc:#e08b68;--acc-ink:#1d1b17;
-    --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#a89c87;
+    --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#b3a792;
     --code-bg:#26231e;
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;
+  --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;--rule-ctl:#776d5c;
   --acc:#e08b68;--acc-ink:#1d1b17;
-  --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#a89c87;
+  --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#b3a792;
   --code-bg:#26231e;
 }
 
@@ -46,7 +46,7 @@ code{font:.8em/1.5 var(--mono)}
 .skip{position:absolute;left:16px;top:-48px;background:var(--ink);color:var(--bg);padding:6px 10px;font:16px var(--serif);z-index:5}
 .skip:focus{top:8px}
 /* small capitals, the section-head voice */
-.sc,.run,.sec > h2,.fig,.foot-links,.deck a,.deck-n,.k{font-variant-caps:all-small-caps;letter-spacing:.05em;font-variant-numeric:lining-nums}
+.sc,.run,.sec > h2,.cmp .fig,.plate-title .fig,.top .fig,.foot-links,.deck a,.deck-n,.k{font-variant-caps:all-small-caps;letter-spacing:.05em;font-variant-numeric:lining-nums}
 
 /* ---------- index ---------- */
 .wrap{max-width:1180px;margin:0 auto;padding:0 56px}
@@ -80,7 +80,8 @@ main{counter-reset:sec}
 .cmp-img img{display:block;width:100%;height:100%;object-fit:cover}
 .cmp figcaption{margin:18px 5px 0;font-style:italic;font-size:1.02rem;line-height:1.45;color:var(--ink-2)}
 .cmp .who{font-style:normal;color:var(--ink)}
-.fig{font-style:normal;color:var(--acc);margin-right:.35em;white-space:nowrap}
+.cmp .fig,.plate-title .fig,.top .fig{font-style:normal;color:var(--acc);margin-right:.35em;white-space:nowrap}
+.nb{white-space:nowrap}
 
 /* how it works: a numbered list, set like a textbook's */
 .steps{list-style:none;margin:0;padding:0;counter-reset:step;max-width:40em}
@@ -155,7 +156,7 @@ aside{border-left:1px solid var(--ink);background:var(--bg);overflow:auto;paddin
 aside h2{margin:24px 0 8px;font-weight:400;font-size:1.05rem;line-height:1.3;font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--ink);border-top:1px solid var(--ink);padding-top:8px}
 .ctl{margin:0 0 14px}
 .ctl label{display:block;font-size:.95rem;font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--mut);margin-bottom:4px}
-.ctl select{width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:0;padding:6px 8px;font:17px var(--serif)}
+.ctl select{width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--rule-ctl);border-radius:0;padding:6px 8px;font:17px var(--serif)}
 .chk{display:flex;gap:8px;align-items:center;margin:0 0 12px;font-size:17px}
 .chk input{accent-color:var(--acc);width:15px;height:15px;margin:0}
 #info{font-size:1rem;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:12px}

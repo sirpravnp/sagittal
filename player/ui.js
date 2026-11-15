@@ -34,7 +34,6 @@
     return String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '') || 'figure';
   }
-  function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function roman(n) {
     n = Math.max(1, Math.min(3999, Math.floor(n) || 1));
     var r = '', t = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
@@ -202,7 +201,7 @@
       g.drawImage(src, 0, 0, W, H);
       var cs = getComputedStyle(D.stage);
       var tok = function (n, d) { return (cs.getPropertyValue(n) || '').trim() || d; };
-      var stageInk = tok('--stage-ink', '#2a251e'), mut = tok('--stage-mut', '#6a6152'), knock = tok('--stage-knock', 'rgba(238,231,216,.86)');
+      var stageInk = tok('--stage-ink', '#2a251e'), mut = tok('--stage-mut', '#6a6152'), knock = tok('--stage-knock', 'rgba(238,231,216,.92)');
       var sb = D.stage.getBoundingClientRect();
       function fontOf(c) { return c.fontStyle + ' ' + c.fontWeight + ' ' + parseFloat(c.fontSize) * k + 'px ' + c.fontFamily; }
 
