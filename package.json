@@ -10,7 +10,8 @@
     "cards": "node tools/render_cards.mjs",
     "decks": ".venv/bin/python tools/build_decks.py --site site --cards build/cards --out build/decks",
     "decks:3d": ".venv/bin/python tools/build_decks.py --site site --cards build/cards --out build/decks --include-3d",
-    "test:py": ".venv/bin/pytest tests/python -q"
+    "test:py": ".venv/bin/pytest tests/python -q",
+    "thumbs": "node tools/render_thumbs.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1"

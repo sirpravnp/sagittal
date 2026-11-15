@@ -37,26 +37,83 @@
     }));
   }
 
+  // Same rule as tools/render_thumbs.mjs plateVariant(): the first view that is not the normal reference.
+  function plateVariant(meta) {
+    var v = meta.variants;
+    return v.length > 1 && /^norm/i.test(v[0].key) ? v[1] : v[0];
+  }
+
+  // Thumbnails are optional: site/thumbs/manifest.json lists the scenes that have one
+  // (npm run thumbs). A scene missing from it gets a plain text plate, never a broken image.
+  function getThumbs() {
+    return getJson('thumbs/manifest.json').catch(function () { return {}; });
+  }
+
+  function plate(meta, n, thumb) {
+    var li = el('li', 'card plate');
+    var fig = el('figure');
+    var shown = plateVariant(meta);
+    var frame = el('div', 'plate-img');
+    function empty() {
+      frame.innerHTML = '';
+      frame.className = 'plate-img empty';
+      frame.appendChild(el('span', 'empty-title', meta.title));
+      frame.appendChild(el('span', 'empty-note', 'No preview image yet'));
+    }
+    if (thumb && thumb.file) {
+      var img = el('img');
+      img.src = 'thumbs/' + encodeURIComponent(thumb.file);
+      img.width = thumb.width || 1440; img.height = thumb.height || 1080;
+      img.loading = 'lazy'; img.decoding = 'async';
+      img.alt = meta.title + ', ' + shown.label + ' view';
+      img.onerror = empty;
+      frame.appendChild(img);
+    } else {
+      empty();
+    }
+    fig.appendChild(frame);
+    var cap = el('figcaption');
+    var h = el('h3', 'plate-title');
+    h.appendChild(el('span', 'fig', 'Fig. ' + n));
+    var a = el('a', null, meta.title);
+    a.href = 'viewer.html?scene=' + encodeURIComponent(meta.id);
+    h.appendChild(a);
+    cap.appendChild(h);
+    cap.appendChild(el('p', 'topic', meta.topic));
+    var views = el('p', 'views');
+    views.appendChild(el('span', 'k', meta.variants.length === 1 ? '1 view: ' : meta.variants.length + ' views: '));
+    meta.variants.forEach(function (v, i) {
+      if (i) views.appendChild(document.createTextNode('; '));
+      var s = el(v.key === shown.key && thumb ? 'em' : 'span', null, v.label);
+      if (v.key === shown.key && thumb) s.title = 'Pictured';
+      views.appendChild(s);
+    });
+    views.appendChild(document.createTextNode('.'));
+    cap.appendChild(views);
+    var b = badge(meta); if (b) cap.appendChild(b);
+    fig.appendChild(cap);
+    li.appendChild(fig);
+    return li;
+  }
+
   function renderGallery(container, notFoundId) {
     container.innerHTML = '';
     if (notFoundId != null) {
       var nf = el('p', 'notice', 'Scene not found: "' + notFoundId + '". Pick one below.');
       container.appendChild(nf);
     }
-    var list = el('ul', 'cards');
+    var list = el('ol', 'cards plates');
     container.appendChild(list);
-    return getJson('scenes/index.json').then(function (ids) {
-      return Promise.all(ids.map(function (id) { return getJson('scenes/' + id + '.meta.json'); }));
-    }).then(function (metas) {
-      renderDecks(metas);
-      metas.forEach(function (m) {
-        var li = el('li', 'card');
-        var a = el('a', null, m.title);
-        a.href = 'viewer.html?scene=' + encodeURIComponent(m.id);
-        li.appendChild(a);
-        li.appendChild(el('span', 'topic', m.topic));
-        var b = badge(m); if (b) li.appendChild(b);
-        list.appendChild(li);
+    return Promise.all([getJson('scenes/index.json'), getThumbs()]).then(function (r) {
+      var thumbs = r[1] || {};
+      return Promise.all(r[0].map(function (id) { return getJson('scenes/' + id + '.meta.json'); })).then(function (metas) {
+        renderDecks(metas);
+        metas.forEach(function (m, i) { list.appendChild(plate(m, i + 1, thumbs[m.id])); });
+        var note = document.getElementById('plates-note');
+        if (note) {
+          var topics = metas.map(function (m) { return m.topic; }).filter(function (t, i, all) { return all.indexOf(t) === i; });
+          note.textContent = metas.length + ' scenes in ' + topics.length + ' topics. Each figure shows one view, set in italics in its caption; open the scene for the rest.';
+        }
       });
     });
   }
@@ -70,25 +127,56 @@
     var list = document.getElementById('deck-list');
     if (!section || !list) return;
     list.innerHTML = '';
-    var topics = [];
-    metas.forEach(function (m) { if (topics.indexOf(m.topic) < 0) topics.push(m.topic); });
+    var topics = [], counts = {};
+    metas.forEach(function (m) {
+      if (topics.indexOf(m.topic) < 0) { topics.push(m.topic); counts[m.topic] = 0; }
+      counts[m.topic]++;
+    });
     topics.forEach(function (t) {
       var slug = deckSlug(t);
-      var li = el('li', 'card');
-      var a = el('a', null, t + ' deck');
+      var li = el('li', 'deck');
+      li.appendChild(el('span', 'deck-topic', t));
+      li.appendChild(el('span', 'deck-n', counts[t] === 1 ? '1 scene' : counts[t] + ' scenes'));
+      var a = el('a', 'deck-2d', 'Deck');
       a.href = 'decks/' + slug + '.apkg';
       a.setAttribute('download', '');
+      a.setAttribute('aria-label', t + ' deck');
       li.appendChild(a);
-      var a3 = el('a', 'topic', '3D (experimental)');
+      var a3 = el('a', 'deck-3d', '3D deck');
       a3.href = 'decks/' + slug + '-3d.apkg';
       a3.setAttribute('download', '');
+      a3.setAttribute('aria-label', t + ' 3D deck (experimental)');
       li.appendChild(a3);
       list.appendChild(li);
     });
     section.hidden = topics.length === 0;
   }
 
+  // GitHub links: <meta name="sagittal-repo"> if set, else inferred from OWNER.github.io/REPO.
+  // Unknown (e.g. served locally): the links are hidden rather than pointing somewhere made up.
+  function repoUrl() {
+    var m = document.querySelector('meta[name="sagittal-repo"]');
+    var v = m && m.getAttribute('content');
+    if (v) return v.replace(/\/+$/, '');
+    var host = location.hostname, gh = host.match(/^([a-z0-9-]+)\.github\.io$/i);
+    if (!gh) return null;
+    var first = location.pathname.split('/')[1] || '';
+    var repo = first && !/\.html?$/.test(first) ? first : host;
+    return 'https://github.com/' + gh[1] + '/' + repo;
+  }
+  function wireRepoLinks() {
+    var base = repoUrl();
+    var items = document.querySelectorAll('[data-repo-link]');
+    for (var i = 0; i < items.length; i++) {
+      var a = items[i].querySelector('a');
+      if (!base || !a) { items[i].hidden = true; continue; }
+      var path = items[i].getAttribute('data-repo-link');
+      a.href = base + (path ? '/' + path : '');
+    }
+  }
+
   function initGallery() {
+    wireRepoLinks();
     renderGallery(document.getElementById('gallery')).catch(function (e) {
       document.getElementById('gallery').textContent = 'Could not load the scene list. ' + e.message;
     });
@@ -103,7 +191,7 @@
 
     function notFound() {
       document.body.classList.add('missing');
-      document.title = 'Scene not found · sagittal';
+      document.title = 'Scene not found · Sagittal';
       document.querySelector('h1').textContent = 'Scene not found';
       return renderGallery(document.getElementById('gallery'), id);
     }
@@ -116,8 +204,10 @@
         return loadMeshes(id).then(function () { return r; });
       }).then(function (r) {
         var meta = r[0];
-        document.title = meta.title + ' · sagittal';
+        document.title = meta.title + ' · Sagittal';
         document.querySelector('h1').textContent = meta.title;
+        var fig = document.getElementById('fig');
+        if (fig) fig.textContent = 'Fig. ' + (ids.indexOf(id) + 1);
         var b = badge(meta);
         if (b) {
           document.getElementById('badge').appendChild(b);

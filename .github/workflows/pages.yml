@@ -34,6 +34,9 @@ jobs:
       - run: npm run test:py
       - run: npm run e2e
       - run: npm run cards
+      # Re-render the landing-page plate images so the deployed thumbnails always match the scenes
+      # (the committed site/thumbs/ copies are for local use and PR review).
+      - run: npm run thumbs
       - run: npm run decks
       - run: npm run decks:3d
       - name: Assemble dist
