@@ -2,8 +2,7 @@
    (site/style.css) copies verbatim: keep the :root blocks in step.
 
    Identity: a plate from an old anatomy atlas, in Claude's colours. Warm cream paper, warm ink,
-   one clay accent, a book serif throughout (small caps for section heads, italic for captions
-   and labels), hairline ink rules, square corners, generous margins.
+   one clay accent, a book serif throughout (small caps for section heads, italic only for the labels in the stage), hairline ink rules, square corners, generous margins.
    The 3D stage is a paper-toned plate in light mode and warm dark ("paper in lamplight") in dark
    mode; ui.js reads --stage and sets the renderer's clear colour from it, so canvas and page
    agree. The page follows prefers-color-scheme, or [data-theme] on <html>.
@@ -77,7 +76,7 @@ a:hover{color:var(--ink);text-decoration-color:var(--acc);text-decoration-thickn
 .fig-run span + span{text-align:right}
 .fig-head{padding:30px 0 22px}
 .fig-title{margin:0;font:400 var(--fs-xl)/1.12 var(--serif);letter-spacing:-.01em;color:var(--ink);max-width:24em;text-wrap:balance}
-.fig-sub{margin:8px 0 0;font:italic 400 var(--fs-l)/1.35 var(--serif);color:var(--ink-2)}
+.fig-sub{margin:8px 0 0;font:400 var(--fs-m)/1.4 var(--serif);color:var(--mut)}
 
 /* ---------- plate: stage + control row ---------- */
 .fig-plate{margin:0;border:var(--hair) solid var(--ink);outline:var(--hair) solid var(--rule);outline-offset:4px}
@@ -101,13 +100,10 @@ a:hover{color:var(--ink);text-decoration-color:var(--acc);text-decoration-thickn
 .fig .is-variant .kit-anchor{fill:var(--stage-ink);stroke:var(--acc);stroke-width:1.6px;r:3px}
 .fig .is-variant.is-occluded .kit-anchor{fill:var(--stage);stroke:var(--acc)}
 .fig .is-occluded .kit-anchor{fill:var(--stage);stroke:var(--stage-ink);stroke-width:1px}
-.fig-orient{position:absolute;left:14px;top:11px;z-index:1;max-width:calc(100% - 28px);pointer-events:none;margin:0;
-  font:italic 400 var(--fs-s)/1.35 var(--serif);color:var(--stage-ink);background:var(--stage-knock);padding:1px 4px 2px}
-.fig-orient:empty{display:none}
-.fig-hint{position:absolute;right:14px;bottom:10px;z-index:1;margin:0;pointer-events:none;font:italic 400 var(--fs-xs)/1.4 var(--serif);color:var(--stage-mut)}
+.fig-hint{position:absolute;right:14px;bottom:10px;z-index:1;margin:0;pointer-events:none;font:400 var(--fs-xs)/1.4 var(--serif);color:var(--stage-mut)}
 .fig-hint .h-touch{display:none}
 @media (hover:none) and (pointer:coarse){.fig-hint .h-pointer{display:none}.fig-hint .h-touch{display:inline}}
-.kit-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--stage-ink);font:italic var(--fs-m)/1.5 var(--serif)}
+.kit-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--stage-ink);font:var(--fs-m)/1.5 var(--serif)}
 
 .fig-bar{display:flex;flex-wrap:wrap;align-items:stretch;border-top:var(--hair) solid var(--ink);background:var(--bg)}
 .fig-bar > *{padding:11px 16px 12px;min-width:0}
@@ -152,7 +148,7 @@ a:hover{color:var(--ink);text-decoration-color:var(--acc);text-decoration-thickn
 .fig-claims .ref:hover{text-decoration:underline}
 .fig-refs li{display:grid;grid-template-columns:2em minmax(0,1fr);padding:0 0 9px;font-size:var(--fs-s);line-height:1.45}
 .fig-refs .n{color:var(--mut);font-variant-numeric:lining-nums}
-.fig-refs .host{display:block;font-style:italic;color:var(--mut);overflow-wrap:anywhere}
+.fig-refs .host{display:block;color:var(--mut);overflow-wrap:anywhere}
 .fig-refs a{color:var(--ink);text-decoration-color:var(--rule)}
 .fig-refs a:hover{text-decoration-color:var(--acc)}
 .fig-provenance h3{margin:18px 0 6px;font:400 var(--fs-s)/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--mut)}
@@ -163,7 +159,7 @@ a:hover{color:var(--ink);text-decoration-color:var(--acc);text-decoration-thickn
 .pv-list.pv-variant .pv-name{color:var(--acc)}
 .pv-name::after{content:" \2014"}
 .pv-text{color:var(--ink-2)}
-.fig-credit{grid-column:1 / -1;margin:0;padding-top:10px;border-top:var(--hair) solid var(--rule);font:italic 400 var(--fs-s)/1.55 var(--serif);color:var(--mut)}
+.fig-credit{grid-column:1 / -1;margin:0;padding-top:10px;border-top:var(--hair) solid var(--rule);font:400 var(--fs-s)/1.55 var(--serif);color:var(--mut)}
 .fig-errors{margin:24px 16px;padding:12px 14px;border:1px solid var(--ink);font:13px/1.5 var(--mono);white-space:pre-wrap;color:var(--ink)}
 
 /* ---------- narrow ---------- */

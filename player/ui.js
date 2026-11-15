@@ -4,19 +4,16 @@
  *   SagittalUI.mount({ resolved, root?, credits?, organs?, state? }) -> figure
  *     Builds the page into root (default document.body): running head, title (and the variant's
  *     full name when the title does not carry it),
- *     the 3D stage with the orientation note, the control row (view, organ toggles, labels, Save
+ *     the 3D stage, the control row (view, organ toggles, labels, Save
  *     as image) and the info panel (claims with their references, "Changed from base anatomy",
  *     credits). Sets window.viewer (the Kit viewer) and window.figure.
  *     credits: site/meshes/credits.json (default window.SagittalCredits); Task 6 passes it in.
  *     The stage's clear colour follows the --stage token of figure.css (paper in light mode, warm
  *     dark in dark mode) and the leaders take their colours from figure.css (leaderStyle 'css').
- *   figure.snapshot({ labels?, footer? }) -> Promise<PNG data URL>
- *     The stage at its device-pixel size: the WebGL canvas, the orientation note, a footer line
- *     (Sagittal · title · view) and, when labels is true (default: the page's Labels
- *     toggle), the anchor dots, leaders and italic captions drawn from viewer.debug() geometry in
- *     the page's computed label styles. The footer goes to the first free corner (bottom right,
- *     bottom left, top right), shortened to "Sagittal" if the full line fits nowhere,
- *     and left out if every corner holds a label, or when footer is false. The page is left as it was.
+ *   figure.snapshot({ labels? }) -> Promise<PNG data URL>
+ *     The stage at its device-pixel size: the WebGL canvas and, when labels is true (default:
+ *     the page's Labels toggle), the anchor dots, leaders and labels drawn from viewer.debug()
+ *     geometry in the page's computed label styles. No caption or footer. The page is left as it was.
  *   figure.save() downloads that image as <slug>-<view>.png.
  *   SagittalUI.infoHtml(ctx) is the info panel markup; the player calls it on every build.
  */
@@ -196,7 +193,7 @@
     head.appendChild(el('h1', 'fig-title', R.title));
     // the variant's full name, unless the title already says it
     var vl = R.variant && R.variant.label;
-    if (vl && R.title.toLowerCase().indexOf(vl.toLowerCase()) < 0) head.appendChild(el('p', 'fig-sub', 'Variant shown: ' + vl));
+    if (vl && R.title.toLowerCase().indexOf(vl.toLowerCase()) < 0) head.appendChild(el('p', 'fig-sub', 'Variant: ' + vl));
     fig.appendChild(head);
 
     var plate = el('figure', 'fig-plate');
@@ -204,11 +201,10 @@
     var cv = el('canvas'); cv.id = 'cv';
     cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', R.title + ': 3D figure, drag to rotate');
     var labels = el('div'); labels.id = 'labels';
-    var orient = el('p', 'fig-orient'); orient.id = 'orient'; orient.setAttribute('aria-live', 'polite');
     var hint = el('p', 'fig-hint');
-    hint.appendChild(el('span', 'h-pointer', 'Drag to rotate \u00b7 scroll to zoom'));
-    hint.appendChild(el('span', 'h-touch', 'Drag to rotate \u00b7 pinch to zoom'));
-    stage.append(cv, orient, labels, hint);
+    hint.appendChild(el('span', 'h-pointer', 'Drag to rotate, scroll to zoom'));
+    hint.appendChild(el('span', 'h-touch', 'Drag to rotate, pinch to zoom'));
+    stage.append(cv, labels, hint);
 
     var bar = el('div', 'fig-bar');
     var view = el('div', 'fig-view');
@@ -242,7 +238,7 @@
     var info = el('div', 'fig-info'); info.id = 'info';
     fig.appendChild(info);
     root.appendChild(fig);
-    return { fig: fig, stage: stage, cv: cv, labels: labels, orient: orient, view: view, radios: radios, opts: opts, toggle: lt, save: save, info: info };
+    return { fig: fig, stage: stage, cv: cv, labels: labels, view: view, radios: radios, opts: opts, toggle: lt, save: save, info: info };
   }
 
   function mount(o) {
@@ -251,7 +247,7 @@
     var D = build(root, R);
     document.title = R.title + ' · Sagittal';
     var aspect = D.stage.clientWidth / (D.stage.clientHeight || 1);
-    var def = window.SagittalPlayer.register(R, { credits: o.credits || window.SagittalCredits || null, organs: o.organs, orientEl: D.orient, aspect: aspect,
+    var def = window.SagittalPlayer.register(R, { credits: o.credits || window.SagittalCredits || null, organs: o.organs, aspect: aspect,
       explicitZoom: /[?&]zoom=/.test(location.search) });
     var staging = el('div'); // the kit builds its controls here; they are moved into the control row
     function stageColour() { return getComputedStyle(D.stage).backgroundColor; }
@@ -292,7 +288,6 @@
     D.toggle.onchange = function () { labelsOn = D.toggle.checked; viewer.setLabelsVisible(labelsOn); };
 
     function viewKey() { return viewer.getState().v || 'variant'; }
-    function viewName() { return viewKey() === 'normal' ? 'Normal anatomy' : R.variant.label; }
 
     function snapshot(so) {
       so = so || {};
@@ -300,7 +295,7 @@
       try {
         // draw a fresh frame (and lay the labels out when they are wanted but hidden)
         viewer.setLabelsVisible(want);
-        var url = composite(want, so.footer !== false);
+        var url = composite(want);
         return Promise.resolve(url);
       } catch (e) {
         return Promise.reject(e);
@@ -309,73 +304,16 @@
       }
     }
 
-    function composite(withLabels, withFooter) {
+    function composite(withLabels) {
       var src = D.cv, W = src.width, H = src.height, k = W / (src.clientWidth || W);
       var out = document.createElement('canvas'); out.width = W; out.height = H;
       var g = out.getContext('2d');
       g.drawImage(src, 0, 0, W, H);
       var cs = getComputedStyle(D.stage);
       var tok = function (n, d) { return (cs.getPropertyValue(n) || '').trim() || d; };
-      var stageInk = tok('--stage-ink', '#2a251e'), mut = tok('--stage-mut', '#6a6152'), knock = tok('--stage-knock', 'rgba(238,231,216,.92)');
-      var sb = D.stage.getBoundingClientRect();
-      function fontOf(c) { return c.fontStyle + ' ' + c.fontWeight + ' ' + parseFloat(c.fontSize) * k + 'px ' + c.fontFamily; }
-
-      // orientation note, where it sits on the stage (wrapped as on the page)
-      var text = D.orient.textContent;
-      if (text) {
-        var oc = getComputedStyle(D.orient), r = D.orient.getBoundingClientRect();
-        var x = (r.left - sb.left) * k, y = (r.top - sb.top) * k, w = r.width * k, h = r.height * k;
-        g.fillStyle = oc.backgroundColor; g.fillRect(x, y, w, h);
-        g.font = fontOf(oc);
-        g.fillStyle = oc.color; g.textBaseline = 'middle';
-        var pl = parseFloat(oc.paddingLeft) * k, pt = parseFloat(oc.paddingTop) * k;
-        var lh = (parseFloat(oc.lineHeight) || parseFloat(oc.fontSize) * 1.35) * k;
-        wrap(text, w - pl - parseFloat(oc.paddingRight) * k).forEach(function (line, i) {
-          g.fillText(line, x + pl, y + pt + lh * (i + 0.5));
-        });
-      }
-
-      // footer line: Sagittal · title · view. Bottom right, else bottom left, else top
-      // right: the first corner where it covers no label (and not the orientation note); none, no footer.
-      if (withFooter) footer();
+      var stageInk = tok('--stage-ink', '#2a251e');
       if (withLabels) drawLabels(g, k, stageInk);
       return out.toDataURL('image/png');
-
-      function footer() {
-      var fs = 12.5 * k, m = 10 * k, fam = tok('--serif', 'Georgia, serif');
-      g.font = 'italic 400 ' + fs + 'px ' + fam;
-      var head = 'Sagittal \u00b7 ', tail = ' · ' + viewName(), title = R.title, maxW = W - 2 * m - 10 * k;
-      var foot = head + title + tail;
-      while (g.measureText(foot).width > maxW && title.length > 8) { title = title.slice(0, -2); foot = head + title.replace(/\s+$/, '') + '…' + tail; }
-      var fh = fs * 1.55;
-      var busy = (withLabels ? viewer.debug().labelRects.map(function (r) { return [r.x * k, r.y * k, r.w * k, r.h * k]; }) : []);
-      if (text) { var orr = D.orient.getBoundingClientRect(); busy.push([(orr.left - sb.left) * k, (orr.top - sb.top) * k, orr.width * k, orr.height * k]); }
-      // the full line first; failing that, the short one ("Sagittal")
-      var at = null, fw = 0;
-      [foot, 'Sagittal'].some(function (t) {
-        fw = g.measureText(t).width + 10 * k;
-        var spots = [[W - m - fw, H - m - fh], [m, H - m - fh], [W - m - fw, m]];
-        for (var si = 0; si < spots.length; si++) {
-          var fx = spots[si][0], fy = spots[si][1];
-          var hit = busy.some(function (b) { return fx < b[0] + b[2] + 4 * k && fx + fw > b[0] - 4 * k && fy < b[1] + b[3] + 4 * k && fy + fh > b[1] - 4 * k; });
-          if (!hit) { at = spots[si]; foot = t; return true; }
-        }
-        return false;
-      });
-      if (!at) return;
-      g.fillStyle = knock; g.fillRect(at[0], at[1], fw, fh);
-      g.fillStyle = mut; g.textBaseline = 'middle'; g.fillText(foot, at[0] + 5 * k, at[1] + fh / 2);
-      }
-
-      function wrap(t, maxw) {
-        var words = t.split(' '), lines = [], cur = '';
-        words.forEach(function (wd) {
-          var next = cur ? cur + ' ' + wd : wd;
-          if (cur && g.measureText(next).width > maxw + 0.5) { lines.push(cur); cur = wd; } else cur = next;
-        });
-        if (cur) lines.push(cur);
-        return lines;
-      }
     }
 
     // The page's label style (figure.css): a paper halo under a fine ink leader, a small ink dot,
