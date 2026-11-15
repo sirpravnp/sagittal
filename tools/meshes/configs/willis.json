@@ -1,0 +1,156 @@
+{
+  "name": "willis",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), circle of Willis, cranial nerves II/III, pituitary, brainstem; extracted with tools/meshes/extract_blend.py (tools/meshes/zanatomy_extract_neuro.txt)",
+  "source_root": "${ASSETS}/zanatomy-neuro/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    161,
+    0
+  ],
+  "default_budget": 600,
+  "parts": {
+    "ica_l": {
+      "files": [
+        "Internal_carotid_artery.l.obj"
+      ],
+      "budget": 700
+    },
+    "ica_r": {
+      "files": [
+        "Internal_carotid_artery.r.obj"
+      ],
+      "budget": 700
+    },
+    "ophthalmic": {
+      "files": [
+        "Ophthalmic_artery.*.obj"
+      ],
+      "budget": 400
+    },
+    "aca": {
+      "files": [
+        "Anterior_cerebral_artery.*.obj"
+      ],
+      "budget": 500
+    },
+    "aca_branches": {
+      "files": [
+        "Orbitofrontal_branches_of_anterior_cerebral_artery.*.obj"
+      ],
+      "budget": 600
+    },
+    "m1_l": {
+      "files": [
+        "Middle_cerebral_artery_(M1-segment).l.obj"
+      ],
+      "budget": 500
+    },
+    "m1_r": {
+      "files": [
+        "Middle_cerebral_artery_(M1-segment).r.obj"
+      ],
+      "budget": 500
+    },
+    "mca_br_l": {
+      "files": [
+        "Insular_branches_of_middle_cerebral_artery_*.l.obj",
+        "Middle_cerebral_artery_(M3*.l.obj",
+        "Temporal_branches_of_middle_cerebral_artery.l.obj",
+        "Parietal_branches_of_middle_cerebral_artery.l.obj"
+      ],
+      "budget": 1500
+    },
+    "mca_br_r": {
+      "files": [
+        "Insular_branches_of_middle_cerebral_artery_*.r.obj",
+        "Middle_cerebral_artery_(M3*.r.obj",
+        "Temporal_branches_of_middle_cerebral_artery.r.obj",
+        "Parietal_branches_of_middle_cerebral_artery.r.obj"
+      ],
+      "budget": 1500
+    },
+    "pcom_l": {
+      "files": [
+        "Posterior_communicating_artery.l.obj"
+      ],
+      "budget": 300
+    },
+    "pcom_r": {
+      "files": [
+        "Posterior_communicating_artery.r.obj"
+      ],
+      "budget": 300
+    },
+    "pca": {
+      "files": [
+        "Posterior_cerebral_artery.*.obj"
+      ],
+      "budget": 2200
+    },
+    "basilar": {
+      "files": [
+        "Basilar_artery.obj"
+      ],
+      "budget": 400
+    },
+    "vertebral": {
+      "files": [
+        "Vertebral_artery.*.obj"
+      ],
+      "budget": 1000
+    },
+    "sca": {
+      "files": [
+        "Superior_cerebellar_artery.*.obj"
+      ],
+      "budget": 1000
+    },
+    "aica": {
+      "files": [
+        "Anterior_inferior_cerebellar_artery.*.obj"
+      ],
+      "budget": 700
+    },
+    "pica": {
+      "files": [
+        "Posterior_inferior_cerebellar_artery.*.obj"
+      ],
+      "budget": 1400
+    },
+    "cn3_l": {
+      "files": [
+        "Oculomotor_nerve_(III).l.obj"
+      ],
+      "budget": 700
+    },
+    "cn3_r": {
+      "files": [
+        "Oculomotor_nerve_(III).r.obj"
+      ],
+      "budget": 700
+    },
+    "brainstem": {
+      "files": [
+        "Pons.*.obj",
+        "Midbrain.*.obj",
+        "Medulla_oblongata.*.obj"
+      ],
+      "budget": 3000
+    },
+    "optic_nerves": {
+      "files": [
+        "Optic_nerve_(II).*.obj"
+      ],
+      "budget": 700
+    },
+    "optic_tracts": {
+      "files": [
+        "Optic_tract.*.obj"
+      ],
+      "budget": 900
+    }
+  }
+}

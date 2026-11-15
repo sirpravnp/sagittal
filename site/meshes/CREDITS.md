@@ -167,3 +167,33 @@ patella) subdivided and Taubin-smoothed; decimated. The `knee` scene splits the 
 and meniscus meshes along planes to show tears, moves the tibia for the drawer/sag/valgus signs, and
 adds a drawn patellar ligament (Z-Anatomy has only its attachment areas).
 Used by: `scenes/knee.js`.
+## willis (Z-Anatomy circle of Willis, cranial nerves, brainstem)
+
+`willis.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP)
+(config `tools/meshes/configs/willis.json`, objects listed in `tools/meshes/zanatomy_extract_neuro.txt`,
+extracted into the asset cache's `zanatomy-neuro/obj/`): internal carotid, anterior cerebral (with its
+orbitofrontal branches), middle cerebral (M1, insular M2, M3, temporal and parietal branches), posterior
+communicating, posterior cerebral, basilar, vertebral, superior cerebellar, anterior and posterior inferior
+cerebellar and ophthalmic arteries; oculomotor nerves, optic nerves and tracts; pons, midbrain and medulla.
+Changes: curve tubes swept and decimated; centred on (0, 161, 0) cm of the Z-Anatomy frame, shared with
+`endocast.js` and `cranium.js`. Z-Anatomy's anterior communicating artery and optic chiasm objects are not
+used: the `cow` scene draws the ACom between the two A1 segments and the chiasm between the optic nerves
+and tracts. No Brainder cortex or white-matter objects are used.
+Used by: `scenes/cow.js`.
+## cranium (Z-Anatomy cranial vault, meninges, middle meningeal artery)
+
+`cranium.js` is baked from the **zanatomy** source above (CC BY-SA 4.0; BodyParts3D, CC BY-SA 2.1 JP)
+(config `tools/meshes/configs/cranium.json`): frontal, parietal, temporal, occipital and sphenoid bones,
+temporalis, epicranial aponeurosis, falx cerebri, superior sagittal sinus and middle meningeal arteries.
+Changes: decimated, centred on (0, 161, 0) cm. The `bleed` scene clips them to a coronal slab and adds
+section caps; skin, dura, arachnoid, subarachnoid space, pia and brain are drawn in code, fitted to the
+section of `endocast.js`.
+Used by: `scenes/bleed.js`.
+## endocast (cranial cavity computed from the Z-Anatomy skull)
+
+`endocast.js` is derived from the **zanatomy** skull bones above (CC BY-SA 4.0; BodyParts3D, CC BY-SA
+2.1 JP): `tools/meshes/make_endocast.py` voxelises the frontal, parietal, temporal, occipital, sphenoid and
+ethmoid bones (2 mm), seals small foramina, flood-fills the cranial cavity (closed by a plane through the
+foramen magnum) and writes its surface, which `tools/meshes/configs/endocast.json` smooths and decimates.
+It stands in for the brain base (cow) and the inner table (bleed); no brain-cortex objects are used.
+Used by: `scenes/cow.js`, `scenes/bleed.js`.

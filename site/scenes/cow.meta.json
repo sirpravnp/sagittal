@@ -1,0 +1,48 @@
+{
+  "id": "cow",
+  "title": "Circle of Willis and its lesions",
+  "topic": "Neurology",
+  "variantControl": "v",
+  "variants": [
+    {
+      "key": "norm",
+      "label": "Normal circle of Willis"
+    },
+    {
+      "key": "acom",
+      "label": "ACom aneurysm"
+    },
+    {
+      "key": "pcom",
+      "label": "PCom aneurysm (CN III palsy)"
+    },
+    {
+      "key": "mca",
+      "label": "MCA occlusion (stroke)"
+    }
+  ],
+  "claims": [
+    "The circle of Willis at the base of the brain joins the anterior circulation (internal carotid arteries) to the posterior circulation (vertebral arteries → basilar artery).",
+    "The ring is formed by the A1 segments of the ACAs, the ACom, the terminal internal carotids, the PComs and the P1 segments of the PCAs.",
+    "Each internal carotid artery ends by dividing into the ACA and the MCA; the PCom joins the internal carotid to the PCA.",
+    "The two vertebral arteries join to form the basilar artery, which ends by dividing into the two PCAs. PICA arises from the vertebral artery, AICA from the lower basilar and the SCA from the top of the basilar.",
+    "CN III leaves the midbrain between the PCA and the SCA and runs beside the PCom towards the cavernous sinus.",
+    "The ACom is the most common site of saccular (berry) aneurysms.",
+    "Rupture of a berry aneurysm causes subarachnoid hemorrhage (sudden 'worst headache of my life').",
+    "Berry aneurysms are associated with ADPKD, Ehlers-Danlos syndrome and Marfan syndrome; hypertension and smoking are risk factors.",
+    "A large ACom aneurysm can compress the optic chiasm and cause bitemporal hemianopia.",
+    "A PCom aneurysm compresses CN III: dilated, poorly reactive pupil, ptosis and an eye that is down and out.",
+    "The parasympathetic pupillary fibres run on the outside of CN III, so compression involves the pupil early; ischemic (diabetic) CN III palsy usually spares the pupil.",
+    "The MCA supplies most of the lateral convexity of the hemisphere; the ACA supplies the medial surface (leg area) and the PCA the occipital lobe and inferomedial temporal lobe.",
+    "MCA occlusion causes contralateral face and arm weakness and sensory loss (leg relatively spared) and a contralateral homonymous hemianopia.",
+    "Dominant (usually left) MCA stroke causes aphasia; non-dominant MCA stroke causes hemineglect."
+  ],
+  "sources": [
+    "StatPearls: Neuroanatomy, Circle of Willis. https://www.ncbi.nlm.nih.gov/books/NBK534861/",
+    "StatPearls: Neuroanatomy, Cerebral Blood Supply. https://www.ncbi.nlm.nih.gov/books/NBK532297/",
+    "StatPearls: Neuroanatomy, Vertebrobasilar System. https://www.ncbi.nlm.nih.gov/books/NBK540995/",
+    "StatPearls: Saccular Aneurysm. https://www.ncbi.nlm.nih.gov/books/NBK557867/",
+    "StatPearls: Neuroanatomy, Middle Cerebral Artery. https://www.ncbi.nlm.nih.gov/books/NBK526002/"
+  ],
+  "status": "unreviewed"
+}

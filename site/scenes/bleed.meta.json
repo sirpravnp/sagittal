@@ -1,0 +1,39 @@
+{
+  "id": "bleed",
+  "title": "Intracranial hemorrhage by layer",
+  "topic": "Neurology",
+  "variantControl": "v",
+  "variants": [
+    {
+      "key": "epi",
+      "label": "Epidural hematoma"
+    },
+    {
+      "key": "sub",
+      "label": "Subdural hematoma"
+    },
+    {
+      "key": "sah",
+      "label": "Subarachnoid hemorrhage"
+    }
+  ],
+  "claims": [
+    "Layers from outside in: scalp, skull, dura mater, arachnoid mater, subarachnoid space (CSF), pia mater, brain.",
+    "Epidural hematoma: blood between the skull and the dura, classically arterial from the middle meningeal artery torn by a temporal bone fracture near the pterion.",
+    "Epidural hematoma is biconvex (lens-shaped) on CT and does not cross suture lines, where the dura is firmly attached to the skull.",
+    "Epidural hematoma classically causes brief loss of consciousness, a lucid interval, then rapid deterioration from mass effect and herniation; treat with urgent surgical evacuation.",
+    "Subdural hematoma: blood between the dura and the arachnoid, usually venous from torn bridging veins that cross from the cortex to the dural venous sinuses.",
+    "Subdural hematoma is crescent-shaped on CT and crosses suture lines, but does not cross the falx or tentorium.",
+    "Subdural hematoma risk factors: older age (brain atrophy stretches bridging veins), alcohol use, anticoagulation, and abusive head trauma in infants.",
+    "Subarachnoid hemorrhage: blood between the arachnoid and the pia, in the CSF of the sulci, fissures and basal cisterns.",
+    "Most non-traumatic subarachnoid hemorrhage comes from a ruptured berry aneurysm: thunderclap 'worst headache of my life' and neck stiffness.",
+    "Suspected subarachnoid hemorrhage: non-contrast head CT first; if negative, lumbar puncture for xanthochromia. Complications include vasospasm (nimodipine) and hydrocephalus."
+  ],
+  "sources": [
+    "StatPearls: Epidural Hematoma. https://www.ncbi.nlm.nih.gov/books/NBK518982/",
+    "StatPearls: Subdural Hematoma. https://www.ncbi.nlm.nih.gov/books/NBK532970/",
+    "StatPearls: Acute Stroke: Evaluation and Management. https://www.ncbi.nlm.nih.gov/books/NBK535369/",
+    "StatPearls: Saccular Aneurysm. https://www.ncbi.nlm.nih.gov/books/NBK557867/"
+  ],
+  "status": "unreviewed"
+}
