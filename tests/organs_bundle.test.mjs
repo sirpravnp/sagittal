@@ -2,7 +2,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
 import { loadClassic } from './helpers/loadClassic.mjs';
 
 const index = JSON.parse(readFileSync('organs/index.json', 'utf8'));
@@ -39,7 +38,9 @@ test('references: ids, titles and https urls', () => {
   }
 });
 
-test('npm run organs is idempotent', () => {
-  const run = () => { execFileSync('node', ['tools/build_organs.mjs'], { stdio: 'pipe' }); return readFileSync('organs/organs.js'); };
-  assert.ok(run().equals(run()));
+test('organs.js is what npm run organs generates (compared in memory; nothing is written)', async () => {
+  const { generate } = await import('../tools/build_organs.mjs');
+  const a = generate()['organs/organs.js'], b = generate()['organs/organs.js'];
+  assert.equal(a, b, 'generation is deterministic');
+  assert.equal(readFileSync('organs/organs.js', 'utf8'), a, 'organs/organs.js is stale: run npm run organs');
 });
