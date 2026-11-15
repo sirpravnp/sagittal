@@ -62,9 +62,11 @@ test('unknown scene shows the gallery with "Scene not found"', async ({ page }) 
   expect(errors).toEqual([]);
 });
 
+// The landing page no longer lists the library; the viewer's own scene list (shown for an unknown
+// scene) still links every scene.
 test('gallery lists scenes with title and link', async ({ page }) => {
   const errors = watchErrors(page);
-  await page.goto('index.html');
+  await page.goto('viewer.html?scene=nope');
   const card = page.locator('.card', { hasText: heartMeta.title });
   expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   await expect(card.locator('a')).toHaveAttribute('href', 'viewer.html?scene=heart');

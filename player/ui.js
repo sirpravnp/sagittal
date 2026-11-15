@@ -1,16 +1,22 @@
 /* Sagittal figure page. Classic script: sets window.SagittalUI. Needs Kit, SagittalPlayer and
  * player/figure.css; the organ meshes must be loaded before mount() (the player reads them).
  *
- *   SagittalUI.mount({ resolved, root?, credits?, organs?, state? }) -> figure
- *     Builds the page into root (default document.body): title, the 3D stage with the
- *     orientation chip, the control row (view, organ toggles, labels, Save as image) and the info
- *     panel (claims with their references, "Changed from base anatomy", credits). Sets
- *     window.viewer (the Kit viewer) and window.figure.
+ *   SagittalUI.mount({ resolved, root?, credits?, organs?, state?, plate? }) -> figure
+ *     Builds the page into root (default document.body): running head, plate number and title,
+ *     the 3D stage with the orientation note, the control row (view, organ toggles, labels, Save
+ *     as image) and the info panel (claims with their references, "Changed from base anatomy",
+ *     credits). Sets window.viewer (the Kit viewer) and window.figure.
  *     credits: site/meshes/credits.json (default window.SagittalCredits); Task 6 passes it in.
- *   figure.snapshot({ labels? }) -> Promise<PNG data URL>
- *     The stage at its device-pixel size: the WebGL canvas, the orientation chip, a footer line
- *     (title · view · sagittal) and, when labels is true (default: the page's Labels toggle), the
- *     label dots, leaders and chips drawn from viewer.debug() geometry. The page is left as it was.
+ *     plate: the plate number (default 1), shown as "Plate I".
+ *     The stage's clear colour follows the --stage token of figure.css (paper in light mode, warm
+ *     dark in dark mode) and the leaders take their colours from figure.css (leaderStyle 'css').
+ *   figure.snapshot({ labels?, footer? }) -> Promise<PNG data URL>
+ *     The stage at its device-pixel size: the WebGL canvas, the orientation note, a footer line
+ *     (Sagittal · Plate I · title · view) and, when labels is true (default: the page's Labels
+ *     toggle), the anchor dots, leaders and italic captions drawn from viewer.debug() geometry in
+ *     the page's computed label styles. The footer goes to the first free corner (bottom right,
+ *     bottom left, top right), shortened to "Sagittal · Plate I" if the full line fits nowhere,
+ *     and left out if every corner holds a label, or when footer is false. The page is left as it was.
  *   figure.save() downloads that image as <slug>-<view>.png.
  *   SagittalUI.infoHtml(ctx) is the info panel markup; the player calls it on every build.
  */
@@ -30,7 +36,12 @@
     return String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '') || 'figure';
   }
-  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function roman(n) {
+    n = Math.max(1, Math.min(3999, Math.floor(n) || 1));
+    var r = '', t = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+    t.forEach(function (p) { while (n >= p[0]) { r += p[1]; n -= p[0]; } });
+    return r;
+  }
   function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } }
   function uniq(a) { var out = []; a.forEach(function (x) { if (out.indexOf(x) < 0) out.push(x); }); return out; }
 
@@ -49,7 +60,7 @@
       var links = c.refs.filter(function (r) { return refs[r]; }).map(function (r) {
         return '<a class="ref" href="' + esc(refs[r].url) + '" target="_blank" rel="noopener" title="' + esc(refs[r].title) + '">[' + (cited.indexOf(r) + 1) + ']</a>';
       }).join('');
-      h += '<li><span class="n">' + pad2(i + 1) + '</span><span>' + esc(c.text) + (links ? ' ' + links : '') + '</span></li>';
+      h += '<li><span class="n">' + (i + 1) + '.</span><span>' + esc(c.text) + (links ? ' ' + links : '') + '</span></li>';
     });
     h += '</ol></section>';
     if (cited.length) {
@@ -98,14 +109,14 @@
   }
 
   /* ---------- page ---------- */
-  function build(root, R) {
+  function build(root, R, plateName) {
     var fig = el('div', 'fig');
+    var run = el('p', 'fig-run');
+    run.appendChild(el('span', 'fig-mark', 'Sagittal'));
+    run.appendChild(el('span', null, (R.topic ? R.topic + ' \u00b7 ' : '') + 'Anatomical variant'));
+    fig.appendChild(run);
     var head = el('header', 'fig-head');
-    var kick = el('p', 'fig-kicker');
-    kick.appendChild(el('span', 'fig-mark', 'Sagittal'));
-    if (R.topic) kick.appendChild(el('span', null, R.topic));
-    kick.appendChild(el('span', null, 'Anatomical variant'));
-    head.appendChild(kick);
+    head.appendChild(el('p', 'fig-no', plateName));
     head.appendChild(el('h1', 'fig-title', R.title));
     fig.appendChild(head);
 
@@ -114,7 +125,7 @@
     var cv = el('canvas'); cv.id = 'cv';
     cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', R.title + ': 3D figure, drag to rotate');
     var labels = el('div'); labels.id = 'labels';
-    var orient = el('div', 'fig-orient'); orient.id = 'orient'; orient.setAttribute('aria-live', 'polite');
+    var orient = el('p', 'fig-orient'); orient.id = 'orient'; orient.setAttribute('aria-live', 'polite');
     var hint = el('p', 'fig-hint', 'Drag to rotate · scroll to zoom');
     stage.append(cv, orient, labels, hint);
 
@@ -145,11 +156,21 @@
   function mount(o) {
     o = o || {};
     var R = o.resolved, root = o.root || document.body;
-    var D = build(root, R);
+    var plateName = 'Plate ' + roman(o.plate || 1);
+    var D = build(root, R, plateName);
     document.title = R.title + ' · Sagittal';
     var def = window.SagittalPlayer.register(R, { credits: o.credits || window.SagittalCredits || null, organs: o.organs, orientEl: D.orient });
     var staging = el('div'); // the kit builds its controls here; they are moved into the control row
-    var viewer = window.Kit.createViewer({ canvas: D.cv, labelsEl: D.labels, controlsEl: staging, infoEl: D.info });
+    function stageColour() { return getComputedStyle(D.stage).backgroundColor; }
+    var viewer = window.Kit.createViewer({ canvas: D.cv, labelsEl: D.labels, controlsEl: staging, infoEl: D.info,
+      background: stageColour(), leaderStyle: 'css' });
+    // the clear colour follows the theme (prefers-color-scheme, or data-theme on <html>)
+    function retone() { viewer.setBackground(stageColour()); }
+    if (window.matchMedia) {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq.addEventListener) mq.addEventListener('change', retone); else if (mq.addListener) mq.addListener(retone);
+    }
+    if (window.MutationObserver) new MutationObserver(retone).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
     viewer.open(def.id, o.state || {});
     Array.prototype.slice.call(staging.children).forEach(function (c) {
       (c.classList.contains('chk') ? D.opts : D.view).appendChild(c);
@@ -166,7 +187,7 @@
       try {
         // draw a fresh frame (and lay the labels out when they are wanted but hidden)
         viewer.setLabelsVisible(want);
-        var url = composite(want);
+        var url = composite(want, so.footer !== false);
         return Promise.resolve(url);
       } catch (e) {
         return Promise.reject(e);
@@ -175,55 +196,63 @@
       }
     }
 
-    function composite(withLabels) {
+    function composite(withLabels, withFooter) {
       var src = D.cv, W = src.width, H = src.height, k = W / (src.clientWidth || W);
       var out = document.createElement('canvas'); out.width = W; out.height = H;
       var g = out.getContext('2d');
       g.drawImage(src, 0, 0, W, H);
       var cs = getComputedStyle(D.stage);
       var tok = function (n, d) { return (cs.getPropertyValue(n) || '').trim() || d; };
-      var ink = tok('--stage-ink', '#e9eef4'), mut = tok('--stage-mut', '#94a3b5'), rule = tok('--stage-rule', '#364352');
-      var chip = tok('--stage-chip', 'rgba(15,20,27,.86)'), acc = tok('--stage-acc', '#6db3ff');
+      var stageInk = tok('--stage-ink', '#2a251e'), mut = tok('--stage-mut', '#6a6152'), knock = tok('--stage-knock', 'rgba(238,231,216,.92)');
       var sb = D.stage.getBoundingClientRect();
+      function fontOf(c) { return c.fontStyle + ' ' + c.fontWeight + ' ' + parseFloat(c.fontSize) * k + 'px ' + c.fontFamily; }
 
-      function box(x, y, w, h, fill, stroke, dashed) {
-        g.save();
-        g.fillStyle = fill; g.fillRect(x, y, w, h);
-        g.strokeStyle = stroke; g.lineWidth = k;
-        if (dashed) g.setLineDash([3 * k, 2 * k]);
-        g.strokeRect(x + k / 2, y + k / 2, w - k, h - k);
-        g.restore();
-      }
-
-      // orientation chip, where it sits on the stage (wrapped as on the page)
+      // orientation note, where it sits on the stage (wrapped as on the page)
       var text = D.orient.textContent;
       if (text) {
         var oc = getComputedStyle(D.orient), r = D.orient.getBoundingClientRect();
         var x = (r.left - sb.left) * k, y = (r.top - sb.top) * k, w = r.width * k, h = r.height * k;
-        box(x, y, w, h, chip, rule);
-        g.fillStyle = acc; g.fillRect(x, y, 2 * k, h);
-        g.font = oc.fontWeight + ' ' + parseFloat(oc.fontSize) * k + 'px ' + oc.fontFamily;
-        g.fillStyle = ink; g.textBaseline = 'middle';
-        var pl = (parseFloat(oc.paddingLeft) + parseFloat(oc.borderLeftWidth)) * k;
-        var pt = (parseFloat(oc.paddingTop) + parseFloat(oc.borderTopWidth)) * k;
-        var lh = (parseFloat(oc.lineHeight) || parseFloat(oc.fontSize) * 1.5) * k;
-        wrap(text, w - pl - (parseFloat(oc.paddingRight) + parseFloat(oc.borderRightWidth)) * k).forEach(function (line, i) {
+        g.fillStyle = oc.backgroundColor; g.fillRect(x, y, w, h);
+        g.font = fontOf(oc);
+        g.fillStyle = oc.color; g.textBaseline = 'middle';
+        var pl = parseFloat(oc.paddingLeft) * k, pt = parseFloat(oc.paddingTop) * k;
+        var lh = (parseFloat(oc.lineHeight) || parseFloat(oc.fontSize) * 1.35) * k;
+        wrap(text, w - pl - parseFloat(oc.paddingRight) * k).forEach(function (line, i) {
           g.fillText(line, x + pl, y + pt + lh * (i + 0.5));
         });
       }
 
-      // footer line, bottom right
-      var fs = 10.5 * k, m = 10 * k;
-      g.font = '400 ' + fs + 'px ' + tok('--mono', 'monospace');
-      var tail = ' · ' + viewName() + ' · sagittal', title = R.title, maxW = W - 2 * m - 12 * k;
-      var foot = title + tail;
-      while (g.measureText(foot).width > maxW && title.length > 8) { title = title.slice(0, -2); foot = title.replace(/\s+$/, '') + '…' + tail; }
-      var fw = g.measureText(foot).width, fh = fs * 1.6, fx = W - m - fw - 12 * k, fy = H - m - fh;
-      g.fillStyle = chip; g.fillRect(fx, fy, fw + 12 * k, fh);
-      g.fillStyle = mut; g.textBaseline = 'middle'; g.fillText(foot, fx + 6 * k, fy + fh / 2);
-
-      if (withLabels) drawLabels(g, k, chip, rule, ink);
+      // footer line: Sagittal · Plate I · title · view. Bottom right, else bottom left, else top
+      // right: the first corner where it covers no label (and not the orientation note); none, no footer.
+      if (withFooter) footer();
+      if (withLabels) drawLabels(g, k, stageInk);
       return out.toDataURL('image/png');
+
+      function footer() {
+      var fs = 12.5 * k, m = 10 * k, fam = tok('--serif', 'Georgia, serif');
+      g.font = 'italic 400 ' + fs + 'px ' + fam;
+      var head = 'Sagittal · ' + plateName + ' · ', tail = ' · ' + viewName(), title = R.title, maxW = W - 2 * m - 10 * k;
+      var foot = head + title + tail;
+      while (g.measureText(foot).width > maxW && title.length > 8) { title = title.slice(0, -2); foot = head + title.replace(/\s+$/, '') + '…' + tail; }
+      var fh = fs * 1.55;
+      var busy = (withLabels ? viewer.debug().labelRects.map(function (r) { return [r.x * k, r.y * k, r.w * k, r.h * k]; }) : []);
+      if (text) { var orr = D.orient.getBoundingClientRect(); busy.push([(orr.left - sb.left) * k, (orr.top - sb.top) * k, orr.width * k, orr.height * k]); }
+      // the full line first; failing that, the short one ("Sagittal · Plate I")
+      var at = null, fw = 0;
+      [foot, 'Sagittal \u00b7 ' + plateName].some(function (t) {
+        fw = g.measureText(t).width + 10 * k;
+        var spots = [[W - m - fw, H - m - fh], [m, H - m - fh], [W - m - fw, m]];
+        for (var si = 0; si < spots.length; si++) {
+          var fx = spots[si][0], fy = spots[si][1];
+          var hit = busy.some(function (b) { return fx < b[0] + b[2] + 4 * k && fx + fw > b[0] - 4 * k && fy < b[1] + b[3] + 4 * k && fy + fh > b[1] - 4 * k; });
+          if (!hit) { at = spots[si]; foot = t; return true; }
+        }
+        return false;
+      });
+      if (!at) return;
+      g.fillStyle = knock; g.fillRect(at[0], at[1], fw, fh);
+      g.fillStyle = mut; g.textBaseline = 'middle'; g.fillText(foot, at[0] + 5 * k, at[1] + fh / 2);
+      }
 
       function wrap(t, maxw) {
         var words = t.split(' '), lines = [], cur = '';
@@ -236,42 +265,64 @@
       }
     }
 
-    // The kit's leader style (site/kit/kit.js): halo, line, anchor dot; then the chips. Hidden
-    // anchors (drawn x-ray style) get a dashed leader, a hollow dot and a dashed, faded chip.
-    function drawLabels(g, k, chip, rule, ink) {
+    // The page's label style (figure.css): a paper halo under a fine ink leader, a small ink dot,
+    // and an italic caption on a knocked-out patch of paper. Hidden anchors (drawn x-ray style) get
+    // a dashed leader, a hollow dot and a muted caption. Colours and sizes are read from the
+    // rendered elements, so the image matches the page in either theme.
+    function drawLabels(g, k, fallbackInk) {
       var d = viewer.debug(), rects = d.labelRects, leads = d.leaders;
-      var LIGHT = '#f2f5fa', DARK = 'rgba(15,20,27,0.9)';
+      function px(v, def) { var n = parseFloat(v); return isFinite(n) ? n : def; }
+      function svgStyle(sel, occluded) {
+        var e = D.labels.querySelector((occluded ? '.is-occluded ' : '.kit-leaders g:not(.is-occluded) ') + sel) ||
+          D.labels.querySelector('.kit-leaders ' + sel);
+        return e ? getComputedStyle(e) : null;
+      }
+      function look(occluded) {
+        var h = svgStyle('.kit-halo', occluded), l = svgStyle('.kit-leader', occluded), a = svgStyle('.kit-anchor', occluded);
+        var stage = getComputedStyle(D.stage).backgroundColor;
+        return {
+          halo: h ? h.stroke : stage, haloW: h ? px(h.strokeWidth, 3) : 3,
+          line: l ? l.stroke : fallbackInk, lineW: l ? px(l.strokeWidth, 0.9) : 0.9,
+          dash: occluded ? [2.5, 2.5] : [],
+          dotR: a ? px(a.r, 2.4) : 2.4, dotFill: a ? a.fill : (occluded ? stage : fallbackInk),
+          dotStroke: a ? a.stroke : stage, dotW: a ? px(a.strokeWidth, 1.4) : 1.4,
+        };
+      }
+      var L = { false: look(false), true: look(true) };
       g.save();
       g.lineCap = 'round';
       leads.forEach(function (l) {
         if (!l) return;
-        g.setLineDash(l.occluded ? [3 * k, 3 * k] : []);
-        g.strokeStyle = 'rgba(15,20,27,0.75)'; g.lineWidth = 3.5 * k;
+        var s = L[!!l.occluded];
+        g.setLineDash([]);
+        g.strokeStyle = s.halo; g.lineWidth = s.haloW * k;
         g.beginPath(); g.moveTo(l.ax * k, l.ay * k); g.lineTo(l.x2 * k, l.y2 * k); g.stroke();
-        g.strokeStyle = LIGHT; g.lineWidth = 1.4 * k;
+        g.setLineDash(s.dash.map(function (v) { return v * k; }));
+        g.strokeStyle = s.line; g.lineWidth = s.lineW * k;
         g.beginPath(); g.moveTo(l.ax * k, l.ay * k); g.lineTo(l.x2 * k, l.y2 * k); g.stroke();
         g.setLineDash([]);
-        g.beginPath(); g.arc(l.ax * k, l.ay * k, 3.5 * k, 0, Math.PI * 2);
-        g.fillStyle = l.occluded ? DARK : LIGHT; g.fill();
-        g.strokeStyle = l.occluded ? LIGHT : DARK; g.lineWidth = 1.5 * k; g.stroke();
+        g.beginPath(); g.arc(l.ax * k, l.ay * k, s.dotR * k, 0, Math.PI * 2);
+        g.fillStyle = s.dotFill; g.fill();
+        g.strokeStyle = s.dotStroke; g.lineWidth = s.dotW * k; g.stroke();
       });
       g.restore();
-      var lab = D.labels.querySelector('.lab');
-      var lc = lab ? getComputedStyle(lab) : null;
-      var font = lc ? lc.fontWeight + ' ' + parseFloat(lc.fontSize) * k + 'px ' + lc.fontFamily : 500 * 1 + ' ' + 11 * k + 'px sans-serif';
-      var pl = lc ? (parseFloat(lc.paddingLeft) + parseFloat(lc.borderLeftWidth)) * k : 7 * k;
+      function fontOf(c) { return c.fontStyle + ' ' + c.fontWeight + ' ' + parseFloat(c.fontSize) * k + 'px ' + c.fontFamily; }
+      var labs = D.labels.querySelectorAll('.lab');
       rects.forEach(function (r, i) {
         var l = leads[i];
         if (!l) return;
-        g.save();
-        if (l.occluded) g.globalAlpha = 0.7;
+        // the label element with this text (labels are unique per figure)
+        var e = null;
+        for (var j = 0; j < labs.length; j++) if (labs[j].textContent === l.text) { e = labs[j]; break; }
+        var c = e ? getComputedStyle(e) : null;
         var x = r.x * k, y = r.y * k, w = r.w * k, h = r.h * k;
-        g.fillStyle = chip; g.fillRect(x, y, w, h);
-        g.strokeStyle = rule; g.lineWidth = k;
-        if (l.occluded) g.setLineDash([3 * k, 2 * k]);
-        g.strokeRect(x + k / 2, y + k / 2, w - k, h - k);
-        g.font = font; g.fillStyle = ink; g.textBaseline = 'middle';
-        g.fillText(l.text, x + pl, y + h / 2 + 0.5 * k);
+        g.save();
+        g.fillStyle = c ? c.backgroundColor : 'rgba(0,0,0,0)'; g.fillRect(x, y, w, h);
+        g.font = c ? fontOf(c) : 'italic 400 ' + 14.5 * k + 'px Georgia, serif';
+        g.fillStyle = c ? c.color : fallbackInk; g.textBaseline = 'middle';
+        var pl = c ? (parseFloat(c.paddingLeft) + parseFloat(c.borderLeftWidth)) * k : 4 * k;
+        var pt = c ? parseFloat(c.paddingTop) * k : 0, pb = c ? parseFloat(c.paddingBottom) * k : 0;
+        g.fillText(l.text, x + pl, y + pt + (h - pt - pb) / 2 + 0.5 * k);
         g.restore();
       });
     }
