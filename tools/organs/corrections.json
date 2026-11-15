@@ -1,0 +1,76 @@
+{
+ "about": "Rigid corrections of Z-Anatomy source objects, written by tools/organs/build.py from organs.json 'corrections'; see organs/README.md (Corrections).",
+ "corrections": {
+  "bile_duct_onto_d2": {
+   "type": "rotate_end_onto_wall",
+   "curve": "Bile duct",
+   "why": "In Z-Anatomy the bile duct runs on the anterior surface of the pancreatic head and ends 0.5 cm in front of the anterior wall of the descending duodenum (1.1 cm anterior to the centre of its slab at that height); the bile duct descends behind the first part of the duodenum and through the back of the pancreatic head and enters the posteromedial wall of the descending part at the major papilla. The duct is rotated rigidly about its upper end (kept where the cystic and common hepatic ducts would join) so its lower end reaches the posteromedial wall (direction medial + posterior) of the descending duodenum's source mesh at the same height.",
+   "rotation": [
+    [
+     0.986909,
+     -0.114787,
+     -0.113286
+    ],
+    [
+     0.078684,
+     0.955867,
+     -0.283066
+    ],
+    [
+     0.140779,
+     0.270447,
+     0.952386
+    ]
+   ],
+   "translation_cm": [
+    13.6892,
+    6.4538,
+    -30.6892
+   ],
+   "pivot_cm": [
+    -3.019,
+    115.737,
+    3.916
+   ],
+   "rotation_deg": 18.63,
+   "moving_end_before_cm": [
+    -5.757,
+    109.015,
+    2.922
+   ],
+   "moving_end_after_cm": [
+    -4.837,
+    109.378,
+    0.766
+   ],
+   "moving_end_shift_cm": 2.37,
+   "max_point_shift_cm": 2.37,
+   "mean_point_shift_cm": 1.04,
+   "wall": {
+    "file": "Duodenum.obj",
+    "slab_vertices": 21,
+    "slab_centre_cm": [
+     -5.348,
+     109.065,
+     1.821
+    ],
+    "target_cm": [
+     -4.881,
+     109.225,
+     0.69
+    ],
+    "moving_end_before_offset_from_slab_centre_cm": [
+     -0.41,
+     -0.05,
+     1.1
+    ],
+    "moving_end_after_offset_from_slab_centre_cm": [
+     0.51,
+     0.31,
+     -1.05
+    ],
+    "moving_end_after_to_target_cm": 0.18
+   }
+  }
+ }
+}

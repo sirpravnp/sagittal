@@ -157,6 +157,7 @@ already there, with file paths, triangle counts and licences.
    | `default_budget` / `budget` | target triangles per part after decimation |
    | `files` / `exclude` | glob patterns (OBJ, PLY, STL, legacy ASCII VTK); all files in a part are merged |
    | `subdivide`, `smooth` | per part: midpoint subdivision passes, then Taubin smoothing iterations (for coarse subdivision-surface cages such as Z-Anatomy's organs) |
+   | `rigid` | per part: `{"rotation": 3x3, "translation": [x, y, z]}`, a rigid correction applied right after `transform` (v' = R v + t, cm); only for a documented source defect (the organ library's bile duct, `tools/organs/corrections.json`) |
    | `weld` | vertex weld tolerance in source units (default 1e-4) |
    | `normals` | `true` to store normals (bigger file; normally the kit computes them) |
    | `decimate` | `"auto"` (quadric via fast-simplification, else clustering), `"quadric"`, `"cluster"` |

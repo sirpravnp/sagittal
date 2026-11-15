@@ -294,6 +294,12 @@ The base organ library in `organs/` (meshes `organs/meshes/<id>.js`, manifests
   onto the Z-Anatomy heart by a similarity fit on chamber centroids and valve centres.
 - **totalsegmentator** (CC BY 4.0): `kidneys`, `adrenals`, `thyroid`, `brain` (see above).
 
+What we changed: the Z-Anatomy bile duct (curve and mesh) is rotated rigidly by 18.6 degrees about its
+upper end so that its lower end enters the posteromedial wall of the descending duodenum (moved 2.37
+cm; in the source it ends in front of the duodenum, on the anterior surface of the pancreatic head);
+see `organs/README.md` (Corrections) and `tools/organs/corrections.json`. No other source object is
+moved or reshaped beyond the registrations above and bake.py's smoothing and decimation.
+
 Landmarks in the manifests are computed from this geometry (curve end points, branch points, mesh
 extremes, centroids, nearest points); the rule for each is stated in its `derived` field. All organs
 share one frame, so they can be combined; a combined figure that includes a Z-Anatomy organ is

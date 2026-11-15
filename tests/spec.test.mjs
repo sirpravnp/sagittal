@@ -450,6 +450,28 @@ test('real organs: cystic duct from the gallbladder neck to the bile duct, moved
     .map((x) => `variant.edits[0]: aorta/${x} branches from aorta/aortic_arch; reroute or remove aorta/${x} too`));
 });
 
+test('real organs: the portal vein cannot be removed while the SMV and splenic vein join it; a tributary can', () => {
+  const real = loadClassic('organs/organs.js').SagittalOrgans;
+  const spec = (edits) => ({
+    schema: 'sagittal-figure/1', title: 'Portal confluence', topic: 'Hepatobiliary',
+    organs: [{ id: 'portal-venous' }],
+    variant: { label: 'Variant', edits },
+    labels: [{ text: 'Portal vein', on: 'portal-venous/portal_vein' }],
+    claims: [{ text: 'The cystic duct may join the bile duct low, near the duodenum.', refs: ['statpearls-biliary-ducts'] }],
+  });
+  assert.deepEqual(run(spec([{ op: 'remove', structure: 'portal-venous/portal_vein' }]), real).errors,
+    ['splenic_vein', 'superior_mesenteric_vein']
+      .map((x) => `variant.edits[0]: portal-venous/${x} branches from portal-venous/portal_vein; reroute or remove portal-venous/${x} too`));
+  // the reverse direction: removing a tributary leaves the portal vein valid
+  assert.deepEqual(run(spec([{ op: 'remove', structure: 'portal-venous/superior_mesenteric_vein' }]), real).errors, []);
+  // removing the portal vein with both tributaries (and the splenic vein's own tributaries) is allowed
+  const all = ['portal_vein', 'splenic_vein', 'superior_mesenteric_vein', 'inferior_mesenteric_vein']
+    .concat([1, 2, 3, 4, 5, 6].map((i) => 'splenic_vein_hilar_tributary_' + i))
+    .map((x) => ({ op: 'remove', structure: 'portal-venous/' + x }));
+  const s = spec(all); s.labels = [];
+  assert.deepEqual(run(s, real).errors, []);
+});
+
 test('docs/spec.md worked examples validate against the real organs', () => {
   const real = loadClassic('organs/organs.js').SagittalOrgans;
   const md = readFileSync('docs/spec.md', 'utf8');

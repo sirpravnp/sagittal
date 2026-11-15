@@ -94,6 +94,10 @@ test('centre-line parents: null or a line of the same system whose path passes w
   assert.equal(P('coeliac_trunk'), 'abdominal_aorta');
   assert.equal(P('inferior_mesenteric_vein'), 'splenic_vein');
   assert.equal(P('portal_vein'), null);
+  // the portal confluence: the SMV and splenic vein are tributaries joining at the portal vein's start
+  assert.equal(P('superior_mesenteric_vein'), 'portal_vein');
+  assert.equal(P('splenic_vein'), 'portal_vein');
+  for (const k of ['superior_mesenteric_vein', 'splenic_vein']) assert.equal(lines.get(k).c.from, 'portal_confluence');
   assert.equal(P('bile_duct'), null);
 });
 
