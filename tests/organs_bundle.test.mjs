@@ -35,6 +35,7 @@ test('references: ids, titles and https urls', () => {
     assert.match(id, /^[a-z0-9-]+$/);
     assert.ok(typeof r.title === 'string' && r.title.trim(), id);
     assert.match(r.url, /^https:\/\/\S+$/, id);
+    assert.ok(typeof r.covers === 'string' && r.covers.length > 30, id + ': covers (what the source covers)');
   }
 });
 

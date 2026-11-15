@@ -155,9 +155,12 @@ function organsMd(O) {
     L.push(`| [\`${id}\`](#${id}) | ${cell(m.name)} | ${m.system} | ${m.parts.length} | ${Object.keys(m.centerlines || {}).length} | ${Object.keys(m.landmarks || {}).length} |`);
   }
   L.push('', '## Gaps (not in the base organs: never draw these from memory)', '', gapsMd(), '');
-  L.push('## References (cite only these ids in `claims[].refs`)', '');
-  L.push('| id | title |', '|---|---|');
-  for (const [id, r] of Object.entries(O.references)) L.push(`| \`${id}\` | ${cell(r.title)} |`);
+  L.push('## References (cite only these ids in `claims[].refs`)', '',
+    'Cite a reference only for what its "covers" line says it covers. If no listed reference covers a',
+    'fact (a variant, a prevalence, a relation), leave the fact out and tell the student no listed source',
+    'covers it.', '');
+  L.push('| id | title | covers |', '|---|---|---|');
+  for (const [id, r] of Object.entries(O.references)) L.push(`| \`${id}\` | ${cell(r.title)} | ${cell(r.covers)} |`);
   L.push('');
   for (const { id } of O.index) L.push(organMd(O, O.manifests[id]));
   return L.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';

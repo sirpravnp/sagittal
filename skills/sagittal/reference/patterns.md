@@ -33,8 +33,9 @@ textbook structure in `base` with `via` points `on` the hidden line. The lines t
 - **New origin a short distance away** (a few cm along the same or a neighbouring trunk):
   `move_insertion` of the structure onto the new line (worked example 2). Its children stay on it.
 - **New origin on a distant trunk** (a vessel replaced by one from elsewhere): `remove` the normal
-  vessel, then `branch` the new one from the new parent near that parent's origin (read the
-  parent's `t` values; a small `t` is close to its origin). Route it through the relations the
+  vessel, then `branch` the new one from the new parent at the point the reference gives (its
+  proximal part, a named stretch, or next to one of its branches: read the parent's `t` values in
+  its "Along each line" row; a small `t` is close to the parent's own origin). Route it through the relations the
   reference gives, as offsets from the structures named in them, then join the normal distal course
   (`via` points on the library or hidden line) and end at the same end landmark. If the removed
   vessel has children, `move_insertion` them onto the new vessel (`t: 1` for its end) or remove

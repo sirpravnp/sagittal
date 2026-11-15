@@ -98,15 +98,17 @@ common origin with it), leaving two branches from the arch. The new origin visib
 Claims only what a listed reference supports (aortic arch / great vessels references); if no
 listed reference covers the bovine arch, the agent says so instead of citing one that does not.
 
-## 8. Hepatomesenteric trunk (held out)
+## 8. Caterpillar hump of the right hepatic artery (held out)
 
-> Can you draw a hepatomesenteric trunk?
+> what's a caterpillar hump of the hepatic artery? can you show me one
 
-Expect: normal view with the common hepatic artery from the coeliac trunk and the SMA from the
-aorta; variant with the common hepatic artery and the SMA arising together from one short trunk
-off the aorta (Michels IX), the coeliac trunk keeping the left gastric and splenic arteries; the
-proper hepatic and gastroduodenal arteries stay attached to the common hepatic. Shared origin
-visible. Cites `jclinmedres-hepatic-artery-variations`.
+Expect: normal view with the right hepatic artery running from the proper hepatic artery towards
+the right lobe, with a cystic artery to the gallbladder; variant with the right hepatic artery's
+origin and distal course unchanged but forming a tortuous loop (hump) that comes close to the
+gallbladder neck and cystic duct in Calot's triangle, the cystic artery then short. Nothing is
+replaced or removed apart from the redrawn right hepatic course. Called a caterpillar or
+Moynihan's hump. Cites `jmas-vasculobiliary-anatomy` and/or `jmas-anatomy-cholecystectomy`; any
+prevalence quoted matches the cited source (the two sources give different figures).
 
 ## Refusal: request the library cannot support
 

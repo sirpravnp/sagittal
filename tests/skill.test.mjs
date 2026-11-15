@@ -109,7 +109,7 @@ test('evals/prompts.md has the three named variants and two more', () => {
   assert.match(p, /retrocaval ureter/i);
   // held-out prompts are not described anywhere the skill reader sees
   const ref = ['SKILL.md', 'reference/spec.md', 'reference/patterns.md'].map(read).join('\n').toLowerCase();
-  for (const h of ['bovine', 'hepatomesenteric', 'replaced left hepatic', 'michels ii']) assert.ok(!ref.includes(h), 'reference/ mentions held-out ' + h);
+  for (const h of ['bovine', 'replaced left hepatic', 'michels ii', 'caterpillar', 'moynihan']) assert.ok(!ref.includes(h), 'reference/ mentions held-out ' + h);
 });
 
 test('scripts/sagittal.mjs finds the repo through the install symlink and builds a figure', () => {

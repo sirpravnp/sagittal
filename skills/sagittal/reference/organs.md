@@ -77,49 +77,53 @@ textbook identity: do not label them with a textbook name.
 
 ## References (cite only these ids in `claims[].refs`)
 
-| id | title |
-|---|---|
-| `statpearls-celiac-trunk` | StatPearls: Anatomy, Abdomen and Pelvis: Celiac Trunk |
-| `statpearls-biliary-ducts` | StatPearls: Anatomy, Abdomen and Pelvis: Biliary Ducts |
-| `statpearls-gallbladder` | StatPearls: Anatomy, Abdomen and Pelvis: Gallbladder |
-| `statpearls-liver` | StatPearls: Anatomy, Abdomen and Pelvis: Liver |
-| `statpearls-portal-venous-system` | StatPearls: Anatomy, Abdomen and Pelvis, Portal Venous System |
-| `statpearls-superior-mesenteric-artery` | StatPearls: Anatomy, Abdomen and Pelvis: Superior Mesenteric Artery |
-| `statpearls-inferior-mesenteric-artery` | StatPearls: Anatomy, Abdomen and Pelvis: Inferior Mesenteric Artery |
-| `statpearls-superior-mesenteric-vein` | StatPearls: Anatomy, Abdomen and Pelvis: Superior Mesenteric Vein |
-| `statpearls-abdominal-aorta` | StatPearls: Anatomy, Abdomen and Pelvis: Abdominal Aorta |
-| `statpearls-inferior-vena-cava` | StatPearls: Anatomy, Abdomen and Pelvis: Inferior Vena Cava |
-| `statpearls-renal-artery` | StatPearls: Anatomy, Abdomen and Pelvis, Renal Artery |
-| `statpearls-pancreas` | StatPearls: Anatomy, Abdomen and Pelvis, Pancreas |
-| `statpearls-stomach` | StatPearls: Anatomy, Abdomen and Pelvis: Stomach |
-| `statpearls-duodenum` | StatPearls: Anatomy, Abdomen and Pelvis: Duodenum |
-| `statpearls-small-intestine` | StatPearls: Anatomy, Abdomen and Pelvis, Small Intestine |
-| `statpearls-large-intestine` | StatPearls: Anatomy, Abdomen and Pelvis: Large Intestine |
-| `statpearls-spleen` | StatPearls: Anatomy, Abdomen and Pelvis, Spleen |
-| `statpearls-kidneys` | StatPearls: Anatomy, Abdomen and Pelvis: Kidneys |
-| `statpearls-adrenal-glands` | StatPearls: Anatomy, Abdomen and Pelvis: Adrenal Glands (Suprarenal Glands) |
-| `statpearls-bladder` | StatPearls: Anatomy, Abdomen and Pelvis: Bladder |
-| `statpearls-prostate` | StatPearls: Anatomy, Abdomen and Pelvis, Prostate |
-| `statpearls-scrotum` | StatPearls: Anatomy, Abdomen and Pelvis, Scrotum |
-| `statpearls-esophagus` | StatPearls: Anatomy, Thorax, Esophagus |
-| `statpearls-aortic-arch` | StatPearls: Anatomy, Thorax, Aortic Arch |
-| `statpearls-brachiocephalic-artery` | StatPearls: Anatomy, Thorax, Brachiocephalic (Right Innominate) Arteries |
-| `statpearls-subclavian-arteries` | StatPearls: Anatomy, Thorax, Subclavian Arteries |
-| `statpearls-superior-vena-cava` | StatPearls: Anatomy, Thorax, Superior Vena Cava |
-| `statpearls-heart` | StatPearls: Anatomy, Thorax, Heart |
-| `statpearls-heart-great-vessels` | StatPearls: Anatomy, Thorax, Heart Great Vessels |
-| `statpearls-coronary-arteries` | StatPearls: Anatomy, Thorax, Heart Coronary Arteries (Archived) |
-| `statpearls-lungs` | StatPearls: Anatomy, Thorax, Lungs |
-| `statpearls-tracheobronchial-tree` | StatPearls: Anatomy, Thorax, Tracheobronchial Tree |
-| `statpearls-thyroid` | StatPearls: Anatomy, Head and Neck, Thyroid |
-| `statpearls-cerebral-blood-flow` | StatPearls: Anatomy, Head and Neck: Cerebral Blood Flow |
-| `jclinmedres-hepatic-artery-variations` | The Main Anatomic Variations of the Hepatic Artery and Their Importance in Surgical Practice: Review of the Literature (J Clin Med Res 2017) |
-| `openaccessmacedonjms-celiac-hepatic-variants` | Celiac Trunk and Hepatic Artery Variants in Pancreatic and Liver Resection Anatomy and Implications in Surgical Practice (Open Access Maced J Med Sci 2019) |
-| `frontiers-hepatic-artery-variations` | Anatomical variations of hepatic arteries: implications for clinical practice (Front Surg 2025) |
-| `jpersmed-aberrant-right-subclavian` | Morphological Aspects of the Aberrant Right Subclavian Artery: A Systematic Review of the Literature (J Pers Med 2024) |
-| `jmas-vasculobiliary-anatomy` | Clinical reappraisal of vasculobiliary anatomy relevant to laparoscopic cholecystectomy (J Minim Access Surg 2017) |
-| `jmas-anatomy-cholecystectomy` | Anatomy relevant to cholecystectomy (J Minim Access Surg 2005) |
-| `z-anatomy-models` | Z-Anatomy: Models of human anatomy (libre 3D atlas, CC BY-SA 4.0) |
+Cite a reference only for what its "covers" line says it covers. If no listed reference covers a
+fact (a variant, a prevalence, a relation), leave the fact out and tell the student no listed source
+covers it.
+
+| id | title | covers |
+|---|---|---|
+| `statpearls-celiac-trunk` | StatPearls: Anatomy, Abdomen and Pelvis: Celiac Trunk | StatPearls review chapter on the anatomy of the coeliac trunk and its branches. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the coeliac trunk and its branches, not for a variant or a prevalence. |
+| `statpearls-biliary-ducts` | StatPearls: Anatomy, Abdomen and Pelvis: Biliary Ducts | StatPearls review chapter on the anatomy of the biliary ducts. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the biliary ducts, not for a variant or a prevalence. |
+| `statpearls-gallbladder` | StatPearls: Anatomy, Abdomen and Pelvis: Gallbladder | StatPearls review chapter on the anatomy of the gallbladder. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the gallbladder, not for a variant or a prevalence. |
+| `statpearls-liver` | StatPearls: Anatomy, Abdomen and Pelvis: Liver | StatPearls review chapter on the anatomy of the liver. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the liver, not for a variant or a prevalence. |
+| `statpearls-portal-venous-system` | StatPearls: Anatomy, Abdomen and Pelvis, Portal Venous System | StatPearls review chapter on the anatomy of the portal venous system. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the portal venous system, not for a variant or a prevalence. |
+| `statpearls-superior-mesenteric-artery` | StatPearls: Anatomy, Abdomen and Pelvis: Superior Mesenteric Artery | StatPearls review chapter on the anatomy of the superior mesenteric artery. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the superior mesenteric artery, not for a variant or a prevalence. |
+| `statpearls-inferior-mesenteric-artery` | StatPearls: Anatomy, Abdomen and Pelvis: Inferior Mesenteric Artery | StatPearls review chapter on the anatomy of the inferior mesenteric artery. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the inferior mesenteric artery, not for a variant or a prevalence. |
+| `statpearls-superior-mesenteric-vein` | StatPearls: Anatomy, Abdomen and Pelvis: Superior Mesenteric Vein | StatPearls review chapter on the anatomy of the superior mesenteric vein. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the superior mesenteric vein, not for a variant or a prevalence. |
+| `statpearls-abdominal-aorta` | StatPearls: Anatomy, Abdomen and Pelvis: Abdominal Aorta | StatPearls review chapter on the anatomy of the abdominal aorta. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the abdominal aorta, not for a variant or a prevalence. |
+| `statpearls-inferior-vena-cava` | StatPearls: Anatomy, Abdomen and Pelvis: Inferior Vena Cava | StatPearls review chapter on the anatomy of the inferior vena cava. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the inferior vena cava, not for a variant or a prevalence. |
+| `statpearls-renal-artery` | StatPearls: Anatomy, Abdomen and Pelvis, Renal Artery | StatPearls review chapter on the anatomy of the renal arteries. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the renal arteries, not for a variant or a prevalence. |
+| `statpearls-pancreas` | StatPearls: Anatomy, Abdomen and Pelvis, Pancreas | StatPearls review chapter on the anatomy of the pancreas. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the pancreas, not for a variant or a prevalence. |
+| `statpearls-stomach` | StatPearls: Anatomy, Abdomen and Pelvis: Stomach | StatPearls review chapter on the anatomy of the stomach. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the stomach, not for a variant or a prevalence. |
+| `statpearls-duodenum` | StatPearls: Anatomy, Abdomen and Pelvis: Duodenum | StatPearls review chapter on the anatomy of the duodenum. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the duodenum, not for a variant or a prevalence. |
+| `statpearls-small-intestine` | StatPearls: Anatomy, Abdomen and Pelvis, Small Intestine | StatPearls review chapter on the anatomy of the small intestine. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the small intestine, not for a variant or a prevalence. |
+| `statpearls-large-intestine` | StatPearls: Anatomy, Abdomen and Pelvis: Large Intestine | StatPearls review chapter on the anatomy of the large intestine. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the large intestine, not for a variant or a prevalence. |
+| `statpearls-spleen` | StatPearls: Anatomy, Abdomen and Pelvis, Spleen | StatPearls review chapter on the anatomy of the spleen. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the spleen, not for a variant or a prevalence. |
+| `statpearls-kidneys` | StatPearls: Anatomy, Abdomen and Pelvis: Kidneys | StatPearls review chapter on the anatomy of the kidneys. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the kidneys, not for a variant or a prevalence. |
+| `statpearls-adrenal-glands` | StatPearls: Anatomy, Abdomen and Pelvis: Adrenal Glands (Suprarenal Glands) | StatPearls review chapter on the anatomy of the adrenal glands. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the adrenal glands, not for a variant or a prevalence. |
+| `statpearls-bladder` | StatPearls: Anatomy, Abdomen and Pelvis: Bladder | StatPearls review chapter on the anatomy of the bladder. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the bladder, not for a variant or a prevalence. |
+| `statpearls-prostate` | StatPearls: Anatomy, Abdomen and Pelvis, Prostate | StatPearls review chapter on the anatomy of the prostate. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the prostate, not for a variant or a prevalence. |
+| `statpearls-scrotum` | StatPearls: Anatomy, Abdomen and Pelvis, Scrotum | StatPearls review chapter on the anatomy of the scrotum. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the scrotum, not for a variant or a prevalence. |
+| `statpearls-esophagus` | StatPearls: Anatomy, Thorax, Esophagus | StatPearls review chapter on the anatomy of the oesophagus. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the oesophagus, not for a variant or a prevalence. |
+| `statpearls-aortic-arch` | StatPearls: Anatomy, Thorax, Aortic Arch | StatPearls review chapter on the anatomy of the aortic arch. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the aortic arch, not for a variant or a prevalence. |
+| `statpearls-brachiocephalic-artery` | StatPearls: Anatomy, Thorax, Brachiocephalic (Right Innominate) Arteries | StatPearls review chapter on the anatomy of the brachiocephalic (innominate) artery. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the brachiocephalic (innominate) artery, not for a variant or a prevalence. |
+| `statpearls-subclavian-arteries` | StatPearls: Anatomy, Thorax, Subclavian Arteries | StatPearls review chapter on the anatomy of the subclavian arteries. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the subclavian arteries, not for a variant or a prevalence. |
+| `statpearls-superior-vena-cava` | StatPearls: Anatomy, Thorax, Superior Vena Cava | StatPearls review chapter on the anatomy of the superior vena cava. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the superior vena cava, not for a variant or a prevalence. |
+| `statpearls-heart` | StatPearls: Anatomy, Thorax, Heart | StatPearls review chapter on the anatomy of the heart. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the heart, not for a variant or a prevalence. |
+| `statpearls-heart-great-vessels` | StatPearls: Anatomy, Thorax, Heart Great Vessels | StatPearls review chapter on the anatomy of the great vessels of the heart. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the great vessels of the heart, not for a variant or a prevalence. |
+| `statpearls-coronary-arteries` | StatPearls: Anatomy, Thorax, Heart Coronary Arteries (Archived) | StatPearls review chapter on the anatomy of the coronary arteries (archived chapter). Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the coronary arteries (archived chapter), not for a variant or a prevalence. |
+| `statpearls-lungs` | StatPearls: Anatomy, Thorax, Lungs | StatPearls review chapter on the anatomy of the lungs. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the lungs, not for a variant or a prevalence. |
+| `statpearls-tracheobronchial-tree` | StatPearls: Anatomy, Thorax, Tracheobronchial Tree | StatPearls review chapter on the anatomy of the trachea and bronchi. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the trachea and bronchi, not for a variant or a prevalence. |
+| `statpearls-thyroid` | StatPearls: Anatomy, Head and Neck, Thyroid | StatPearls review chapter on the anatomy of the thyroid gland. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of the thyroid gland, not for a variant or a prevalence. |
+| `statpearls-cerebral-blood-flow` | StatPearls: Anatomy, Head and Neck: Cerebral Blood Flow | StatPearls review chapter on the anatomy of cerebral blood flow and its arteries. Its coverage of variants and their numbers has not been checked: cite it for the normal anatomy of cerebral blood flow and its arteries, not for a variant or a prevalence. |
+| `jclinmedres-hepatic-artery-variations` | The Main Anatomic Variations of the Hepatic Artery and Their Importance in Surgical Practice: Review of the Literature (J Clin Med Res 2017) | Literature review (about 19,000 patients) of hepatic artery variants with prevalences: Michels types I-X (replaced and accessory right and left hepatic arteries from the SMA and left gastric artery, replaced common hepatic artery from the SMA through a hepatomesenteric trunk, from the left gastric artery) and Hiatt types (common hepatic artery from the SMA, from the aorta). |
+| `openaccessmacedonjms-celiac-hepatic-variants` | Celiac Trunk and Hepatic Artery Variants in Pancreatic and Liver Resection Anatomy and Implications in Surgical Practice (Open Access Maced J Med Sci 2019) | Review of coeliac trunk and hepatic artery variants for pancreatic and liver surgery: coeliac trunk trifurcation vs bifurcation, gastrosplenic, hepatosplenomesenteric, splenomesenteric and hepatomesenteric trunks, absent coeliac trunk, with cohort prevalences. |
+| `frontiers-hepatic-artery-variations` | Anatomical variations of hepatic arteries: implications for clinical practice (Front Surg 2025) | Mini-review of hepatic arterial anatomy organised by the Michels classification (types I-X with prevalence ranges) and its relevance to liver surgery, transplantation and interventional radiology. |
+| `jpersmed-aberrant-right-subclavian` | Morphological Aspects of the Aberrant Right Subclavian Artery: A Systematic Review of the Literature (J Pers Med 2024) | Systematic review of 51 patients with an aberrant right subclavian artery: retro-oesophageal course (49 of 51), right vertebral artery from it, Kommerell diverticulum, bicarotid trunk; proposes a classification. |
+| `jmas-vasculobiliary-anatomy` | Clinical reappraisal of vasculobiliary anatomy relevant to laparoscopic cholecystectomy (J Minim Access Surg 2017) | Laparoscopic cholecystectomy series on vasculobiliary anatomy in Calot's triangle: cystic artery origin and number (from the right hepatic artery; double cystic artery 2.6%; low-lying cystic artery from the gastroduodenal artery), caterpillar hump of the right hepatic artery (3.8%), variant right hepatic artery behind the portal vein. |
+| `jmas-anatomy-cholecystectomy` | Anatomy relevant to cholecystectomy (J Minim Access Surg 2005) | Review of anatomy for safe cholecystectomy: gallbladder, Calot's triangle, cystic duct length and union with the bile duct, double cystic artery (2-15%), cystic artery from the common or left hepatic artery, caterpillar (Moynihan's) hump of the right hepatic artery, accessory or replaced right hepatic artery from the SMA, accessory right hepatic ducts. |
+| `z-anatomy-models` | Z-Anatomy: Models of human anatomy (libre 3D atlas, CC BY-SA 4.0) | Source of the 3D models (not a clinical reference): cite it only for where a model comes from, never for an anatomical fact. |
 
 ## brain
 

@@ -57,7 +57,8 @@ Write down, before any JSON:
 - **Labels**: the structures the student asked about and the landmarks that make the change
   readable (usually 4 to 8). Each label on its own structure.
 - **Claims**: 1 to 6 short facts (prevalence, course, clinical relevance), each with reference ids
-  from `reference/organs.md` → References. No listed source for a fact → leave the fact out.
+  from `reference/organs.md` → References, each only for what its "covers" line says it covers.
+  No listed source covers a fact → leave the fact out.
 
 ### 3. When the library cannot support the request, say so and stop
 

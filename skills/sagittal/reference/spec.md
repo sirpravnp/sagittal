@@ -124,7 +124,7 @@ line at that point.
 
 ```json
 {"op": "branch", "id": "cystic_artery", "name": "Cystic artery", "tissue": "vessel-artery", "radius_cm": 0.09,
- "from": {"on": "coeliac-trunk/proper_hepatic_artery", "t": 0.15},
+ "from": {"on": "coeliac-trunk/proper_hepatic_artery", "t": 0.2},
  "to": {"landmark": "gallbladder/gallbladder_centroid", "offset": {"dir": "anterior", "cm": 1.2}}}
 ```
 
@@ -188,7 +188,7 @@ A second copy of a centre-line structure along a path you give with waypoints (a
 
 The library lacks some structures the student will expect (for example the cystic duct, the
 common hepatic duct, the right and left hepatic ducts, named right and left hepatic arteries; see
-"Gaps" in `organs/README.md` and `reference/organs.md`). Put the **normal** course of such a
+"Gaps" in `reference/organs.md`). Put the **normal** course of such a
 structure in `base`, completed from landmarks and centre lines: it is drawn in both views. Then
 the variant edits it like any other structure, by its id: `remove` it, `move_insertion` it a short
 way, or `branch` from it.
@@ -282,8 +282,13 @@ cystic duct, and the duct junction is taken at the bottom of the hook (bile duct
 `bile_duct` part is hidden and redrawn in `base` as the common bile duct (`cbd`, from that point to
 the papilla), the common hepatic duct (`chd`, from the top of `cbd` up to the hilum) and the cystic
 duct (from the gallbladder neck, **on the wall, no offset**, along the hook to the top of `cbd`).
-The normal cystic artery is a `base` branch of the proper hepatic artery line (which runs on as
-the right hepatic artery); the variant adds a second one. Nothing is removed, so this is an
+The normal cystic artery is a `base` branch of the proper hepatic artery line **past the porta**
+(`t` 0.2; the line divides into right and left at about `t` 0.16 and runs on as the right hepatic
+artery), so it arises from the right hepatic artery as the claim says; the variant adds a second
+one further along. The hepatic artery line is not split here (no left hepatic artery is drawn):
+for a cystic artery figure it is not needed, but split it as described above when a figure is
+about the hepatic arteries. The gastroduodenal artery is hidden because it crosses the gallbladder in this view and
+is not part of the variation. Nothing is removed, so this is an
 accessory structure: the variant only adds.
 
 ```json
@@ -293,7 +298,7 @@ accessory structure: the variant only adds.
   "topic": "Hepatobiliary",
   "organs": [
     {"id": "gallbladder", "parts": {"bile_duct": {"visible": false}, "gallbladder": {"opacity": 0.6}}},
-    {"id": "coeliac-trunk"},
+    {"id": "coeliac-trunk", "parts": {"gastroduodenal_artery": {"visible": false}}},
     {"id": "liver", "parts": {"liver": {"opacity": 0.15}}},
     {"id": "duodenum", "parts": {"*": {"opacity": 0.4}}}
   ],
@@ -301,10 +306,10 @@ accessory structure: the variant only adds.
     {"op": "route", "id": "cbd", "name": "Common bile duct", "tissue": "bile-duct", "radius_cm": 0.13, "from": {"on": "gallbladder/bile_duct", "t": 0.125}, "via": [{"on": "gallbladder/bile_duct", "t": 0.3}, {"on": "gallbladder/bile_duct", "t": 0.5}, {"on": "gallbladder/bile_duct", "t": 0.7}, {"on": "gallbladder/bile_duct", "t": 0.9}], "to": {"landmark": "duodenum/major_duodenal_papilla"}},
     {"op": "branch", "id": "chd", "name": "Common hepatic duct", "tissue": "bile-duct", "radius_cm": 0.12, "from": {"on": "cbd", "t": 0}, "via": [{"landmark": "gallbladder/bile_duct_upper_end", "offset": {"dir": "superior", "cm": 1.5}}], "to": {"landmark": "portal-venous/portal_vein_upper_end", "offset": {"dir": "right", "cm": 1.5}}},
     {"op": "route", "id": "cystic_duct", "name": "Cystic duct", "tissue": "bile-duct", "radius_cm": 0.12, "from": {"landmark": "gallbladder/gallbladder_neck"}, "via": [{"on": "gallbladder/bile_duct", "t": 0.03}, {"on": "gallbladder/bile_duct", "t": 0.07}], "to": {"on": "cbd", "t": 0}},
-    {"op": "branch", "id": "cystic_artery", "name": "Cystic artery", "tissue": "vessel-artery", "radius_cm": 0.09, "from": {"on": "coeliac-trunk/proper_hepatic_artery", "t": 0.15}, "to": {"landmark": "gallbladder/gallbladder_centroid", "offset": {"dir": "anterior", "cm": 1.2}}}
+    {"op": "branch", "id": "cystic_artery", "name": "Cystic artery", "tissue": "vessel-artery", "radius_cm": 0.09, "from": {"on": "coeliac-trunk/proper_hepatic_artery", "t": 0.2}, "to": {"landmark": "gallbladder/gallbladder_centroid", "offset": {"dir": "posterior", "cm": 1.2}}}
   ],
   "variant": {"label": "Double cystic artery", "edits": [
-    {"op": "branch", "id": "second_cystic_artery", "name": "Second cystic artery", "tissue": "vessel-artery", "radius_cm": 0.08, "from": {"on": "coeliac-trunk/proper_hepatic_artery", "t": 0.25}, "to": {"landmark": "gallbladder/gallbladder_centroid", "offset": {"dir": "posterior", "cm": 1.2}}}
+    {"op": "branch", "id": "second_cystic_artery", "name": "Second cystic artery", "tissue": "vessel-artery", "radius_cm": 0.08, "from": {"on": "coeliac-trunk/proper_hepatic_artery", "t": 0.28}, "to": {"landmark": "gallbladder/gallbladder_centroid", "offset": {"dir": "anterior", "cm": 1.2}}}
   ]},
   "labels": [
     {"text": "Cystic artery", "on": "cystic_artery"},
@@ -312,7 +317,7 @@ accessory structure: the variant only adds.
     {"text": "Cystic duct", "on": "cystic_duct"},
     {"text": "Common bile duct", "on": "cbd"},
     {"text": "Common hepatic duct", "on": "chd"},
-    {"text": "Gallbladder", "on": "gallbladder/gallbladder"}
+    {"text": "Gallbladder (fundus)", "on": "gallbladder/gallbladder_fundus"}
   ],
   "claims": [
     {"text": "The cystic artery is usually a single branch of the right hepatic artery, given off in Calot's triangle.", "refs": ["jmas-vasculobiliary-anatomy"]},
