@@ -5,10 +5,16 @@ Everything a figure spec can name. A library name is `"<organ>/<id>"`, where `<i
 a centre line or a landmark of that organ (ids are unique across the library). Anything not
 listed here does not exist: say so to the student instead of drawing it.
 
-**Coordinates** in the "t 0 → t 1" and "at" columns are cm in the body frame (+x patient's left,
-+y superior, +z anterior), rounded to 0.1 cm. They are **for planning only** (which side, how far,
-which way a line runs, which offset direction is "behind"). Never write coordinates in a spec: the
-validator refuses them. Use the landmark, a `t` on the line, or a short `offset`.
+**Coordinates** in the "t 0 → t 1", "t 0.25 / 0.5 / 0.75" and "at" columns are cm in the body frame
+(+x patient's left, +y superior, +z anterior), rounded to 0.1 cm. They are **for planning only**
+(which side, how far, which way a line runs, which offset direction is "behind"). Never write
+coordinates in a spec: the validator refuses them. Use the landmark, a `t` on the line, or a short
+`offset`.
+
+**Finding t.** Each organ's "Along each line" table gives the `t` at which every landmark lying on a
+line, and every branch's origin, sits on that line (measured by length, as the validator does).
+To start a branch next to an existing one, or "distal to" a landmark, read its `t` there and pick a
+value a little beyond it (0.05 to 0.1 further for a short line, less for a long one).
 
 **Parent**: the line a centre line branches from (or drains into). A line cannot be removed while
 a child still hangs off it (see `spec.md`, `remove`). Lines named "(unnamed in source)" have no
@@ -60,6 +66,8 @@ textbook identity: do not label them with a textbook name.
   anal canal are inside the "Sigmoid colon" object. Jejunum and ileum are one tube without a boundary.
 - Female reproductive organs: none (Z-Anatomy is a male model; TotalSegmentator has no uterus or ovary).
 - Trachea centre line: the trachea is a mesh in the source (landmarks: `carina`, `trachea_upper_end`).
+- Main pancreatic duct to papilla: in the source its last 1 cm runs outside the pancreas in front of the
+  duodenum; after the bile duct correction it ends 2.0 cm from the bile duct (see Corrections).
 - Pancreatic duct side branches (< 0.7 cm) are in the mesh but have no centre lines; in the source the
   accessory duct does not reach the main duct (1.8 cm gap).
 - Brain: no lobes, gyri or deep structures (Z-Anatomy's cortex objects have an unclear licence; the
@@ -197,6 +205,28 @@ Aorta and its major branches. System: Cardiovascular. Credit: `zanatomy`.
 | `right_internal_iliac_artery` | Right internal iliac artery | `right_internal_iliac_artery_origin` | `right_common_iliac_artery` | 0.402 | 4.8 | (-2.9, 98.3, 1.1) → (-3.2, 94.1, -1.0) |
 | `left_internal_iliac_artery` | Left internal iliac artery | `left_internal_iliac_artery_origin` | `left_common_iliac_artery` | 0.402 | 4.8 | (2.9, 98.3, 1.1) → (3.2, 94.1, -1.0) |
 
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `ascending_aorta` | 0.00 `aortic_root_start` · 1.00 `aortic_arch_start` · 1.00 origin of `aortic_arch` | (1.1, 132.4, 2.4) / (0.6, 133.5, 2.9) / (0.5, 134.8, 3.0) |
+| `aortic_arch` | 0.00 `aortic_arch_start` · 0.33 `brachiocephalic_trunk_origin` (0.3 cm off) · 0.33 origin of `brachiocephalic_trunk` (0.3 cm off) · 0.46 origin of `left_common_carotid_artery` (1.2 cm off) · 0.55 origin of `left_subclavian_artery` (0.6 cm off) · 1.00 `thoracic_aorta_start` · 1.00 `aortic_arch_end` · 1.00 origin of `thoracic_aorta` | (1.1, 137.8, 1.8) / (1.8, 138.4, -0.1) / (2.0, 137.7, -2.0) |
+| `thoracic_aorta` | 0.00 `thoracic_aorta_start` · 0.00 `aortic_arch_end` · 1.00 `abdominal_aorta_start` · 1.00 `thoracic_aorta_end` · 1.00 origin of `abdominal_aorta` | (2.0, 132.2, -3.7) / (1.7, 128.4, -2.8) / (1.2, 124.6, -1.8) |
+| `abdominal_aorta` | 0.00 `abdominal_aorta_start` · 0.00 `thoracic_aorta_end` · 0.40 `coeliac-trunk/coeliac_trunk_origin` · 0.40 origin of `coeliac-trunk/coeliac_trunk` · 0.47 `mesenteric-arteries/superior_mesenteric_artery_origin` (0.1 cm off) · 0.47 origin of `mesenteric-arteries/superior_mesenteric_artery` (0.1 cm off) · 0.52 `right_renal_artery_origin` (0.5 cm off) · 0.52 origin of `right_renal_artery` (0.5 cm off) · 0.53 `left_renal_artery_origin` · 0.53 origin of `left_renal_artery` · 0.84 `mesenteric-arteries/inferior_mesenteric_artery_origin` (0.3 cm off) · 0.84 origin of `mesenteric-arteries/inferior_mesenteric_artery` (0.3 cm off) · 1.00 `right_common_iliac_artery_origin` · 1.00 `left_common_iliac_artery_origin` · 1.00 `aortic_bifurcation` · 1.00 origin of `right_common_iliac_artery` · 1.00 origin of `left_common_iliac_artery` | (1.0, 116.5, 0.7) / (0.8, 112.1, 1.9) / (0.7, 107.6, 2.7) |
+| `brachiocephalic_trunk` | 0.00 `brachiocephalic_trunk_origin` · 1.00 `right_common_carotid_artery_origin` · 1.00 `right_subclavian_artery_origin` · 1.00 `brachiocephalic_bifurcation` · 1.00 origin of `right_common_carotid_artery` · 1.00 origin of `right_subclavian_artery` | (0.9, 139.3, 1.5) / (0.2, 140.1, 1.6) / (-0.7, 140.6, 1.7) |
+| `right_common_carotid_artery` | 0.00 `right_common_carotid_artery_origin` · 0.00 `right_subclavian_artery_origin` · 0.00 `brachiocephalic_bifurcation` · 1.00 `right_carotid_bifurcation` | (-1.8, 143.1, 1.3) / (-2.1, 145.0, 0.8) / (-2.7, 146.8, 0.3) |
+| `right_subclavian_artery` | 0.00 `right_common_carotid_artery_origin` · 0.00 `right_subclavian_artery_origin` · 0.00 `brachiocephalic_bifurcation` · 1.00 `right_subclavian_artery_end` | (-2.5, 141.7, 0.1) / (-4.3, 142.1, -0.1) / (-6.2, 141.9, -0.1) |
+| `left_common_carotid_artery` | 0.00 `left_common_carotid_artery_origin` · 1.00 `left_carotid_bifurcation` | (1.7, 141.9, 0.6) / (1.8, 144.2, 0.4) / (2.4, 146.4, 0.1) |
+| `left_subclavian_artery` | 0.00 `left_subclavian_artery_origin` · 1.00 `left_subclavian_artery_end` | (2.5, 141.0, -0.4) / (4.1, 142.3, 0.2) / (6.1, 142.3, -0.1) |
+| `right_renal_artery` | 0.00 `right_renal_artery_origin` · 1.00 `right_renal_artery_hilar_end` | (-0.2, 111.5, 1.1) / (-1.1, 111.2, 0.8) / (-2.1, 110.9, 0.7) |
+| `left_renal_artery` | 0.00 `left_renal_artery_origin` · 0.08 `right_renal_artery_origin` (0.5 cm off) · 1.00 `left_renal_artery_hilar_end` | (1.3, 111.6, 1.7) / (1.9, 111.6, 1.3) / (2.5, 111.6, 1.0) |
+| `right_common_iliac_artery` | 0.00 `right_common_iliac_artery_origin` · 0.00 `left_common_iliac_artery_origin` · 0.00 `aortic_bifurcation` · 1.00 `right_external_iliac_artery_origin` · 1.00 `right_internal_iliac_artery_origin` · 1.00 `right_iliac_bifurcation` · 1.00 origin of `right_external_iliac_artery` · 1.00 origin of `right_internal_iliac_artery` | (-0.1, 101.6, 3.0) / (-1.2, 100.5, 2.7) / (-2.1, 99.3, 2.0) |
+| `left_common_iliac_artery` | 0.00 `right_common_iliac_artery_origin` · 0.00 `left_common_iliac_artery_origin` · 0.00 `aortic_bifurcation` · 1.00 `left_external_iliac_artery_origin` · 1.00 `left_internal_iliac_artery_origin` · 1.00 `left_iliac_bifurcation` · 1.00 origin of `left_external_iliac_artery` · 1.00 origin of `left_internal_iliac_artery` | (1.0, 101.8, 2.8) / (1.6, 100.6, 2.3) / (2.2, 99.4, 1.7) |
+| `right_external_iliac_artery` | 0.00 `right_external_iliac_artery_origin` · 0.00 `right_internal_iliac_artery_origin` · 0.00 `right_iliac_bifurcation` | (-4.0, 96.1, 0.2) / (-4.8, 93.7, 0.2) / (-5.3, 91.3, 1.1) |
+| `left_external_iliac_artery` | 0.00 `left_external_iliac_artery_origin` · 0.00 `left_internal_iliac_artery_origin` · 0.00 `left_iliac_bifurcation` | (4.0, 96.1, 0.2) / (4.8, 93.7, 0.2) / (5.3, 91.3, 1.1) |
+| `right_internal_iliac_artery` | 0.00 `right_external_iliac_artery_origin` · 0.00 `right_internal_iliac_artery_origin` · 0.00 `right_iliac_bifurcation` | (-3.3, 97.3, 0.6) / (-3.3, 96.2, 0.0) / (-3.3, 95.1, -0.5) |
+| `left_internal_iliac_artery` | 0.00 `left_external_iliac_artery_origin` · 0.00 `left_internal_iliac_artery_origin` · 0.00 `left_iliac_bifurcation` | (3.3, 97.3, 0.6) / (3.3, 96.2, 0.0) / (3.3, 95.1, -0.5) |
+
 **Landmarks** (`{"landmark": "aorta/<landmark>"}`)
 
 | landmark | name | at |
@@ -266,6 +296,26 @@ Coeliac trunk and its branches. System: Cardiovascular. Credit: `zanatomy`.
 | `proper_hepatic_artery_branch_2` | Branch 2 of the proper hepatic artery curve (unnamed in source) | `proper_hepatic_artery_branch_2_origin` | `proper_hepatic_artery` | 0.035 | 0.5 | (-9.5, 116.0, 5.3) → (-9.6, 116.5, 5.3) |
 | `gastroduodenal_artery` | Gastroduodenal artery | `gastroduodenal_artery_origin` | `common_hepatic_artery` | 0.079 | 4.0 | (-2.1, 114.7, 6.0) → (-2.9, 112.9, 8.8) |
 
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `coeliac_trunk` | 0.00 `coeliac_trunk_origin` · 1.00 `common_hepatic_artery_origin` · 1.00 `left_gastric_artery_origin` · 1.00 `splenic_artery_origin` · 1.00 `coeliac_trunk_division` · 1.00 origin of `common_hepatic_artery` · 1.00 origin of `left_gastric_artery` · 1.00 origin of `splenic_artery` | (1.0, 114.2, 2.0) / (1.0, 114.6, 2.5) / (0.9, 115.1, 2.9) |
+| `common_hepatic_artery` | 0.00 `common_hepatic_artery_origin` · 0.00 `left_gastric_artery_origin` · 0.00 `splenic_artery_origin` · 0.00 `coeliac_trunk_division` · 1.00 `proper_hepatic_artery_origin` · 1.00 `gastroduodenal_artery_origin` · 1.00 origin of `proper_hepatic_artery` · 1.00 origin of `gastroduodenal_artery` · 1.00 `common_hepatic_artery_division` | (0.2, 115.3, 4.1) / (-0.3, 114.8, 4.9) / (-1.2, 114.6, 5.5) |
+| `left_gastric_artery` | 0.00 `common_hepatic_artery_origin` · 0.00 `left_gastric_artery_origin` · 0.00 `splenic_artery_origin` · 0.00 `coeliac_trunk_division` · 0.65 `left_gastric_artery_branch_origin` · 0.65 origin of `left_gastric_artery_branch` · 1.00 `left_gastric_artery_end` | (0.9, 116.3, 3.8) / (1.5, 117.0, 4.1) / (1.8, 117.6, 4.8) |
+| `left_gastric_artery_branch` | 0.00 `left_gastric_artery_branch_origin` | (1.6, 117.5, 4.5) / (1.5, 117.6, 4.7) / (1.5, 117.7, 4.8) |
+| `splenic_artery` | 0.00 `common_hepatic_artery_origin` · 0.00 `left_gastric_artery_origin` · 0.00 `splenic_artery_origin` · 0.00 `coeliac_trunk_division` · 0.18 `portal-venous/inferior_mesenteric_vein_junction` (0.2 cm off) · 0.80 `splenic_artery_hilar_branch_1_origin` · 0.80 origin of `splenic_artery_hilar_branch_1` · 0.89 `spleen/splenic_hilum` (0.4 cm off) · 0.90 `splenic_artery_hilar_branch_5_origin` · 0.90 origin of `splenic_artery_hilar_branch_5` · 0.93 `splenic_artery_hilar_branch_6_origin` · 0.93 origin of `splenic_artery_hilar_branch_6` · 1.00 `splenic_artery_end` | (2.7, 114.7, 2.1) / (5.0, 115.2, 0.7) / (7.5, 115.8, 0.4) |
+| `splenic_artery_hilar_branch_1` | 0.00 `splenic_artery_hilar_branch_1_origin` · 0.50 `splenic_artery_hilar_branch_2_origin` · 0.50 origin of `splenic_artery_hilar_branch_2` · 0.74 `splenic_artery_hilar_branch_3_origin` (0.4 cm off) · 0.74 origin of `splenic_artery_hilar_branch_3` (0.4 cm off) · 0.76 `splenic_artery_hilar_branch_4_origin` · 0.76 origin of `splenic_artery_hilar_branch_4` | (8.1, 116.2, -0.2) / (8.3, 116.2, -0.5) / (8.5, 116.3, -0.9) |
+| `splenic_artery_hilar_branch_2` | 0.00 `splenic_artery_hilar_branch_2_origin` · 0.19 `splenic_artery_hilar_branch_4_origin` (0.3 cm off) · 0.40 `splenic_artery_hilar_branch_3_origin` | (8.2, 116.4, -0.8) / (8.0, 116.6, -1.1) / (8.0, 116.7, -1.4) |
+| `splenic_artery_hilar_branch_3` | 0.00 `splenic_artery_hilar_branch_3_origin` · 0.00 `splenic_artery_hilar_branch_4_origin` (0.5 cm off) | (8.2, 116.6, -1.2) / (8.2, 116.6, -1.4) / (8.4, 116.7, -1.6) |
+| `splenic_artery_hilar_branch_4` | 0.00 `splenic_artery_hilar_branch_2_origin` (0.4 cm off) · 0.00 `splenic_artery_hilar_branch_3_origin` (0.5 cm off) · 0.00 `splenic_artery_hilar_branch_4_origin` · 0.88 `spleen/spleen_centroid` (0.4 cm off) | (8.6, 116.3, -1.0) / (8.7, 116.3, -1.1) / (8.8, 116.4, -1.2) |
+| `splenic_artery_hilar_branch_5` | 0.00 `splenic_artery_hilar_branch_5_origin` · 0.00 `spleen/splenic_hilum` (0.4 cm off) · 0.15 `splenic_artery_hilar_branch_6_origin` (0.4 cm off) · 0.83 `spleen/spleen_centroid` (0.4 cm off) | (8.9, 115.9, -0.5) / (8.9, 116.1, -0.7) / (9.0, 116.2, -0.8) |
+| `splenic_artery_hilar_branch_6` | 0.00 `splenic_artery_hilar_branch_5_origin` (0.4 cm off) · 0.00 `splenic_artery_hilar_branch_6_origin` | (9.3, 115.5, -0.4) / (9.5, 115.3, -0.3) / (9.7, 115.2, -0.3) |
+| `proper_hepatic_artery` | 0.00 `proper_hepatic_artery_origin` · 0.00 `gastroduodenal_artery_origin` · 0.00 `common_hepatic_artery_division` · 0.57 `proper_hepatic_artery_branch_1_origin` · 0.57 origin of `proper_hepatic_artery_branch_1` · 0.81 `proper_hepatic_artery_branch_2_origin` · 0.81 origin of `proper_hepatic_artery_branch_2` · 1.00 `proper_hepatic_artery_end` | (-4.6, 116.5, 6.4) / (-6.9, 114.7, 7.1) / (-9.1, 115.5, 5.8) |
+| `proper_hepatic_artery_branch_1` | 0.00 `proper_hepatic_artery_branch_1_origin` | (-7.3, 114.8, 6.1) / (-7.4, 115.1, 5.9) / (-7.4, 115.5, 5.8) |
+| `proper_hepatic_artery_branch_2` | 0.00 `proper_hepatic_artery_branch_2_origin` | (-9.5, 116.1, 5.3) / (-9.5, 116.3, 5.3) / (-9.5, 116.4, 5.3) |
+| `gastroduodenal_artery` | 0.00 `proper_hepatic_artery_origin` · 0.00 `gastroduodenal_artery_origin` · 0.00 `common_hepatic_artery_division` · 1.00 `gastroduodenal_artery_end` | (-2.7, 114.4, 6.8) / (-3.1, 114.1, 7.6) / (-3.4, 113.4, 8.3) |
+
 **Landmarks** (`{"landmark": "coeliac-trunk/<landmark>"}`)
 
 | landmark | name | at |
@@ -332,6 +382,33 @@ Superior and inferior mesenteric arteries. System: Cardiovascular. Credit: `zana
 | `sigmoid_artery_5` | Sigmoid artery (curve 5 of the source's 'Sigmoid arteries') | `sigmoid_artery_5_origin` | `sigmoid_artery_2` | 0.07 | 2.5 | (5.3, 97.3, 2.0) → (4.5, 95.7, 2.0) |
 | `superior_rectal_artery` | Superior rectal artery (Z-Anatomy: superior anorectal artery) | `superior_rectal_artery_origin` | `inferior_mesenteric_artery` | 0.09 | 18.5 | (0.5, 97.5, 1.6) → (-1.7, 82.9, -4.5) |
 
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `superior_mesenteric_artery` | 0.00 `superior_mesenteric_artery_origin` · 0.14 `inferior_pancreaticoduodenal_artery_origin` · 0.14 origin of `inferior_pancreaticoduodenal_artery` · 0.21 `sma_branch_3_origin` · 0.21 `sma_branch_4_origin` · 0.21 origin of `sma_branch_3` · 0.21 origin of `sma_branch_4` · 0.24 `middle_colic_artery_origin` · 0.24 origin of `middle_colic_artery` · 0.35 `right_colic_artery_origin` (0.2 cm off) · 0.35 origin of `right_colic_artery` (0.2 cm off) · 0.42 origin of `ileocolic_artery` (0.5 cm off) · 0.44 `portal-venous/superior_mesenteric_vein_lower_end` (0.4 cm off) · 0.93 `sma_branch_2_origin` · 0.93 origin of `sma_branch_2` · 0.97 `sma_branch_1_origin` · 0.97 origin of `sma_branch_1` · 1.00 `superior_mesenteric_artery_end` | (-0.7, 108.8, 4.7) / (-0.8, 103.8, 4.1) / (-3.2, 99.5, 2.6) |
+| `sma_branch_1` | 0.00 `sma_branch_1_origin` | (-6.2, 100.0, 2.3) / (-6.6, 99.9, 2.3) / (-6.9, 99.8, 2.2) |
+| `sma_branch_2` | 0.00 `sma_branch_2_origin` | (-6.1, 99.5, 2.2) / (-6.3, 99.4, 2.3) / (-6.6, 99.4, 2.3) |
+| `sma_branch_3` | 0.00 `sma_branch_3_origin` · 0.00 `sma_branch_4_origin` | (-0.2, 110.2, 4.9) / (0.2, 110.8, 5.3) / (0.5, 111.5, 5.7) |
+| `sma_branch_4` | 0.00 `sma_branch_3_origin` · 0.00 `sma_branch_4_origin` · 0.40 `small-intestine/small_intestine_duodenal_end` (0.2 cm off) · 0.44 `sma_branch_6_origin` · 0.44 origin of `sma_branch_6` · 0.78 `sma_branch_5_origin` · 0.78 origin of `sma_branch_5` | (1.4, 109.0, 4.2) / (3.2, 108.3, 4.0) / (5.0, 107.8, 4.6) |
+| `sma_branch_5` | 0.00 `sma_branch_5_origin` | (5.3, 107.8, 4.4) / (5.5, 107.7, 4.1) / (5.5, 107.4, 4.0) |
+| `sma_branch_6` | 0.00 `sma_branch_6_origin` · 0.00 `small-intestine/small_intestine_duodenal_end` (0.3 cm off) · 0.66 `sma_branch_7_origin` · 0.66 origin of `sma_branch_7` | (3.7, 109.2, 4.5) / (4.7, 109.4, 4.9) / (5.6, 109.7, 4.8) |
+| `sma_branch_7` | 0.00 `sma_branch_7_origin` | (5.4, 109.4, 4.7) / (5.5, 109.4, 4.6) / (5.6, 109.3, 4.6) |
+| `inferior_pancreaticoduodenal_artery` | 0.00 `inferior_pancreaticoduodenal_artery_origin` | (-0.3, 110.6, 3.9) / (-0.3, 110.6, 4.1) / (-0.5, 110.7, 4.4) |
+| `ileocolic_artery` | 0.00 `ileocolic_artery_origin` | (-1.3, 104.9, 4.1) / (-1.8, 104.3, 3.8) / (-2.4, 103.7, 3.5) |
+| `right_colic_artery` | 0.00 `right_colic_artery_origin` · 0.35 `right_colic_artery_branch_origin` · 0.35 origin of `right_colic_artery_branch` | (-2.9, 106.2, 4.4) / (-4.9, 106.2, 3.3) / (-6.7, 107.1, 2.2) |
+| `right_colic_artery_branch` | 0.00 `right_colic_artery_branch_origin` | (-4.4, 106.9, 3.9) / (-5.0, 107.6, 3.6) / (-5.5, 108.2, 3.1) |
+| `middle_colic_artery` | 0.00 `middle_colic_artery_origin` · 0.03 `sma_branch_3_origin` (0.5 cm off) · 0.03 `sma_branch_4_origin` (0.5 cm off) · 0.55 `middle_colic_artery_branch_origin` · 0.55 origin of `middle_colic_artery_branch` · 0.62 `duodenum/minor_duodenal_papilla` · 0.64 `pancreas/accessory_pancreatic_duct_duodenal_end` (0.4 cm off) | (-2.4, 110.4, 4.6) / (-4.3, 111.0, 3.4) / (-6.3, 111.0, 2.4) |
+| `middle_colic_artery_branch` | 0.00 `middle_colic_artery_branch_origin` · 0.61 `pancreas/pancreatic_duct_papillary_end` (0.5 cm off) | (-5.1, 110.5, 3.1) / (-5.4, 109.8, 3.1) / (-5.5, 109.0, 3.1) |
+| `inferior_mesenteric_artery` | 0.00 `inferior_mesenteric_artery_origin` · 0.17 `left_colic_artery_origin` · 0.17 origin of `left_colic_artery` · 1.00 `sigmoid_artery_1_origin` · 1.00 `superior_rectal_artery_origin` · 1.00 `inferior_mesenteric_artery_end` · 1.00 origin of `sigmoid_artery_1` · 1.00 origin of `superior_rectal_artery` | (1.6, 104.1, 3.6) / (1.5, 101.7, 3.2) / (0.9, 99.5, 2.8) |
+| `left_colic_artery` | 0.00 `left_colic_artery_origin` | (1.9, 104.8, 3.7) / (2.3, 104.9, 3.5) / (2.7, 105.1, 3.2) |
+| `sigmoid_artery_1` | 0.00 `sigmoid_artery_1_origin` · 0.00 `superior_rectal_artery_origin` · 0.00 `inferior_mesenteric_artery_end` · 0.85 `sigmoid_artery_2_origin` · 0.85 origin of `sigmoid_artery_2` | (3.0, 95.3, 1.7) / (4.0, 97.2, 2.0) / (2.7, 100.2, 2.5) |
+| `sigmoid_artery_2` | 0.00 `sigmoid_artery_2_origin` · 0.33 `sigmoid_artery_4_origin` · 0.33 origin of `sigmoid_artery_4` · 0.50 `sigmoid_artery_3_origin` · 0.50 origin of `sigmoid_artery_3` · 0.84 `sigmoid_artery_5_origin` · 0.84 origin of `sigmoid_artery_5` | (4.1, 100.2, 2.3) / (5.8, 99.1, 1.9) / (6.1, 97.3, 1.9) |
+| `sigmoid_artery_3` | 0.00 `sigmoid_artery_3_origin` | (6.6, 99.0, 1.7) / (7.0, 99.6, 1.5) / (6.9, 100.3, 1.5) |
+| `sigmoid_artery_4` | 0.00 `sigmoid_artery_4_origin` | (6.2, 100.6, 1.9) / (5.0, 102.1, 2.0) / (3.3, 102.9, 2.7) |
+| `sigmoid_artery_5` | 0.00 `sigmoid_artery_5_origin` | (5.7, 96.8, 2.0) / (5.6, 96.2, 2.1) / (5.1, 95.8, 2.1) |
+| `superior_rectal_artery` | 0.00 `sigmoid_artery_1_origin` · 0.00 `superior_rectal_artery_origin` · 0.00 `inferior_mesenteric_artery_end` | (-1.0, 94.0, -0.5) / (-2.0, 90.1, -2.3) / (-2.0, 87.3, -5.3) |
+
 **Landmarks** (`{"landmark": "mesenteric-arteries/<landmark>"}`)
 
 | landmark | name | at |
@@ -396,6 +473,26 @@ Venae cavae and their major tributaries. System: Cardiovascular. Credit: `zanato
 | `left_internal_iliac_vein` | Left internal iliac vein | `left_internal_iliac_vein_junction` | `left_common_iliac_vein` | 0.415 | 4.9 | (1.8, 98.1, 1.2) → (2.6, 94.2, -1.3) |
 | `right_internal_iliac_vein` | Right internal iliac vein | `right_internal_iliac_vein_junction` | `right_common_iliac_vein` | 0.415 | 4.9 | (-1.8, 98.1, 1.2) → (-2.6, 94.2, -1.3) |
 
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `inferior_vena_cava_abdominal` | 0.00 `ivc_origin` · 0.00 `left_common_iliac_vein_junction` · 0.00 `right_common_iliac_vein_junction` · 0.00 origin of `left_common_iliac_vein` · 0.00 origin of `right_common_iliac_vein` · 0.51 origin of `right_renal_vein` (0.6 cm off) · 0.51 `left_renal_vein_junction` · 0.51 origin of `left_renal_vein` · 1.00 `inferior_vena_cava_thoracic_start` · 1.00 origin of `inferior_vena_cava_thoracic` | (-1.0, 106.7, 2.6) / (-1.0, 110.2, 2.5) / (-1.0, 113.7, 2.1) |
+| `inferior_vena_cava_thoracic` | 0.00 `inferior_vena_cava_thoracic_start` · 0.79 `hepatic_vein_1_junction` · 0.79 `hepatic_vein_2_junction` · 0.79 origin of `hepatic_vein_1` · 0.79 origin of `hepatic_vein_2` · 1.00 `ivc_upper_end` | (-1.0, 119.5, 1.0) / (-1.0, 121.8, 0.9) / (-1.4, 124.1, 1.4) |
+| `superior_vena_cava` | 0.00 `svc_formation` · 0.00 `left_brachiocephalic_vein_junction` · 0.00 `right_brachiocephalic_vein_junction` · 0.00 origin of `left_brachiocephalic_vein` · 0.00 origin of `right_brachiocephalic_vein` · 1.00 `svc_lower_end` | (-1.5, 136.6, 2.1) / (-1.5, 135.8, 2.0) / (-1.6, 134.9, 1.9) |
+| `left_brachiocephalic_vein` | 0.00 `svc_formation` · 0.00 `left_brachiocephalic_vein_junction` · 0.00 `right_brachiocephalic_vein_junction` | (-0.6, 138.5, 2.7) / (0.5, 139.3, 2.8) / (1.6, 140.2, 2.5) |
+| `right_brachiocephalic_vein` | 0.00 `svc_formation` · 0.00 `left_brachiocephalic_vein_junction` · 0.00 `right_brachiocephalic_vein_junction` | (-1.7, 138.4, 2.2) / (-2.0, 139.3, 1.9) / (-2.3, 140.2, 1.9) |
+| `hepatic_vein_1` | 0.00 `hepatic_vein_1_junction` · 0.00 `hepatic_vein_2_junction` | (-1.1, 124.3, 1.7) / (-0.7, 124.2, 2.0) / (-0.4, 124.0, 2.2) |
+| `hepatic_vein_2` | 0.00 `hepatic_vein_1_junction` · 0.00 `hepatic_vein_2_junction` | (-1.6, 124.2, 2.0) / (-1.6, 124.0, 2.6) / (-1.7, 123.8, 3.1) |
+| `left_renal_vein` | 0.00 `left_renal_vein_junction` · 0.19 `mesenteric-arteries/inferior_pancreaticoduodenal_artery_origin` (0.5 cm off) | (0.3, 110.6, 3.2) / (1.7, 110.8, 2.7) / (2.3, 110.9, 1.4) |
+| `right_renal_vein` | 0.00 `right_renal_vein_junction` · 0.94 `kidneys/right_renal_hilum` (0.5 cm off) | (-1.8, 110.1, 1.5) / (-2.2, 110.0, 1.0) / (-2.5, 109.9, 0.4) |
+| `left_common_iliac_vein` | 0.00 `ivc_origin` · 0.00 `left_common_iliac_vein_junction` · 0.00 `right_common_iliac_vein_junction` · 1.00 `left_external_iliac_vein_junction` · 1.00 `left_internal_iliac_vein_junction` · 1.00 origin of `left_external_iliac_vein` · 1.00 origin of `left_internal_iliac_vein` | (-0.3, 101.8, 2.6) / (0.5, 100.5, 2.3) / (1.2, 99.3, 1.9) |
+| `right_common_iliac_vein` | 0.00 `ivc_origin` · 0.00 `left_common_iliac_vein_junction` · 0.00 `right_common_iliac_vein_junction` · 1.00 `right_external_iliac_vein_junction` · 1.00 `right_internal_iliac_vein_junction` · 1.00 origin of `right_external_iliac_vein` · 1.00 origin of `right_internal_iliac_vein` | (-1.0, 101.8, 2.3) / (-1.3, 100.6, 2.0) / (-1.5, 99.3, 1.6) |
+| `left_external_iliac_vein` | 0.00 `left_external_iliac_vein_junction` · 0.00 `left_internal_iliac_vein_junction` | (2.9, 95.6, 0.5) / (3.9, 92.9, 0.7) / (4.4, 90.7, 2.4) |
+| `right_external_iliac_vein` | 0.00 `right_external_iliac_vein_junction` · 0.00 `right_internal_iliac_vein_junction` | (-2.9, 95.6, 0.5) / (-3.9, 92.9, 0.7) / (-4.4, 90.7, 2.4) |
+| `left_internal_iliac_vein` | 0.00 `left_external_iliac_vein_junction` · 0.00 `left_internal_iliac_vein_junction` | (2.3, 97.2, 0.5) / (2.6, 96.4, -0.3) / (2.6, 95.3, -0.8) |
+| `right_internal_iliac_vein` | 0.00 `right_external_iliac_vein_junction` · 0.00 `right_internal_iliac_vein_junction` | (-2.3, 97.2, 0.5) / (-2.6, 96.4, -0.3) / (-2.6, 95.3, -0.8) |
+
 **Landmarks** (`{"landmark": "venae-cavae/<landmark>"}`)
 
 | landmark | name | at |
@@ -436,8 +533,8 @@ Hepatic portal vein and its tributaries. System: Cardiovascular. Credit: `zanato
 | line | name | from (t 0) | parent | radius cm | length cm | t 0 → t 1 |
 |---|---|---|---|---|---|---|
 | `portal_vein` | Hepatic portal vein | `portal_confluence` | — | 0.275 | 5.1 | (-0.4, 114.8, 3.1) → (-0.7, 119.9, 3.1) |
-| `splenic_vein` | Splenic vein | `portal_confluence` | — | 0.145 | 12.2 | (-0.4, 114.8, 3.1) → (10.0, 115.6, 0.3) |
-| `superior_mesenteric_vein` | Superior mesenteric vein | `portal_confluence` | — | 0.173 | 29.3 | (-0.4, 114.8, 3.1) → (-1.2, 105.0, 4.8) |
+| `splenic_vein` | Splenic vein | `portal_confluence` | `portal_vein` | 0.145 | 12.2 | (-0.4, 114.8, 3.1) → (10.0, 115.6, 0.3) |
+| `superior_mesenteric_vein` | Superior mesenteric vein | `portal_confluence` | `portal_vein` | 0.173 | 29.3 | (-0.4, 114.8, 3.1) → (-1.2, 105.0, 4.8) |
 | `inferior_mesenteric_vein` | Inferior mesenteric vein | `inferior_mesenteric_vein_junction` | `splenic_vein` | 0.149 | 18.5 | (2.5, 114.7, 2.8) → (0.5, 97.4, 1.5) |
 | `splenic_vein_hilar_tributary_1` | Hilar tributary 1 of the splenic vein (unnamed in source) | `splenic_vein_hilar_tributary_1_junction` | `splenic_vein` | 0.065 | 1.8 | (8.1, 116.1, 1.1) → (8.8, 116.5, -0.3) |
 | `splenic_vein_hilar_tributary_2` | Hilar tributary 2 of the splenic vein (unnamed in source) | `splenic_vein_hilar_tributary_2_junction` | `splenic_vein` | 0.062 | 1.7 | (8.4, 116.3, 0.6) → (8.4, 116.9, -0.9) |
@@ -445,6 +542,21 @@ Hepatic portal vein and its tributaries. System: Cardiovascular. Credit: `zanato
 | `splenic_vein_hilar_tributary_4` | Hilar tributary 4 of the splenic vein (unnamed in source) | `splenic_vein_hilar_tributary_4_junction` | `splenic_vein_hilar_tributary_1` | 0.046 | 0.6 | (8.8, 116.4, 0.1) → (9.2, 116.4, -0.3) |
 | `splenic_vein_hilar_tributary_5` | Hilar tributary 5 of the splenic vein (unnamed in source) | `splenic_vein_hilar_tributary_5_junction` | `splenic_vein` | 0.053 | 1.0 | (9.4, 115.7, 0.6) → (10.0, 115.0, 0.8) |
 | `splenic_vein_hilar_tributary_6` | Hilar tributary 6 of the splenic vein (unnamed in source) | `splenic_vein_hilar_tributary_6_junction` | `splenic_vein` | 0.057 | 1.0 | (9.1, 115.9, 0.7) → (9.4, 116.4, 0.1) |
+
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `portal_vein` | 0.00 `portal_confluence` · 0.00 origin of `splenic_vein` · 0.00 origin of `superior_mesenteric_vein` · 1.00 `portal_vein_upper_end` | (-0.6, 116.1, 3.0) / (-0.7, 117.3, 3.1) / (-0.7, 118.6, 3.1) |
+| `splenic_vein` | 0.00 `portal_confluence` · 0.27 `inferior_mesenteric_vein_junction` · 0.27 origin of `inferior_mesenteric_vein` · 0.82 `splenic_vein_hilar_tributary_1_junction` · 0.82 origin of `splenic_vein_hilar_tributary_1` · 0.86 `splenic_vein_hilar_tributary_2_junction` (0.5 cm off) · 0.86 origin of `splenic_vein_hilar_tributary_2` (0.5 cm off) · 0.91 `splenic_vein_hilar_tributary_6_junction` · 0.91 origin of `splenic_vein_hilar_tributary_6` · 0.95 `splenic_vein_hilar_tributary_5_junction` · 0.95 origin of `splenic_vein_hilar_tributary_5` · 1.00 `splenic_vein_hilar_end` | (2.3, 114.7, 3.0) / (4.8, 115.2, 1.3) / (7.3, 115.9, 1.1) |
+| `superior_mesenteric_vein` | 0.00 `portal_confluence` · 0.19 `mesenteric-arteries/sma_branch_3_origin` (0.4 cm off) · 0.19 `mesenteric-arteries/sma_branch_4_origin` (0.4 cm off) · 0.30 `mesenteric-arteries/right_colic_artery_origin` (0.5 cm off) · 0.72 `mesenteric-arteries/sma_branch_2_origin` (0.3 cm off) · 0.74 `mesenteric-arteries/sma_branch_1_origin` (0.2 cm off) · 0.76 `mesenteric-arteries/superior_mesenteric_artery_end` (0.2 cm off) · 1.00 `superior_mesenteric_vein_lower_end` | (-1.2, 108.3, 5.1) / (-2.0, 101.6, 3.1) / (-6.0, 100.5, 2.3) |
+| `inferior_mesenteric_vein` | 0.00 `inferior_mesenteric_vein_junction` · 0.99 `mesenteric-arteries/sigmoid_artery_1_origin` (0.1 cm off) · 0.99 `mesenteric-arteries/superior_rectal_artery_origin` (0.1 cm off) · 0.99 `mesenteric-arteries/inferior_mesenteric_artery_end` (0.1 cm off) | (3.2, 110.4, 2.3) / (2.4, 105.9, 3.2) / (1.7, 101.4, 3.2) |
+| `splenic_vein_hilar_tributary_1` | 0.00 `splenic_vein_hilar_tributary_1_junction` · 0.40 `splenic_vein_hilar_tributary_2_junction` · 0.70 `splenic_vein_hilar_tributary_3_junction` (0.4 cm off) · 0.70 origin of `splenic_vein_hilar_tributary_3` (0.4 cm off) · 0.78 `splenic_vein_hilar_tributary_4_junction` · 0.78 origin of `splenic_vein_hilar_tributary_4` | (8.3, 116.3, 0.9) / (8.5, 116.3, 0.5) / (8.8, 116.4, 0.1) |
+| `splenic_vein_hilar_tributary_2` | 0.00 `splenic_vein_hilar_tributary_2_junction` · 0.31 `splenic_vein_hilar_tributary_4_junction` (0.4 cm off) · 0.42 `splenic_vein_hilar_tributary_3_junction` · 0.93 `coeliac-trunk/splenic_artery_hilar_branch_3_origin` (0.5 cm off) | (8.4, 116.5, 0.3) / (8.3, 116.6, -0.1) / (8.3, 116.8, -0.5) |
+| `splenic_vein_hilar_tributary_3` | 0.00 `splenic_vein_hilar_tributary_3_junction` · 0.06 `splenic_vein_hilar_tributary_4_junction` (0.5 cm off) | (8.5, 116.6, -0.2) / (8.6, 116.7, -0.5) / (8.7, 116.8, -0.6) |
+| `splenic_vein_hilar_tributary_4` | 0.00 `splenic_vein_hilar_tributary_3_junction` (0.5 cm off) · 0.00 `splenic_vein_hilar_tributary_4_junction` | (8.9, 116.4, 0.0) / (9.0, 116.4, -0.1) / (9.1, 116.4, -0.2) |
+| `splenic_vein_hilar_tributary_5` | 0.00 `splenic_vein_hilar_tributary_5_junction` · 0.00 `splenic_vein_hilar_tributary_6_junction` (0.4 cm off) | (9.5, 115.6, 0.8) / (9.7, 115.4, 0.8) / (9.8, 115.2, 0.8) |
+| `splenic_vein_hilar_tributary_6` | 0.00 `splenic_vein_hilar_tributary_6_junction` · 0.08 `splenic_vein_hilar_tributary_5_junction` (0.4 cm off) | (9.2, 116.0, 0.7) / (9.2, 116.1, 0.4) / (9.3, 116.2, 0.3) |
 
 **Landmarks** (`{"landmark": "portal-venous/<landmark>"}`)
 
@@ -527,7 +639,13 @@ Gallbladder and bile duct. System: Hepatobiliary. Credit: `zanatomy`.
 
 | line | name | from (t 0) | parent | radius cm | length cm | t 0 → t 1 |
 |---|---|---|---|---|---|---|
-| `bile_duct` | Bile duct (common bile duct) | `bile_duct_upper_end` | — | 0.104 | 10.6 | (-3.0, 115.7, 3.9) → (-5.8, 109.0, 2.9) |
+| `bile_duct` | Bile duct (common bile duct) | `bile_duct_upper_end` | — | 0.104 | 10.6 | (-3.0, 115.7, 3.9) → (-4.8, 109.4, 0.8) |
+
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `bile_duct` | 0.00 `bile_duct_upper_end` · 0.01 `gallbladder_neck` (0.1 cm off) · 0.99 `duodenum/major_duodenal_papilla` (0.1 cm off) · 1.00 `bile_duct_lower_end` | (-1.4, 114.9, 3.9) / (-1.7, 112.6, 3.0) / (-3.7, 111.0, 2.4) |
 
 **Landmarks** (`{"landmark": "gallbladder/<landmark>"}`)
 
@@ -537,7 +655,7 @@ Gallbladder and bile duct. System: Hepatobiliary. Credit: `zanatomy`.
 | `gallbladder_neck` | Gallbladder neck (gallbladder surface point nearest the upper end of the bile duct) | (-3.0, 115.8, 4.0) |
 | `gallbladder_fundus` | Gallbladder fundus (gallbladder surface point farthest from the neck) | (-5.5, 111.7, 7.6) |
 | `gallbladder_centroid` | Gallbladder centroid | (-4.9, 113.3, 5.7) |
-| `bile_duct_lower_end` | Lower (duodenal) end of the bile duct curve | (-5.8, 109.0, 2.9) |
+| `bile_duct_lower_end` | Lower (duodenal) end of the bile duct curve | (-4.8, 109.4, 0.8) |
 
 ## pancreas
 
@@ -557,6 +675,13 @@ Pancreas and pancreatic ducts. System: Gastrointestinal. Credit: `zanatomy`.
 |---|---|---|---|---|---|---|
 | `main_pancreatic_duct` | Main pancreatic duct (tail to papilla) | `pancreatic_duct_tail_end` | — | 0.043 | 15.8 | (6.6, 114.6, 0.3) → (-5.3, 109.4, 3.5) |
 | `accessory_pancreatic_duct` | Accessory pancreatic duct (duodenal end first; in the source it does not reach the main duct, nearest gap 1.8 cm) | `accessory_pancreatic_duct_duodenal_end` | — | 0.056 | 5.1 | (-5.2, 111.4, 2.5) → (-1.8, 110.2, 4.7) |
+
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `main_pancreatic_duct` | 0.00 `pancreatic_duct_tail_end` · 1.00 `pancreatic_duct_papillary_end` | (3.3, 113.4, 1.6) / (0.4, 112.3, 4.0) / (-3.0, 110.9, 3.1) |
+| `accessory_pancreatic_duct` | 0.00 `accessory_pancreatic_duct_duodenal_end` · 0.01 `duodenum/minor_duodenal_papilla` (0.3 cm off) | (-4.0, 111.1, 2.7) / (-2.9, 110.8, 3.1) / (-2.2, 111.0, 4.2) |
 
 **Landmarks** (`{"landmark": "pancreas/<landmark>"}`)
 
@@ -583,6 +708,12 @@ Oesophagus. System: Gastrointestinal. Credit: `zanatomy`.
 | line | name | from (t 0) | parent | radius cm | length cm | t 0 → t 1 |
 |---|---|---|---|---|---|---|
 | `oesophagus` | Oesophagus | `oesophagus_upper_end` | — | 0.754 | 29.1 | (0.0, 147.5, 0.3) → (1.3, 119.9, 1.5) |
+
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `oesophagus` | 0.00 `oesophagus_upper_end` · 0.05 `airways/trachea_upper_end` (0.5 cm off) · 1.00 `stomach/cardia` (0.4 cm off) · 1.00 `oesophagus_lower_end` | (0.1, 140.4, -1.4) / (0.1, 133.3, -3.0) / (0.1, 126.2, -1.5) |
 
 **Landmarks** (`{"landmark": "oesophagus/<landmark>"}`)
 
@@ -625,7 +756,7 @@ Duodenum. System: Gastrointestinal. Credit: `zanatomy`.
 | landmark | name | at |
 |---|---|---|
 | `minor_duodenal_papilla` | Minor duodenal papilla (duodenal surface point nearest the duodenal end of the accessory pancreatic duct) | (-5.2, 111.3, 2.8) |
-| `major_duodenal_papilla` | Major duodenal papilla (duodenal surface point nearest the lower end of the bile duct) | (-5.8, 108.6, 2.7) |
+| `major_duodenal_papilla` | Major duodenal papilla (duodenal surface point nearest the lower end of the bile duct) | (-4.7, 109.3, 0.8) |
 | `duodenojejunal_flexure` | Duodenojejunal flexure (duodenal surface point nearest the duodenal end of the small-intestine curve) | (2.6, 108.3, 3.7) |
 
 ## small-intestine
@@ -643,6 +774,12 @@ Small intestine (jejunum and ileum). System: Gastrointestinal. Credit: `zanatomy
 | line | name | from (t 0) | parent | radius cm | length cm | t 0 → t 1 |
 |---|---|---|---|---|---|---|
 | `small_intestine` | Small intestine, duodenojejunal end to ileal end (Z-Anatomy 'Jejunum' curve) | `small_intestine_duodenal_end` | — | 0.823 | 190.8 | (2.5, 108.6, 4.0) → (-8.0, 96.5, 2.5) |
+
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `small_intestine` | 0.00 `mesenteric-arteries/sma_branch_6_origin` (0.3 cm off) · 0.00 `small_intestine_duodenal_end` · 0.00 `duodenum/duodenojejunal_flexure` (0.3 cm off) · 1.00 `terminal_ileum_end` | (6.5, 100.0, 5.7) / (-6.5, 98.9, 3.8) / (-5.1, 95.0, 5.1) |
 
 **Landmarks** (`{"landmark": "small-intestine/<landmark>"}`)
 
@@ -744,6 +881,20 @@ Trachea and bronchi. System: Respiratory. Credit: `zanatomy`.
 | `lingular_bronchus` | Second branch of the left superior lobar bronchus curve (towards the lingula; unnamed in source) | `lingular_bronchus_origin` | `left_superior_lobar_bronchus` | 0.387 | 3.5 | (6.1, 133.0, -1.6) → (8.4, 131.3, 0.3) |
 | `left_inferior_lobar_bronchus` | Left inferior lobar bronchus | `left_inferior_lobar_bronchus_origin` | `left_main_bronchus` | 0.543 | 5.0 | (4.4, 132.1, -2.1) → (7.6, 128.5, -1.7) |
 
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `right_main_bronchus` | 0.00 `carina` · 0.98 `right_superior_lobar_bronchus_origin` · 0.98 `intermediate_bronchus_start` · 0.98 origin of `right_superior_lobar_bronchus` · 0.98 origin of `intermediate_bronchus` | (-0.4, 136.5, -1.3) / (-0.7, 135.9, -1.4) / (-1.1, 135.4, -1.6) |
+| `left_main_bronchus` | 0.00 `carina` · 1.00 `left_superior_lobar_bronchus_origin` · 1.00 `left_inferior_lobar_bronchus_origin` · 1.00 origin of `left_superior_lobar_bronchus` · 1.00 origin of `left_inferior_lobar_bronchus` | (0.9, 135.7, -1.4) / (1.9, 134.4, -1.7) / (3.1, 133.2, -1.9) |
+| `right_superior_lobar_bronchus` | 0.00 `right_superior_lobar_bronchus_origin` · 0.00 `intermediate_bronchus_start` | (-1.8, 135.0, -1.7) / (-2.2, 135.0, -1.6) / (-2.6, 135.1, -1.6) |
+| `intermediate_bronchus` | 0.00 `right_superior_lobar_bronchus_origin` · 0.00 `intermediate_bronchus_start` · 0.99 `right_middle_lobar_bronchus_origin` · 0.99 `right_inferior_lobar_bronchus_origin` · 0.99 origin of `right_middle_lobar_bronchus` · 0.99 origin of `right_inferior_lobar_bronchus` | (-1.8, 134.1, -1.8) / (-2.2, 133.3, -1.9) / (-2.7, 132.5, -2.0) |
+| `right_middle_lobar_bronchus` | 0.00 `right_middle_lobar_bronchus_origin` · 0.00 `right_inferior_lobar_bronchus_origin` | (-3.5, 131.4, -1.5) / (-3.8, 131.0, -1.0) / (-4.1, 130.6, -0.4) |
+| `right_inferior_lobar_bronchus` | 0.00 `right_middle_lobar_bronchus_origin` · 0.00 `right_inferior_lobar_bronchus_origin` | (-4.1, 130.3, -2.4) / (-4.6, 128.6, -2.8) / (-5.0, 127.1, -3.6) |
+| `left_superior_lobar_bronchus` | 0.00 `left_superior_lobar_bronchus_origin` · 0.00 `left_inferior_lobar_bronchus_origin` · 0.56 `lingular_bronchus_origin` · 0.56 origin of `lingular_bronchus` | (5.2, 132.5, -1.9) / (5.9, 132.9, -1.6) / (6.4, 133.6, -1.4) |
+| `lingular_bronchus` | 0.00 `lingular_bronchus_origin` | (6.7, 132.7, -1.1) / (7.3, 132.4, -0.6) / (7.9, 131.9, -0.2) |
+| `left_inferior_lobar_bronchus` | 0.00 `left_superior_lobar_bronchus_origin` · 0.00 `left_inferior_lobar_bronchus_origin` | (5.4, 131.4, -2.1) / (6.3, 130.6, -2.0) / (6.9, 129.5, -1.9) |
+
 **Landmarks** (`{"landmark": "airways/<landmark>"}`)
 
 | landmark | name | at |
@@ -835,6 +986,12 @@ Urinary bladder and urethra. System: Urinary. Credit: `zanatomy`.
 |---|---|---|---|---|---|---|
 | `urethra` | Urethra (male; bladder neck to external orifice) | `urethra_internal_end` | — | 0.123 | 16.4 | (0.0, 83.1, -1.6) → (0.0, 74.5, 8.7) |
 
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `urethra` | 0.00 `urethra_internal_end` · 0.00 `bladder_neck` (0.1 cm off) · 0.05 `male-reproductive/prostate_centroid` · 1.00 `external_urethral_orifice` | (0.0, 80.8, 1.0) / (0.0, 81.2, 5.1) / (0.0, 78.5, 7.9) |
+
 **Landmarks** (`{"landmark": "bladder/<landmark>"}`)
 
 | landmark | name | at |
@@ -868,6 +1025,15 @@ Male reproductive organs. System: Reproductive. Credit: `zanatomy`.
 | `right_ductus_deferens` | Right ductus deferens (source curve, end to end) | — | — | 0.15 | 29.7 | (-3.2, 85.9, -3.2) → (-2.2, 75.1, 5.2) |
 | `left_ejaculatory_duct` | Left ejaculatory duct | — | — | 0.08 | 2.4 | (0.0, 82.4, -1.8) → (0.8, 83.8, -3.6) |
 | `right_ejaculatory_duct` | Right ejaculatory duct | — | — | 0.08 | 2.4 | (0.0, 82.4, -1.8) → (-0.8, 83.8, -3.6) |
+
+**Along each line** (t of the landmarks within 0.5 cm of it and of its branches' origins; points at t 0.25, 0.5, 0.75)
+
+| line | at t | t 0.25 / 0.5 / 0.75 |
+|---|---|---|
+| `left_ductus_deferens` | — | (4.2, 89.0, 2.6) / (2.9, 85.6, 5.5) / (1.9, 78.6, 4.6) |
+| `right_ductus_deferens` | — | (-4.2, 89.0, 2.6) / (-2.9, 85.6, 5.5) / (-1.9, 78.6, 4.6) |
+| `left_ejaculatory_duct` | 0.00 `prostate_centroid` (0.3 cm off) | (0.3, 82.8, -2.2) / (0.5, 83.1, -2.6) / (0.6, 83.5, -3.1) |
+| `right_ejaculatory_duct` | 0.00 `prostate_centroid` (0.3 cm off) | (-0.3, 82.8, -2.2) / (-0.5, 83.1, -2.6) / (-0.6, 83.5, -3.1) |
 
 **Landmarks** (`{"landmark": "male-reproductive/<landmark>"}`)
 

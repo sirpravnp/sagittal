@@ -7,6 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { buildFigure, slug } from '../player/make-figure.mjs';
+import { loadClassic } from './helpers/loadClassic.mjs';
 
 const ROOT = process.cwd();
 const TOOL = path.join(ROOT, 'player/make-figure.mjs');
@@ -125,4 +126,20 @@ test('text that could close a script is escaped in the inlined spec', () => {
   assert.equal(JSON.parse(m[1]).title, s.title);
   assert.ok(!b.html.includes('</script><script>alert'));
   assert.ok(b.html.includes('<title>Low cystic duct &lt;/script&gt;'));
+});
+
+test('a figure with the 12 largest organs still fits in 3 MB', () => {
+  const O = JSON.parse(JSON.stringify(loadClassic('organs/organs.js').SagittalOrgans));
+  const size = (id) => statSync(`organs/meshes/${O.manifests[id].mesh}.js`).size;
+  const ids = Object.keys(O.manifests).sort((a, b) => size(b) - size(a)).slice(0, 12);
+  const s = { schema: 'sagittal-figure/1', title: 'Largest figure', organs: ids.map((id) => ({ id })),
+    variant: { label: 'v', edits: [{ op: 'branch', id: 'x', name: 'x', tissue: 'vessel-artery', radius_cm: 0.2,
+      from: { on: 'aorta/abdominal_aorta', t: 0.5 }, to: { landmark: 'aorta/aortic_bifurcation', offset: { dir: 'right', cm: 2 } } }] },
+    claims: [{ text: 'x', refs: [Object.keys(O.references)[0]] }] };
+  const b = buildFigure(s);
+  assert.ok(b.ok, JSON.stringify(b.errors));
+  assert.equal(b.meshes.length, 12);
+  const bytes = Buffer.byteLength(b.html);
+  assert.ok(bytes <= 3 * 1024 * 1024, `largest figure is ${bytes} bytes`);
+  console.log('largest figure:', bytes, 'bytes');
 });

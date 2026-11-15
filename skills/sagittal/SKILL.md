@@ -12,7 +12,7 @@ labels with leader lines, claims with references, and Save as image.
 **The rule that decides everything: a plausible but wrong picture is worse than none.** The
 student memorises what they see. You never draw anatomy from memory and never give coordinates:
 every point is a library landmark, a point along a library centre line, or one of those moved by a
-short offset (at most 3 cm). Every fact you show cites a reference from the fixed list.
+short offset along a body axis. Every fact you show cites a reference from the fixed list.
 
 ## Setup (once)
 
@@ -70,18 +70,23 @@ The same if no listed reference supports the variant: say that no reference in t
 
 ### 4. Place everything through landmarks and centre lines
 
-- Start a branch `on` its parent line (`{"on": "<organ>/<line>", "t": ...}`, no offset). Pick `t`
-  from the line's length in organs.md: `t` is a fraction of length from the `from` end.
+- Start a branch `on` its parent line (`{"on": "<organ>/<line>", "t": ...}`, no offset). `t` is
+  the fraction of the line's length from its `from` end. Read it from the organ's **"Along each
+  line"** table in organs.md, which gives the `t` of every landmark on the line and of every
+  branch's origin: "distal to X" is a little beyond X's `t`, "next to X" just before or after it.
 - End a structure on its target: a landmark in the organ it supplies or drains, or `on` the line
   it joins. A duct starts on its organ (the cystic duct starts at `gallbladder/gallbladder_neck`,
   with no offset, never in mid-air).
 - Express relations as offsets from the structure they are relative to: "behind the portal vein"
   = `{"landmark": "portal-venous/portal_confluence", "offset": {"dir": "posterior", "cm": 1.2}}`.
-  Offsets are for 0.5 to 2 cm relations, not for reaching places far from any landmark.
+  The validator allows offsets up to 3 cm; use 0.5 to 2 cm for real relations (clearing a wall,
+  running alongside), never to reach a place far from any landmark.
 - Follow a library course by putting `via` points `on` that line at spaced `t` values (0.1 apart or
   more), not on its small wiggles.
 - Anything at the ampulla ends at `duodenum/major_duodenal_papilla`, not at the pancreatic duct's
   end (that end is about 2 cm from the bile duct).
+- Express the variation with the op patterns in patterns.md (new origin near or far, accessory,
+  insertion moved far, trunk not formed, course behind a structure).
 - Use the coordinates in organs.md to plan (which side is right, which way is posterior, how far
   apart two points are), never in the spec.
 
@@ -104,24 +109,26 @@ A valid spec can still be wrong anatomy. Render it:
 
 ```sh
 S look sagittal-figures/<slug>.html                 # the starting view
-S look sagittal-figures/<slug>.html --rot 0.2,2.6   # from behind, to check posterior relations
+S look sagittal-figures/<slug>.html --rot 0.2,2.6   # another side, for front/back relations
 ```
 
-It writes `<slug>-normal.png` and `<slug>-variant.png` next to the figure and prints the
-orientation chip text, each label's anchor, labels hidden behind another structure, and dropped
-labels. **Open both PNGs and look at them** (Read the image files). Check every item:
+It writes a normal and a variant PNG into `sagittal-figures/.check/` and prints their paths, the
+orientation chip text, and each label's anchor (stage pixels). **Read its whole output:** exit 1,
+"page error", "console", "BLANK", "HIDDEN" or "dropped labels" each mean something to fix. Then
+**open both PNGs it printed and look at them** (Read the image files). Check every item:
 
-1. **Origins visible.** Each new or moved vessel visibly leaves its parent (e.g. the replaced
-   artery's takeoff from the SMA, the ARSA from the distal arch past the left subclavian). If an
-   organ covers it, fade or hide that organ, or change the view.
+1. **Origins visible.** Each new or moved vessel visibly leaves its parent at the cited place.
+   If an organ covers it, fade or hide that organ, or change the view (patterns.md → Keeping an
+   origin visible).
 2. **Ducts attached.** The cystic duct leaves the gallbladder neck; every duct and vessel ends on
    the structure it joins or supplies, with no gap and no free-floating end.
 3. **No hairpins or loops.** Courses are smooth; no tube doubles back, corkscrews or kinks at a
    `via`. Move or drop the offending waypoint.
 4. **Relations as cited.** "Behind", "to the right of", "parallel to" are true in the picture
    (check from a second angle with `--rot` when the relation is front/back).
-5. **Labels on their own structure.** Every dot sits on the structure its text names; no two dots
-   piled together; nothing listed as HIDDEN or dropped unless you meant it.
+5. **Labels on their own structure.** Every dot sits on the structure its text names (not on the
+   parent at a junction); no two anchors within about 12 px of each other; nothing HIDDEN or
+   dropped unless you meant it.
 6. **Orientation read correctly.** Read the chip ("Right anterior oblique view · patient's right
    on screen left") and check that left/right in what you describe matches it. Choose `view.rot`
    so the variant reads at a glance (see patterns.md → Views).
@@ -135,9 +142,9 @@ library, tell the student what is missing (step 3) instead of showing it.
 
 Open the HTML for the student (`open <file>` on macOS, `xdg-open` on Linux; or build the final
 version with `S figure <spec> --open`) and reply with the file path
-and one line on what it shows, e.g. *"`sagittal-figures/replaced-right-hepatic-artery.html`: the
-right hepatic artery arises from the SMA and runs behind the portal vein to the right lobe; switch
-Normal/Variant in the dropdown."* Add a sentence on the clinical point only if it is in a claim.
+and one line on what it shows, e.g. *"`sagittal-figures/double-cystic-artery.html`: a second
+cystic artery leaves the right hepatic artery beside the first; switch Normal/Variant in the
+dropdown."* Add a sentence on the clinical point only if it is in a claim.
 Do not show the student the spec, the validator or the PNG checks unless they ask.
 
 ## Rules

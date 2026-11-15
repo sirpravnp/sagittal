@@ -5,7 +5,13 @@ as `~/.claude/skills/sagittal`, run in an empty working folder). The agent must 
 with no further help. Then the checker renders both views (`scripts/sagittal.mjs look`, plus a
 second angle where a front/back relation matters), looks at them and judges each against atlas
 anatomy and the criteria below. Record verdicts in `results.md` (prompt, figure path, PNGs,
-PASS/FAIL per criterion, notes). All five must pass before a release.
+PASS/FAIL per criterion, notes). All must pass before a release.
+
+Prompts 1-5 are **regression** prompts (the first variants built; `reference/` teaches the general
+patterns they use but solves none of them). Prompts 6-8 are **held out**: nothing in `reference/`
+(SKILL.md, spec.md, patterns.md) names or describes them, so they test whether the skill
+generalises. Keep it that way: when a held-out prompt's lesson goes into `reference/`, write it as
+a general pattern and add a new held-out prompt.
 
 Common criteria for every prompt (from SKILL.md step 6):
 
@@ -72,7 +78,37 @@ and proper hepatic arteries, which stay attached (moved onto the new artery). Th
 keeps the left gastric and splenic arteries. Cites a hepatic artery / coeliac trunk variation
 reference.
 
-## Extra (optional): request the library cannot support
+## 6. Replaced left hepatic artery from the left gastric artery (held out)
+
+> show me a replaced left hepatic artery coming from the left gastric
+
+Expect: normal view with proper hepatic dividing into right and left hepatic arteries; variant
+with the normal left hepatic artery removed and a left hepatic artery arising from the left
+gastric artery, running up to the left lobe (through the region of the fissure for the ligamentum
+venosum), the right hepatic staying on the proper hepatic (Michels II). Origin from the left
+gastric visible; called "replaced", not "accessory". Cites `jclinmedres-hepatic-artery-variations`.
+
+## 7. Bovine arch (held out)
+
+> What is a bovine aortic arch? Show me in 3D.
+
+Expect: normal view with three arch branches (brachiocephalic trunk, left common carotid, left
+subclavian); variant with the left common carotid arising from the brachiocephalic trunk (or a
+common origin with it), leaving two branches from the arch. The new origin visible from the front.
+Claims only what a listed reference supports (aortic arch / great vessels references); if no
+listed reference covers the bovine arch, the agent says so instead of citing one that does not.
+
+## 8. Hepatomesenteric trunk (held out)
+
+> Can you draw a hepatomesenteric trunk?
+
+Expect: normal view with the common hepatic artery from the coeliac trunk and the SMA from the
+aorta; variant with the common hepatic artery and the SMA arising together from one short trunk
+off the aorta (Michels IX), the coeliac trunk keeping the left gastric and splenic arteries; the
+proper hepatic and gastroduodenal arteries stay attached to the common hepatic. Shared origin
+visible. Cites `jclinmedres-hepatic-artery-variations`.
+
+## Refusal: request the library cannot support
 
 > Show me a retrocaval ureter.
 
