@@ -284,3 +284,7 @@ variant requests, all built by the skill from landmarks and passing our check. A
 
 - The GitHub account and repository name to publish under (needed for CDN URLs; publishing
   is confirmed with the user before it happens).
+
+## Next phase: claude.ai via MCP (user, 2026-11-15)
+
+claude.ai support comes through a hosted MCP server modelled on the user's CoroSim server (Fly.io, sleeps when idle): tools `list_organs`, `get_organ`, `render_figure` (MCP App view in chat), reusing the scene format, validator, player, figure UI and organ library unchanged. Not built in this phase.
