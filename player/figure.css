@@ -1,140 +1,157 @@
 /* Sagittal figure page (player/ui.js). Also the source of the design tokens that the site
-   (site/style.css, Task 9) copies verbatim: keep the :root blocks in step.
+   (site/style.css) copies verbatim: keep the :root blocks in step.
 
-   Identity: atlas plate + instrument panel. Cool graphite and near-white neutrals, one ink-blue
-   accent, a grotesk for text and a mono for small labels, hairline rules, square corners.
-   The page follows the theme (prefers-color-scheme, or [data-theme] on <html>); the 3D stage is
-   dark in both (#0f141b is the kit's clear colour, written to the canvas as-is).
-   No web fonts are loaded: IBM Plex is used when installed, else the system grotesk / mono. */
+   Identity: a plate from an old anatomy atlas, in Claude's colours. Warm cream paper, warm ink,
+   one clay accent, a book serif throughout (small caps for section heads, italic for captions
+   and labels), hairline ink rules, square corners, generous margins.
+   The 3D stage is a paper-toned plate in light mode and warm dark ("paper in lamplight") in dark
+   mode; ui.js reads --stage and sets the renderer's clear colour from it, so canvas and page
+   agree. The page follows prefers-color-scheme, or [data-theme] on <html>.
+   No web fonts are loaded here (figures must work offline): EB Garamond is used when present,
+   else Iowan Old Style / Palatino / Georgia. */
 
 :root{
   color-scheme:light;
-  /* page, light */
-  --bg:#f4f6f8;        /* page */
-  --surface:#ffffff;   /* inputs, raised panels */
-  --ink:#0d1117;       /* text, strong rules */
-  --ink-2:#333b46;     /* body copy */
-  --mut:#56606d;       /* secondary text, mono labels */
-  --rule:#d3d8df;      /* hairlines */
-  --acc:#0a58b8;       /* the one accent: links, focus, primary action, checks */
-  --acc-ink:#ffffff;   /* text on --acc */
-  /* 3D stage: the same in both themes */
-  --stage:#0f141b;
-  --stage-ink:#e9eef4;
-  --stage-mut:#94a3b5;
-  --stage-rule:#364352;
-  --stage-chip:rgba(15,20,27,.86);
-  --stage-acc:#6db3ff;
+  /* paper and ink, light (contrast on --bg: ink 14.5, ink-2 10.2, mut 5.6, acc 5.0) */
+  --bg:#f4efe4;        /* page: warm cream paper */
+  --surface:#fbf8f1;   /* inputs */
+  --ink:#211e19;       /* text, strong rules */
+  --ink-2:#3d382f;     /* body copy */
+  --mut:#665e50;       /* secondary text, small caps heads */
+  --rule:#cdc3af;      /* hairlines */
+  --acc:#a8492a;       /* the one accent (clay): plate numbers, links, focus, primary action */
+  --acc-ink:#fbf8f1;   /* text on --acc */
+  /* 3D stage: a toned plate on the page */
+  --stage:#eee7d8;
+  --stage-ink:#2a251e;               /* labels, leaders */
+  --stage-mut:#6a6152;               /* hint, footer */
+  --stage-knock:rgba(238,231,216,.86); /* paper knocked out behind a label */
+  --stage-halo:rgba(238,231,216,.9);   /* paper halo under a leader */
   /* type */
-  --sans:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
-  --fs-xs:11px;        /* mono labels, chips */
-  --fs-s:13px;         /* controls, notes */
-  --fs-m:15px;         /* body */
-  --fs-l:19px;
-  --fs-xl:clamp(22px,2.6vw,30px); /* figure title */
-  --radius:2px;
+  --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L",P052,"Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace; /* error listings only */
+  --fs-xs:12.5px;      /* small caps heads, hint */
+  --fs-s:14.5px;       /* controls, notes, labels */
+  --fs-m:17px;         /* body */
+  --fs-l:20px;
+  --fs-xl:clamp(26px,3.2vw,38px); /* figure title */
   --hair:1px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#0a0c0f;--surface:#12161b;--ink:#e8ecf0;--ink-2:#bcc4ce;--mut:#8b95a3;--rule:#262c35;
-    --acc:#5ea8ff;--acc-ink:#06121f;
+    --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;
+    --acc:#e08b68;--acc-ink:#1d1b17;
+    --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#a89c87;
+    --stage-knock:rgba(36,32,27,.84);--stage-halo:rgba(36,32,27,.88);
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0a0c0f;--surface:#12161b;--ink:#e8ecf0;--ink-2:#bcc4ce;--mut:#8b95a3;--rule:#262c35;
-  --acc:#5ea8ff;--acc-ink:#06121f;
+  --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;
+  --acc:#e08b68;--acc-ink:#1d1b17;
+  --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#a89c87;
+  --stage-knock:rgba(36,32,27,.84);--stage-halo:rgba(36,32,27,.88);
 }
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font:400 var(--fs-m)/1.55 var(--sans);font-feature-settings:"tnum" 0}
-a{color:var(--acc);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.2em}
-a:hover{text-decoration-thickness:2px}
+body{font:400 var(--fs-m)/1.55 var(--serif);font-variant-numeric:oldstyle-nums;text-rendering:optimizeLegibility}
+a{color:var(--acc);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em}
+a:hover{color:var(--ink);text-decoration-color:var(--acc)}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 
 /* ---------- frame ---------- */
-.fig{max-width:1180px;margin:0 auto;padding:0 32px 48px}
-.fig-head{padding:22px 0 16px}
-.fig-kicker{display:flex;flex-wrap:wrap;gap:4px 0;margin:0 0 10px;font:500 var(--fs-xs)/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
-.fig-kicker > span + span::before{content:"/";margin:0 .7em;color:var(--rule)}
-.fig-kicker .fig-mark{color:var(--ink);font-weight:600}
-.fig-title{margin:0;font:600 var(--fs-xl)/1.15 var(--sans);letter-spacing:-.012em;color:var(--ink);max-width:28em}
+.fig{max-width:1160px;margin:0 auto;padding:0 48px 64px}
+/* running head, as at the top of a book page */
+.fig-run{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0;padding:22px 0 7px;border-bottom:var(--hair) solid var(--ink);
+  font:400 var(--fs-s)/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.06em;color:var(--mut)}
+.fig-run .fig-mark{color:var(--ink)}
+.fig-run span + span{text-align:right}
+.fig-head{padding:30px 0 22px}
+.fig-no{margin:0 0 6px;font:400 var(--fs-l)/1.2 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.06em;color:var(--acc)}
+.fig-title{margin:0;font:400 var(--fs-xl)/1.12 var(--serif);letter-spacing:-.005em;color:var(--ink);max-width:24em;text-wrap:balance}
 
 /* ---------- plate: stage + control row ---------- */
-.fig-plate{margin:0;border:var(--hair) solid var(--ink)}
+.fig-plate{margin:0;border:var(--hair) solid var(--ink);outline:var(--hair) solid var(--rule);outline-offset:4px}
 #stage.fig-stage{position:relative;width:100%;aspect-ratio:16/9;max-height:74vh;min-height:320px;overflow:hidden;background:var(--stage)}
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 #cv.dragging{cursor:grabbing}
 #labels{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
-/* Label chips: the library's chip + leader, in the figure tokens (Save as image reads these). */
-.fig .lab{position:absolute;left:0;top:0;white-space:nowrap;font:500 var(--fs-xs)/1.5 var(--sans);letter-spacing:.01em;
-  background:var(--stage-chip);border:1px solid var(--stage-rule);border-radius:var(--radius);padding:0 6px;color:var(--stage-ink)}
-.fig-orient{position:absolute;left:10px;top:10px;z-index:1;max-width:calc(100% - 20px);pointer-events:none;
-  font:400 var(--fs-xs)/1.5 var(--mono);color:var(--stage-ink);background:var(--stage-chip);
-  border:1px solid var(--stage-rule);border-left:2px solid var(--stage-acc);border-radius:var(--radius);padding:2px 8px}
+/* Labels: italic serif captions on a knocked-out patch of paper, joined to a small ink dot by a
+   fine leader (the kit draws them; leaderStyle 'css' leaves the colours to these rules).
+   Save as image reads the same computed styles. */
+.fig .lab{position:absolute;left:0;top:0;white-space:nowrap;font:italic 400 var(--fs-s)/1.25 var(--serif);letter-spacing:.005em;
+  font-variant-numeric:lining-nums;background:var(--stage-knock);border:0;padding:1px 4px 2px;color:var(--stage-ink)}
+.fig .lab.is-occluded{color:var(--stage-mut)}
+.fig .kit-halo{stroke:var(--stage-halo);stroke-width:3px;stroke-linecap:round}
+.fig .kit-leader{stroke:var(--stage-ink);stroke-width:.9px;stroke-linecap:round}
+.fig .kit-anchor{r:2.4px;fill:var(--stage-ink);stroke:var(--stage-halo);stroke-width:1.4px}
+.fig .is-occluded .kit-leader{stroke-dasharray:2.5 2.5}
+.fig .is-occluded .kit-anchor{fill:var(--stage);stroke:var(--stage-ink);stroke-width:1px}
+.fig-orient{position:absolute;left:14px;top:11px;z-index:1;max-width:calc(100% - 28px);pointer-events:none;margin:0;
+  font:italic 400 var(--fs-s)/1.35 var(--serif);color:var(--stage-ink);background:var(--stage-knock);padding:1px 4px 2px}
 .fig-orient:empty{display:none}
-.fig-hint{position:absolute;right:10px;bottom:8px;z-index:1;margin:0;pointer-events:none;font:400 10.5px/1.4 var(--mono);color:var(--stage-mut)}
-.kit-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--stage-ink);font:var(--fs-s)/1.5 var(--sans)}
+.fig-hint{position:absolute;right:14px;bottom:10px;z-index:1;margin:0;pointer-events:none;font:italic 400 var(--fs-xs)/1.4 var(--serif);color:var(--stage-mut)}
+.kit-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--stage-ink);font:italic var(--fs-m)/1.5 var(--serif)}
 
 .fig-bar{display:flex;flex-wrap:wrap;align-items:stretch;border-top:var(--hair) solid var(--ink);background:var(--bg)}
-.fig-bar > *{padding:10px 14px;min-width:0}
+.fig-bar > *{padding:11px 16px 12px;min-width:0}
 .fig-bar > * + *{border-left:var(--hair) solid var(--rule)}
-.fig-k{display:block;margin:0 0 5px;font:500 var(--fs-xs)/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.fig-k{display:block;margin:0 0 5px;padding:0;font:400 var(--fs-s)/1.2 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--mut)}
 .fig-view{flex:0 1 360px}
 .fig-view .ctl{margin:0}
-.fig-view .ctl > label{display:block;margin:0 0 5px;font:500 var(--fs-xs)/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
-.fig-view select{width:100%;max-width:100%;height:32px;padding:0 28px 0 9px;font:500 var(--fs-s)/1 var(--sans);color:var(--ink);
-  background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2378828f' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 10px center;
-  border:1px solid var(--rule);border-radius:var(--radius);-webkit-appearance:none;appearance:none;text-overflow:ellipsis}
+.fig-view .ctl > label{display:block;margin:0 0 5px;font:400 var(--fs-s)/1.2 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--mut)}
+.fig-view select{width:100%;max-width:100%;height:34px;padding:0 28px 0 9px;font:400 var(--fs-m)/1 var(--serif);color:var(--ink);
+  background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23857a68' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border:1px solid var(--rule);border-radius:0;-webkit-appearance:none;appearance:none;text-overflow:ellipsis}
 .fig-view select:hover{border-color:var(--mut)}
 .fig-organs{flex:1 1 260px;margin:0;border:0;border-left:var(--hair) solid var(--rule)}
 .fig-organs legend{float:left;width:100%;padding:0}
-.fig-organs .opts{clear:both;display:flex;flex-wrap:wrap;gap:4px 16px}
-.fig .chk{display:inline-flex;gap:7px;align-items:center;margin:0;min-height:24px;font:400 var(--fs-s)/1.3 var(--sans);color:var(--ink-2);cursor:pointer}
+.fig-organs .opts{clear:both;display:flex;flex-wrap:wrap;gap:2px 18px}
+.fig .chk{display:inline-flex;gap:7px;align-items:center;margin:0;min-height:26px;font:400 var(--fs-m)/1.3 var(--serif);color:var(--ink-2);cursor:pointer}
 .fig .chk label{cursor:pointer}
 .fig .chk input{accent-color:var(--acc);width:14px;height:14px;margin:0;flex:none}
 .fig-actions{flex:0 0 auto;margin-left:auto}
-.fig-actions .row{display:flex;align-items:center;gap:16px}
-.fig-btn{height:32px;padding:0 14px;font:600 var(--fs-s)/1 var(--sans);color:var(--acc-ink);background:var(--acc);border:1px solid var(--acc);border-radius:var(--radius);cursor:pointer;white-space:nowrap}
-.fig-btn:hover{filter:brightness(1.08)}
+.fig-actions .row{display:flex;align-items:center;gap:18px}
+.fig-btn{height:34px;padding:0 16px 2px;font:400 var(--fs-m)/1 var(--serif);letter-spacing:.01em;
+  color:var(--acc-ink);background:var(--acc);border:1px solid var(--acc);border-radius:0;cursor:pointer;white-space:nowrap}
+.fig-btn:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .fig-btn:disabled{opacity:.6;cursor:progress}
-.fig-actions .chk{height:32px}
+.fig-actions .chk{height:34px}
 
 /* ---------- info ---------- */
-.fig-info{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:min-content 1fr;column-gap:48px;margin-top:28px;color:var(--ink-2)}
+.fig-info{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);grid-template-rows:min-content 1fr;column-gap:56px;margin-top:44px;color:var(--ink-2)}
 .fig-info:empty{display:none}
-.fig-info section{min-width:0;border-top:var(--hair) solid var(--ink);padding-top:10px;margin-bottom:26px}
+.fig-info section{min-width:0;border-top:var(--hair) solid var(--ink);padding-top:9px;margin-bottom:32px}
 .fig-claims{grid-column:1}
 .fig-refs{grid-column:1;align-self:start}
 .fig-provenance{grid-column:2;grid-row:1 / span 2}
-.fig-info h2{margin:0 0 12px;font:500 var(--fs-xs)/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.fig-info h2{margin:0 0 14px;font:400 var(--fs-m)/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--ink)}
 .fig-info ol,.fig-info ul{list-style:none;margin:0;padding:0}
-.fig-claims li{display:grid;grid-template-columns:2.2em minmax(0,1fr);padding:0 0 12px;line-height:1.55}
-.fig-claims .n{font:500 var(--fs-xs)/2.1 var(--mono);color:var(--mut)}
-.fig-claims .ref{font:500 var(--fs-xs)/1 var(--mono);text-decoration:none;white-space:nowrap;padding:0 1px}
+.fig-claims li{display:grid;grid-template-columns:2em minmax(0,1fr);padding:0 0 12px;line-height:1.5}
+.fig-claims .n{color:var(--mut);font-variant-numeric:oldstyle-nums}
+.fig-claims .ref{font-size:.78em;vertical-align:.32em;line-height:0;text-decoration:none;white-space:nowrap;padding:0 1px;font-variant-numeric:lining-nums}
 .fig-claims .ref:hover{text-decoration:underline}
-.fig-refs li{display:grid;grid-template-columns:2.2em minmax(0,1fr);padding:0 0 8px;font-size:var(--fs-s);line-height:1.5}
-.fig-refs .n{font:500 var(--fs-xs)/1.9 var(--mono);color:var(--mut)}
-.fig-refs .host{display:block;font:400 var(--fs-xs)/1.5 var(--mono);color:var(--mut);overflow-wrap:anywhere}
-.fig-refs a{color:var(--ink);text-decoration-color:var(--acc)}
-.fig-provenance li{padding:9px 0 10px;border-bottom:var(--hair) solid var(--rule)}
+.fig-refs li{display:grid;grid-template-columns:2em minmax(0,1fr);padding:0 0 9px;font-size:var(--fs-s);line-height:1.45}
+.fig-refs .n{color:var(--mut);font-variant-numeric:lining-nums}
+.fig-refs .host{display:block;font-style:italic;color:var(--mut);overflow-wrap:anywhere}
+.fig-refs a{color:var(--ink);text-decoration-color:var(--rule)}
+.fig-refs a:hover{text-decoration-color:var(--acc)}
+.fig-provenance li{padding:10px 0 11px;border-bottom:var(--hair) solid var(--rule)}
 .fig-provenance li:first-child{padding-top:0}
 .pv-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.pv-name{font-weight:600;color:var(--ink)}
-.pv-view{flex:none;font:500 10.5px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);border:1px solid var(--rule);border-radius:var(--radius);padding:0 5px}
-.pv-view.is-variant{color:var(--acc);border-color:currentColor}
-.pv-op{margin:2px 0 0;font-size:var(--fs-s);color:var(--ink-2)}
-.pv-via{display:grid;grid-template-columns:5.6em minmax(0,1fr);gap:1px 8px;margin:4px 0 0;font-size:var(--fs-s);line-height:1.45}
-.pv-via dt{font:500 10.5px/1.75 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.pv-name{color:var(--ink)}
+.pv-view{flex:none;font:400 var(--fs-s)/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--mut)}
+.pv-view.is-variant{color:var(--acc)}
+.pv-op{margin:1px 0 0;font-style:italic;font-size:var(--fs-s);color:var(--ink-2)}
+.pv-via{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:1px 10px;margin:5px 0 0;font-size:var(--fs-s);line-height:1.45}
+.pv-via dt{font-variant-caps:all-small-caps;letter-spacing:.05em;color:var(--mut)}
 .pv-via dd{margin:0;color:var(--ink-2)}
-.pv-via dd span[title]{cursor:help}
-.fig-credit{grid-column:1 / -1;margin:0;padding-top:12px;border-top:var(--hair) solid var(--rule);font:400 12px/1.6 var(--sans);color:var(--mut)}
-.fig-errors{margin:24px 16px;padding:12px 14px;border:1px solid var(--ink);font:var(--fs-s)/1.5 var(--mono);white-space:pre-wrap;color:var(--ink)}
+.pv-via dd span[title]{cursor:help;text-decoration:underline dotted var(--rule);text-underline-offset:.2em}
+.fig-credit{grid-column:1 / -1;margin:0;padding-top:10px;border-top:var(--hair) solid var(--rule);font:italic 400 var(--fs-s)/1.55 var(--serif);color:var(--mut)}
+.fig-errors{margin:24px 16px;padding:12px 14px;border:1px solid var(--ink);font:13px/1.5 var(--mono);white-space:pre-wrap;color:var(--ink)}
 
 /* ---------- narrow ---------- */
 @media (max-width:880px){
@@ -142,15 +159,17 @@ a:hover{text-decoration-thickness:2px}
   .fig-claims,.fig-refs,.fig-provenance{grid-column:1;grid-row:auto}
 }
 @media (max-width:640px){
-  .fig{padding:0 16px 40px}
-  .fig-head{padding:16px 0 12px}
-  .fig-plate{margin:0 -16px;border-left:0;border-right:0}
+  .fig{padding:0 16px 44px}
+  .fig-run{padding-top:14px;font-size:13px}
+  .fig-head{padding:20px 0 16px}
+  .fig-plate{margin:0 -16px;border-left:0;border-right:0;outline:0}
   #stage.fig-stage{aspect-ratio:4/5;max-height:70vh;max-height:70svh}
+  .fig .lab{font-size:13.5px}
   .fig-bar > *{padding:10px 16px}
   .fig-view{flex:1 1 100%}
   .fig-organs{flex:1 1 100%;border-left:0;border-top:var(--hair) solid var(--rule)}
   .fig-actions{flex:1 1 100%;border-left:0 !important;border-top:var(--hair) solid var(--rule);margin-left:0;}
   .fig-actions .row{justify-content:space-between}
   .fig-hint{display:none}
-  .fig-info{margin-top:22px}
+  .fig-info{margin-top:30px}
 }

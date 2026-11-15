@@ -151,10 +151,15 @@ test('an invalid spec shows its errors and renders nothing', async ({ page }) =>
 
 // ---------- Figure UI (player/ui.js, player/figure.css) and Save as image ----------
 const UI_OUT = path.join(OUT, 'ui');
-const STAGE_BG = [0x0f, 0x14, 0x1b];
+// The stage colour (figure.css --stage, the renderer's clear colour) as [r, g, b].
+async function stageRgb(page) {
+  return page.evaluate(() => getComputedStyle(document.querySelector('#stage')).backgroundColor.match(/\d+/g).slice(0, 3).map(Number));
+}
 
-// Decodes a PNG data URL in the page: size, share of pixels that are not the stage background.
+// Decodes a PNG data URL in the page: size, share of pixels that are not the stage background,
+// and the colour of a pixel near the left edge, half-way down (stage background in every fixture).
 async function decodePng(page, url) {
+  const bg = await stageRgb(page);
   return page.evaluate(async ([u, bg]) => {
     const img = new Image(); img.src = u; await img.decode();
     const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
@@ -162,8 +167,9 @@ async function decodePng(page, url) {
     const d = x.getImageData(0, 0, c.width, c.height).data;
     let n = 0;
     for (let i = 0; i < d.length; i += 4) if (Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 24) n++;
-    return { w: c.width, h: c.height, fg: n / (c.width * c.height) };
-  }, [url, STAGE_BG]);
+    const e = x.getImageData(2, Math.round(c.height / 2), 1, 1).data;
+    return { w: c.width, h: c.height, fg: n / (c.width * c.height), edge: [e[0], e[1], e[2]] };
+  }, [url, bg]);
 }
 // Pixels (share of the image) that differ clearly between two PNG data URLs of the same size.
 async function pngDiff(page, a, b) {
@@ -203,6 +209,9 @@ test('Save as image downloads <slug>-<view>.png: decodes, not blank, labels draw
   expect(dec.w).toBe(cv.w);
   expect(dec.h).toBe(cv.h);
   expect(dec.fg, 'saved image is not blank').toBeGreaterThan(0.01);
+  // the canvas is cleared to the stage colour of the page (paper in light mode)
+  const bg = await stageRgb(page);
+  dec.edge.forEach((v, i) => expect(Math.abs(v - bg[i]), 'stage colour in the saved image').toBeLessThanOrEqual(3));
   writeFileSync(path.join(UI_OUT, 'saved-replaced-rha-variant.png'), buf);
 
   // window.figure.snapshot: labels on differs from labels off; the page's own label state is kept
@@ -262,10 +271,21 @@ for (const fixture of fixtures) {
     await expect(info.locator('.fig-credit')).toContainText('3D models:');
     expect(await page.locator('body').innerText()).not.toContain('nreviewed');
 
-    // themes: the page follows prefers-color-scheme, [data-theme] overrides it; the stage stays dark
+    // themes: the page follows prefers-color-scheme, [data-theme] overrides it; the stage is paper
+    // in light mode and warm dark in dark mode, and the canvas is cleared to the same colour
     const look = () => page.evaluate(() => ({
       bg: getComputedStyle(document.body).backgroundColor,
       stage: getComputedStyle(document.querySelector('#stage')).backgroundColor,
+      // share of canvas pixels in the stage colour (the WebGL clear colour shows round the model)
+      clear: (() => {
+        const c = document.querySelector('#cv'), gl = c.getContext('webgl2') || c.getContext('webgl');
+        const w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(4 * w * h);
+        gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        const s = getComputedStyle(document.querySelector('#stage')).backgroundColor.match(/\d+/g).map(Number);
+        let n = 0;
+        for (let i = 0; i < px.length; i += 4) if (Math.abs(px[i] - s[0]) + Math.abs(px[i + 1] - s[1]) + Math.abs(px[i + 2] - s[2]) <= 6) n++;
+        return n / (w * h);
+      })(),
       scroll: document.documentElement.scrollWidth - window.innerWidth,
     }));
     const seen = {};
@@ -276,7 +296,9 @@ for (const fixture of fixtures) {
         await page.waitForTimeout(400);
         const l = await look();
         expect(l.scroll, `${name} ${width} ${scheme}: horizontal scroll`).toBeLessThanOrEqual(0);
-        expect(l.stage).toBe('rgb(15, 20, 27)');
+        expect(l.stage).toBe(scheme === 'light' ? 'rgb(238, 231, 216)' : 'rgb(36, 32, 27)');
+        // (at 1200 px the wide stage always shows background round the model; on a phone it may not)
+        if (width === 1200) expect(l.clear, `${name} ${width} ${scheme}: canvas cleared to the stage colour`).toBeGreaterThan(0.15);
         seen[scheme] = l.bg;
         await page.screenshot({ path: path.join(UI_OUT, `${name}-${width}-${scheme}.png`), fullPage: true });
       }

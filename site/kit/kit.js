@@ -240,8 +240,16 @@
 
   /* ---------- viewer ---------- */
   // opts: { canvas, labelsEl, controlsEl?, infoEl?, environment? (default true) }
+  // Options a page may opt into (the library viewer, cards and Anki templates use none of them):
+  //   background: a CSS colour ('#f2ecdf') for the stage instead of BG_RGB; viewer.setBackground()
+  //     changes it later (e.g. on a theme switch).
+  //   leaderStyle: 'css' leaves the leader, halo and anchor dot colours to the page's stylesheet
+  //     (classes kit-halo, kit-leader, kit-anchor; .is-occluded on the leader group and the label)
+  //     instead of the built-in inline colours for a dark stage.
   function createViewer(opts) {
     var canvas = opts.canvas, labelsEl = opts.labelsEl;
+    var cssLeaders = opts.leaderStyle === 'css';
+    var bgRGB = BG_RGB.slice();
     var controlsEl = opts.controlsEl || null, infoEl = opts.infoEl || null;
     var renderer = null;
     try {
@@ -259,6 +267,20 @@
     // Colour(hex) decodes sRGB to linear; three re-encodes the clear colour for the sRGB output,
     // so the canvas background stays exactly #0f141b (tone mapping does not touch the clear colour).
     scene.background = new THREE.Color((BG_RGB[0] << 16) | (BG_RGB[1] << 8) | BG_RGB[2]);
+    function setBackground(css) {
+      var m = /^#?([0-9a-f]{6})$/i.exec(String(css || '').trim());
+      if (!m) {
+        var rgb = /^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/i.exec(String(css || '').trim());
+        if (!rgb) return false;
+        m = [0, [rgb[1], rgb[2], rgb[3]].map(function (n) { return ('0' + (+n).toString(16)).slice(-2); }).join('')];
+      }
+      var n = parseInt(m[1], 16);
+      bgRGB = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+      scene.background = new THREE.Color(n);
+      if (renderer && cur) frame(true);
+      return true;
+    }
+    if (opts.background) setBackground(opts.background);
     var cam = new THREE.PerspectiveCamera(40, 1, 0.1, 100); cam.position.set(0, 0, 9);
     // Lights stay with the camera rig (not children of root), so the model is lit from the viewer's
     // side whichever way it is turned: soft sky/ground fill, warm key, cool rim; plus the PMREM studio.
@@ -317,14 +339,18 @@
       labels.forEach(function (l) {
         var lg = document.createElementNS(SVGNS, 'g');
         var halo = document.createElementNS(SVGNS, 'line');
-        halo.setAttribute('stroke', 'rgba(15,20,27,0.75)'); halo.setAttribute('stroke-width', '3.5'); halo.setAttribute('stroke-linecap', 'round');
+        halo.setAttribute('class', 'kit-halo');
         var ln = document.createElementNS(SVGNS, 'line');
         ln.setAttribute('class', 'kit-leader');
-        ln.setAttribute('stroke', '#f2f5fa'); ln.setAttribute('stroke-width', '1.4'); ln.setAttribute('stroke-linecap', 'round');
         var dt = document.createElementNS(SVGNS, 'circle');
         dt.setAttribute('class', 'kit-anchor');
-        dt.setAttribute('r', String(DOT_R)); dt.setAttribute('fill', '#f2f5fa');
-        dt.setAttribute('stroke', 'rgba(15,20,27,0.9)'); dt.setAttribute('stroke-width', '1.5');
+        dt.setAttribute('r', String(DOT_R));
+        if (!cssLeaders) {
+          halo.setAttribute('stroke', 'rgba(15,20,27,0.75)'); halo.setAttribute('stroke-width', '3.5'); halo.setAttribute('stroke-linecap', 'round');
+          ln.setAttribute('stroke', '#f2f5fa'); ln.setAttribute('stroke-width', '1.4'); ln.setAttribute('stroke-linecap', 'round');
+          dt.setAttribute('fill', '#f2f5fa');
+          dt.setAttribute('stroke', 'rgba(15,20,27,0.9)'); dt.setAttribute('stroke-width', '1.5');
+        }
         lg.appendChild(halo); lg.appendChild(ln); lg.appendChild(dt);
         leadSvg.appendChild(lg);
         leadEls.push({ g: lg, halo: halo, line: ln, dot: dt });
@@ -534,8 +560,12 @@
         var i = idx[k], e = labEls[i], le = leadEls[i], a = anchors[k], d = dots[k];
         e.style.transform = 'translate(' + p.x.toFixed(1) + 'px,' + p.y.toFixed(1) + 'px)';
         var hidden = !!occ[i];
-        e.style.opacity = hidden ? '0.7' : '';
-        e.style.borderStyle = hidden ? 'dashed' : '';
+        if (cssLeaders) {
+          e.classList.toggle('is-occluded', hidden); le.g.classList.toggle('is-occluded', hidden);
+        } else {
+          e.style.opacity = hidden ? '0.7' : '';
+          e.style.borderStyle = hidden ? 'dashed' : '';
+        }
         rects.push({ x: p.x, y: p.y, w: a.w, h: a.h });
         // leader: from the anchor dot to the nearest point of the label chip
         var ex = Math.max(p.x, Math.min(d.x, p.x + a.w)), ey = Math.max(p.y, Math.min(d.y, p.y + a.h));
@@ -543,10 +573,12 @@
           ln.setAttribute('x1', d.x.toFixed(1)); ln.setAttribute('y1', d.y.toFixed(1));
           ln.setAttribute('x2', ex.toFixed(1)); ln.setAttribute('y2', ey.toFixed(1));
         });
-        le.line.setAttribute('stroke-dasharray', hidden ? '3 3' : '');
         le.dot.setAttribute('cx', d.x.toFixed(1)); le.dot.setAttribute('cy', d.y.toFixed(1));
-        le.dot.setAttribute('fill', hidden ? 'rgba(15,20,27,0.9)' : '#f2f5fa');
-        le.dot.setAttribute('stroke', hidden ? '#f2f5fa' : 'rgba(15,20,27,0.9)');
+        if (!cssLeaders) {
+          le.line.setAttribute('stroke-dasharray', hidden ? '3 3' : '');
+          le.dot.setAttribute('fill', hidden ? 'rgba(15,20,27,0.9)' : '#f2f5fa');
+          le.dot.setAttribute('stroke', hidden ? '#f2f5fa' : 'rgba(15,20,27,0.9)');
+        }
         leads.push({ ax: d.x, ay: d.y, x2: ex, y2: ey, len: Math.hypot(ex - d.x, ey - d.y), occluded: hidden, label: i });
       });
     }
@@ -632,7 +664,7 @@
       var w = gl.drawingBufferWidth, h = gl.drawingBufferHeight;
       var px = new Uint8Array(w * h * 4);
       gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
-      var br = BG_RGB[0], bgg = BG_RGB[1], bb = BG_RGB[2];
+      var br = bgRGB[0], bgg = bgRGB[1], bb = bgRGB[2];
       for (var i = 0; i < px.length; i += 4) {
         if (Math.abs(px[i] - br) + Math.abs(px[i + 1] - bgg) + Math.abs(px[i + 2] - bb) > 24) return true;
       }
@@ -643,6 +675,7 @@
       available: !!renderer,
       open: open,
       setLabelsVisible: setLabelsVisible,
+      setBackground: setBackground,
       getState: function () { return Object.assign({}, st); },
       debug: function () {
         return {
