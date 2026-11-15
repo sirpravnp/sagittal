@@ -43,6 +43,15 @@
       }
       if (last < text.length) parent.appendChild(document.createTextNode(text.slice(last)));
     }
+    // Section headings name sources by id ("zanatomy"): shown by their human names from
+    // meshes/credits.json ("Z-Anatomy"), in headings only; the body text is left as written.
+    var names = {};
+    function headingText(t) {
+      Object.keys(names).forEach(function (id) {
+        t = t.replace(new RegExp('`?\\b' + id.replace(/[-]/g, '\\-') + '\\b`?', 'g'), names[id]);
+      });
+      return t;
+    }
     function render(md) {
       var frag = document.createDocumentFragment(), para = [], list = null;
       function flush() {
@@ -53,7 +62,7 @@
         if (h) {
           flush(); list = null;
           if (h[1].length === 1) return; // the page has its own h1
-          var e = document.createElement(h[1].length === 2 ? 'h2' : 'h3'); inline(e, h[2]); frag.appendChild(e);
+          var e = document.createElement(h[1].length === 2 ? 'h2' : 'h3'); inline(e, headingText(h[2])); frag.appendChild(e);
         } else if (li) {
           flush();
           if (!list) { list = document.createElement('ul'); frag.appendChild(list); }
@@ -69,10 +78,15 @@
       flush();
       return frag;
     }
-    fetch('meshes/CREDITS.md').then(function (r) {
+    var getNames = fetch('meshes/credits.json').then(function (r) { return r.ok ? r.json() : {}; }).then(function (c) {
+      var src = (c && c.sources) || {};
+      Object.keys(src).forEach(function (id) { names[id] = String(src[id].text).split(' (')[0].split(', ')[0]; });
+    }).catch(function () { /* ids stay as written */ });
+    Promise.all([fetch('meshes/CREDITS.md').then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.text();
-    }).then(function (t) {
+    }), getNames]).then(function (all) {
+      var t = all[0];
       out.textContent = '';
       out.appendChild(render(t));
     }).catch(function (e) {

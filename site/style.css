@@ -54,15 +54,16 @@ h1,h2,h3{text-wrap:balance}
 .skip{position:absolute;left:16px;top:-48px;background:var(--ink);color:var(--bg);padding:6px 10px;font:16px var(--serif);z-index:5}
 .skip:focus{top:8px}
 /* small capitals: labels and numbers, never running text */
-.sc,.cmp .fig,.plate-title .fig,.top .fig,.k,.deck-n,.deck a,.ask-who{font-variant-caps:all-small-caps;letter-spacing:.04em;font-variant-numeric:lining-nums}
+.sc,.cmp .fig,.plate-title .fig,.top .fig,.k,.deck-n,.deck a{font-variant-caps:all-small-caps;letter-spacing:.04em;font-variant-numeric:lining-nums}
 
 /* ---------- index ---------- */
 .wrap{max-width:1240px;margin:0 auto;padding:0 56px}
 .masthead{display:grid;grid-template-columns:minmax(0,4.6fr) minmax(0,7.4fr);column-gap:64px;align-items:center;padding:88px 0 96px}
 .masthead h1{margin:0;font-weight:400;font-size:var(--fs-h1);line-height:.95;letter-spacing:-.02em}
 .desc{margin:.6rem 0 0;font-style:italic;font-size:clamp(1.4rem,2.2vw,1.75rem);line-height:1.25;color:var(--ink-2)}
-.ask{margin:36px 0 0;padding:14px 18px 15px;background:var(--surface);border:1px solid var(--rule)}
-.ask-who{display:block;margin:0 0 2px;font-size:var(--fs-small);color:var(--mut)}
+.ask{position:relative;margin:40px 0 0;padding:18px 18px 15px;background:var(--surface);border:1px solid var(--rule-ctl)}
+/* the prompt box's label, set into its top edge like a field legend */
+.ask-who{position:absolute;top:-.8em;left:12px;padding:0 6px;background:var(--bg);font-style:italic;font-size:var(--fs-small);line-height:1.5;color:var(--mut)}
 .ask-line{display:block;font-size:1.3rem;line-height:1.35;color:var(--ink)}
 .ask-line::after{content:"";display:inline-block;width:2px;height:1.05em;margin-left:3px;vertical-align:-.15em;background:var(--acc)}
 .intro{margin:24px 0 0;max-width:36em;font-size:1.08rem;line-height:1.55;color:var(--ink-2)}
@@ -132,6 +133,8 @@ main{counter-reset:none}
 .examples figcaption{padding:0 0 14px;border-bottom:1px solid var(--rule)}
 .examples .plate-img{background:var(--stage)}
 .examples .plate-title{font-size:var(--fs-h3)}
+.examples .plate-title .fig{display:inline;margin:0 .45em 0 0;font-size:.82em}
+.examples .plate-title .fig::after{content:"."}
 .ex-line{margin:8px 0 0;font-style:italic;font-size:1.02rem;line-height:1.45;color:var(--ink-2);max-width:30em}
 .topic{margin:2px 0 0;font-style:italic;font-size:1rem;color:var(--mut)}
 .views{margin:8px 0 0;font-size:1rem;line-height:1.5;color:var(--ink-2)}
@@ -235,7 +238,7 @@ body.missing{height:auto}
 }
 @media (max-width:640px){
   .wrap{padding:0 16px}
-  :root{--fs-body:18px;--fs-h3:22.5px;--fs-h2:28px}
+  :root{--fs-body:18px;--fs-h3:22.5px;--fs-h2:28.5px} /* steps 1.25, 1.27 */
   .masthead{padding:32px 0 44px;row-gap:28px}
   .ask{margin-top:24px}
   .ask-line{font-size:1.15rem}
