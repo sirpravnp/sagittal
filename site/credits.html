@@ -13,22 +13,72 @@
 </head>
 <body>
 <main class="credits">
-  <p class="run"><a href="index.html">Sagittal</a><span>Model credits</span></p>
+  <p class="back"><a href="index.html">Sagittal</a></p>
   <h1>Model credits</h1>
-  <p>The 3D anatomy in Sagittal's scenes, card images and Anki decks is adapted from the open works below.
-    Full text of <a href="meshes/CREDITS.md">meshes/CREDITS.md</a>:</p>
-  <pre id="credits-text">Loading…</pre>
+  <p>The 3D anatomy in Sagittal's figures, scenes, card images and Anki decks is adapted from the open works below. Source file: <a href="meshes/CREDITS.md">meshes/CREDITS.md</a>.</p>
+  <div class="md" id="credits-text"><p>Loading the credits…</p></div>
 </main>
 <script>
-  // Plain text only (textContent): no Markdown rendering, nothing from the file reaches innerHTML.
-  fetch('meshes/CREDITS.md').then(function (r) {
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.text();
-  }).then(function (t) {
-    document.getElementById('credits-text').textContent = t;
-  }).catch(function (e) {
-    document.getElementById('credits-text').textContent = 'Could not load meshes/CREDITS.md (' + e.message + ').';
-  });
+  // A small Markdown subset (headings, paragraphs, lists, **bold**, `code`, [links](url), <url>)
+  // rendered with DOM nodes only: no text from the file ever reaches innerHTML, and only http(s)
+  // links become anchors.
+  (function () {
+    var out = document.getElementById('credits-text');
+    function inline(parent, text) {
+      var re = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)|<(https?:\/\/[^>\s]+)>|\*([^*\s][^*]*)\*/g, last = 0, m;
+      while ((m = re.exec(text))) {
+        if (m.index > last) parent.appendChild(document.createTextNode(text.slice(last, m.index)));
+        if (m[1] !== undefined) { var b = document.createElement('strong'); inline(b, m[1]); parent.appendChild(b); }
+        else if (m[2] !== undefined) { var c = document.createElement('code'); c.textContent = m[2]; parent.appendChild(c); }
+        else if (m[6] !== undefined) { var em = document.createElement('em'); inline(em, m[6]); parent.appendChild(em); }
+        else {
+          var href = m[4] || m[5], label = m[3] || m[5];
+          if (/^https?:\/\//.test(href)) {
+            var a = document.createElement('a'); a.href = href; a.rel = 'noopener'; a.textContent = label; parent.appendChild(a);
+          } else if (/^[\w.\/-]+$/.test(href)) {
+            var a2 = document.createElement('a'); a2.href = 'meshes/' + href.replace(/^\.\//, ''); a2.textContent = label; parent.appendChild(a2);
+          } else parent.appendChild(document.createTextNode(label));
+        }
+        last = re.lastIndex;
+      }
+      if (last < text.length) parent.appendChild(document.createTextNode(text.slice(last)));
+    }
+    function render(md) {
+      var frag = document.createDocumentFragment(), para = [], list = null;
+      function flush() {
+        if (para.length) { var p = document.createElement('p'); inline(p, para.join(' ')); frag.appendChild(p); para = []; }
+      }
+      md.replace(/\r/g, '').split('\n').forEach(function (line) {
+        var h = /^(#{1,4})\s+(.*)$/.exec(line), li = /^\s*[-*]\s+(.*)$/.exec(line);
+        if (h) {
+          flush(); list = null;
+          if (h[1].length === 1) return; // the page has its own h1
+          var e = document.createElement(h[1].length === 2 ? 'h2' : 'h3'); inline(e, h[2]); frag.appendChild(e);
+        } else if (li) {
+          flush();
+          if (!list) { list = document.createElement('ul'); frag.appendChild(list); }
+          var item = document.createElement('li'); inline(item, li[1]); list.appendChild(item);
+        } else if (/^\s*$/.test(line)) {
+          flush(); list = null;
+        } else if (list && /^\s{2,}\S/.test(line)) {
+          var lastLi = list.lastChild; lastLi.appendChild(document.createTextNode(' ')); inline(lastLi, line.trim());
+        } else {
+          list = null; para.push(line.trim());
+        }
+      });
+      flush();
+      return frag;
+    }
+    fetch('meshes/CREDITS.md').then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function (t) {
+      out.textContent = '';
+      out.appendChild(render(t));
+    }).catch(function (e) {
+      out.textContent = 'Could not load meshes/CREDITS.md (' + e.message + '). The file is in the repository at site/meshes/CREDITS.md.';
+    });
+  })();
 </script>
 </body>
 </html>

@@ -18,11 +18,18 @@
 <body class="index-page">
 <a class="skip" href="#examples">Skip to the examples</a>
 <div class="wrap">
-  <p class="run"><span>Sagittal</span><span>Anatomy, drawn on request</span></p>
   <header class="masthead">
-    <h1>Sagittal</h1>
-    <p class="desc">Text-to-image for anatomy</p>
-    <p class="intro">Ask Claude Code for an anatomical variant and get back an accurate, labelled, interactive 3D figure. Accurate because it is built from reconstructed CT and open-atlas anatomy, new vessels and ducts are drawn only through named landmarks, and every claim cites its source.</p>
+    <div class="mast-text">
+      <h1>Sagittal</h1>
+      <p class="desc">Text-to-image for anatomy</p>
+      <p class="ask"><span class="ask-who">You, in Claude Code</span><span class="ask-line">Draw a replaced right hepatic artery off the SMA.</span></p>
+      <p class="intro">Back comes an accurate, labelled, interactive 3D figure. Accurate because it is built from reconstructed CT and open-atlas anatomy, new vessels and ducts are drawn only through named landmarks, and every claim cites its source.</p>
+    </div>
+    <figure class="mast-fig">
+      <img src="hero/replaced-rha-figure.webp" width="1660" height="1143" decoding="async" fetchpriority="high"
+        alt="The figure Sagittal returned: a translucent liver with the replaced right hepatic artery, marked in clay with a dark contour, rising from the superior mesenteric artery behind the portal vein; the coeliac trunk, proper and left hepatic arteries, portal vein and common bile duct labelled in italic; below it a Normal / Variant switch, a Labels toggle and a Save as image button.">
+      <figcaption>The figure that request returns, before it is rotated. The changed vessel is printed in clay.</figcaption>
+    </figure>
   </header>
 
   <main>
@@ -59,9 +66,16 @@
     <section class="sec" id="install" aria-labelledby="install-h">
       <h2 id="install-h">Install the skill</h2>
       <div class="sec-body">
-        <p class="sec-note">For Claude Code. From a clone of this repository, link the skill into your skills folder:</p>
-        <pre class="cmd"><code>ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre>
-        <p class="sec-note">Then ask for a figure, for example <q>an aberrant right subclavian artery</q>.</p>
+        <p class="sec-note">You need Claude Code, Anthropic's command-line coding tool. Claude Code reads personal skills from <code>~/.claude/skills</code>, the <code>.claude/skills</code> folder in your home directory; linking the skill there makes it available in every project.</p>
+        <ol class="install">
+          <li><p>Clone this repository and go into it:</p>
+            <pre class="cmd"><code>git clone &lt;this repository&gt;
+cd sagittal</code></pre></li>
+          <li><p>Link the skill into your skills folder (the first line creates the folder if it is missing):</p>
+            <pre class="cmd"><code>mkdir -p ~/.claude/skills
+ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre></li>
+          <li><p>Start Claude Code and ask for a figure, for example <q>an aberrant right subclavian artery</q>.</p></li>
+        </ol>
       </div>
     </section>
 
@@ -110,7 +124,7 @@
       </div>
     </section>
 
-    <section class="sec" id="decks" aria-labelledby="decks-h" hidden>
+    <section class="sec" id="decks" aria-labelledby="decks-h">
       <h2 id="decks-h">Anki decks</h2>
       <div class="sec-body">
         <p class="sec-note">Ready-made decks for the topics of the scene library, one per topic: structures unlabelled on the front of each card, labelled on the back. Import the <code>.apkg</code> file in Anki with File, Import. The standard decks use still images and work in every Anki client; the 3D decks run the scene inside the card and have only been tried on Anki desktop.</p>

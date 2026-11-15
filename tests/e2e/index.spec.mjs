@@ -87,15 +87,42 @@ test('every heading is at most four words; no review disclaimer anywhere', async
   for (const t of ['Same subject, two figures', 'How it works', 'Install the skill', 'Examples', 'Anki decks', 'Credits']) {
     expect(heads.map((h) => h.trim())).toContain(t);
   }
-  await expect(page.locator('#install pre')).toContainText('ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal');
+  // install: prerequisite, then the steps in order, and where the skills folder is
+  const install = page.locator('#install');
+  await expect(install).toContainText('Claude Code');
+  await expect(install).toContainText('~/.claude/skills');
+  const cmds = (await install.locator('pre').allInnerTexts()).join('\n');
+  const order = ['git clone <this repository>', 'cd sagittal', 'mkdir -p ~/.claude/skills', 'ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal'];
+  let at = -1;
+  for (const c of order) { const i = cmds.indexOf(c); expect(i, c).toBeGreaterThan(at); at = i; }
+  await expect(install.locator('ol > li')).toHaveCount(3);
   await expect(page.locator('#how .steps li')).toHaveCount(3);
   expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   expect(await page.content()).not.toContain('nreviewed');
 });
 
+test('first viewport at 1440 px shows a typed request and the figure it produced', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('index.html');
+  const ask = page.locator('.masthead .ask-line');
+  await expect(ask).toContainText('replaced right hepatic artery');
+  const img = page.locator('.masthead .mast-fig img');
+  await expect.poll(() => img.evaluate((e) => e.complete && e.naturalWidth > 0)).toBe(true);
+  for (const loc of [ask, img]) {
+    const b = await loc.boundingBox();
+    expect(b.y + b.height, 'inside the first viewport').toBeLessThanOrEqual(900);
+  }
+  expect((await img.getAttribute('alt')).length).toBeGreaterThan(40);
+  // no section counters or eyebrows: section headings carry no generated prefix
+  const before = await page.locator('.sec > h2').first().evaluate((e) => getComputedStyle(e, '::before').content);
+  expect(['none', 'normal']).toContain(before);
+});
+
 test('index lists one deck row per topic', async ({ page }) => {
   await page.goto('index.html');
   const topics = [...new Set(metas.map((m) => m.topic))];
+  // the section is rendered visible (no hidden attribute waiting for the script)
+  expect(await page.locator('#decks').getAttribute('hidden')).toBeNull();
   await expect(page.locator('#deck-list .deck')).toHaveCount(topics.length);
   const slug = (t) => 'sagittal-' + t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   await expect(page.getByRole('link', { name: `${topics[0]} deck`, exact: true })).toHaveAttribute('href', `decks/${slug(topics[0])}.apkg`);
