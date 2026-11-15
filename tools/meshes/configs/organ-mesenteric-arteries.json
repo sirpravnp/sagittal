@@ -1,0 +1,45 @@
+{
+  "name": "mesenteric-arteries",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "superior_mesenteric_artery": {
+      "files": [
+        "Superior_mesenteric_artery.obj"
+      ],
+      "budget": 1200
+    },
+    "sma_colic_branches": {
+      "files": [
+        "Ileocolic_artery.obj",
+        "Right_colic_artery.obj",
+        "Middle_colic_artery.obj",
+        "Inferior_pancreaticoduodenal_artery.obj"
+      ],
+      "budget": 1200
+    },
+    "inferior_mesenteric_artery": {
+      "files": [
+        "Inferior_mesenteric_artery.obj"
+      ],
+      "budget": 600
+    },
+    "ima_branches": {
+      "files": [
+        "Left_colic_artery.obj",
+        "Sigmoid_arteries.obj",
+        "Superior_anorectal_artery.obj"
+      ],
+      "budget": 1200
+    }
+  }
+}

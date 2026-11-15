@@ -1,0 +1,2752 @@
+{
+ "about": "Source spec for the base organ library (organs/). tools/organs/build.py turns each entry into a bake config (tools/meshes/configs/organ-<id>.json), bakes organs/meshes/<id>.js and writes organs/manifests/<id>.json. Centre lines are Z-Anatomy curve objects taken point for point (cm, body frame); landmarks are computed by the named rule from source geometry. A centre line with a 'parent' is oriented to start at the end nearest its parent centre line, and that end becomes the landmark '<id>_origin' (arteries, ducts, airways) or '<id>_junction' (veins).",
+ "defaults": {
+  "zanatomy": {
+   "credit": "zanatomy",
+   "license": "CC BY-SA 4.0",
+   "source_root": "${ASSETS}/zanatomy-organs/obj",
+   "transform": "zanatomy",
+   "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj"
+  },
+  "totalseg": {
+   "credit": "totalsegmentator",
+   "license": "CC BY 4.0",
+   "source_root": "${ASSETS}/organs-registered/totalseg",
+   "transform": {
+    "axes": [
+     "x",
+     "y",
+     "z"
+    ],
+    "scale": 1
+   },
+   "source": "TotalSegmentator CT dataset v2.0.1 (doi:10.5281/zenodo.10047292), subject s1304 masks; tools/meshes/ct_to_obj.py, registered by tools/organs/register.py"
+  },
+  "rodero": {
+   "credit": "rodero-heart",
+   "license": "CC BY 4.0",
+   "source_root": "${ASSETS}/organs-registered/heart",
+   "transform": {
+    "axes": [
+     "x",
+     "y",
+     "z"
+    ],
+    "scale": 1
+   },
+   "source": "Rodero et al. 2021 average heart (doi:10.5281/zenodo.4593739), per-chamber surfaces from rodero/work/parts, registered by tools/organs/register.py"
+  }
+ },
+ "organs": [
+  {
+   "id": "brain",
+   "name": "Brain",
+   "system": "Nervous",
+   "src": "totalseg",
+   "parts": [
+    {
+     "id": "brain",
+     "name": "Brain (cerebrum, cerebellum and brainstem, one surface)",
+     "tissue": "nerve",
+     "files": [
+      "brain.obj"
+     ],
+     "budget": 5000,
+     "smooth": 2
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "brain_frontal_pole",
+     "name": "Frontal pole",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "brain",
+      "axis": "+z"
+     }
+    },
+    {
+     "id": "brain_occipital_pole",
+     "name": "Occipital pole (most posterior point of the brain surface)",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "brain",
+      "axis": "-z"
+     }
+    },
+    {
+     "id": "brain_vertex",
+     "name": "Highest point of the brain",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "brain",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "brain_centroid",
+     "name": "Brain centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "brain"
+     }
+    }
+   ]
+  },
+  {
+   "id": "heart",
+   "name": "Heart",
+   "system": "Cardiovascular",
+   "src": "rodero",
+   "parts": [
+    {
+     "id": "wall_lv",
+     "name": "Left ventricle",
+     "tissue": "myocardium",
+     "files": [
+      "wall_lv.obj"
+     ],
+     "budget": 4500,
+     "smooth": 3
+    },
+    {
+     "id": "wall_rv",
+     "name": "Right ventricle",
+     "tissue": "myocardium",
+     "files": [
+      "wall_rv.obj"
+     ],
+     "budget": 3800,
+     "smooth": 3
+    },
+    {
+     "id": "wall_la",
+     "name": "Left atrium",
+     "tissue": "myocardium",
+     "files": [
+      "wall_la.obj"
+     ],
+     "budget": 2800,
+     "smooth": 3
+    },
+    {
+     "id": "wall_ra",
+     "name": "Right atrium",
+     "tissue": "myocardium",
+     "files": [
+      "wall_ra.obj"
+     ],
+     "budget": 2800,
+     "smooth": 3
+    },
+    {
+     "id": "aortic_root",
+     "name": "Aortic root",
+     "tissue": "vessel-artery",
+     "files": [
+      "aorta.obj"
+     ],
+     "budget": 1500,
+     "smooth": 3
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "mitral_valve_centre",
+     "name": "Mitral valve centre",
+     "rule": {
+      "type": "registration",
+      "key": "rodero_heart.valve_centres_cm.mitral",
+      "note": "centroid of the Rodero mitral-valve-plane elements (tag 7), mapped by the heart registration"
+     }
+    },
+    {
+     "id": "tricuspid_valve_centre",
+     "name": "Tricuspid valve centre",
+     "rule": {
+      "type": "registration",
+      "key": "rodero_heart.valve_centres_cm.tricuspid",
+      "note": "centroid of the Rodero tricuspid-valve-plane elements (tag 8), mapped by the heart registration"
+     }
+    },
+    {
+     "id": "aortic_valve_centre",
+     "name": "Aortic valve centre",
+     "rule": {
+      "type": "registration",
+      "key": "rodero_heart.valve_centres_cm.aortic",
+      "note": "centroid of the Rodero aortic-valve-plane elements (tag 9), mapped by the heart registration"
+     }
+    },
+    {
+     "id": "pulmonary_valve_centre",
+     "name": "Pulmonary valve centre",
+     "rule": {
+      "type": "registration",
+      "key": "rodero_heart.valve_centres_cm.pulmonary",
+      "note": "centroid of the Rodero pulmonary-valve-plane elements (tag 10), mapped by the heart registration"
+     }
+    },
+    {
+     "id": "cardiac_apex",
+     "name": "Cardiac apex (left ventricular wall point farthest from the mitral valve centre)",
+     "rule": {
+      "type": "mesh_farthest",
+      "part": "wall_lv",
+      "from": "mitral_valve_centre"
+     }
+    },
+    {
+     "id": "left_ventricle_centroid",
+     "name": "Left ventricle centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "wall_lv"
+     }
+    },
+    {
+     "id": "right_ventricle_centroid",
+     "name": "Right ventricle centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "wall_rv"
+     }
+    },
+    {
+     "id": "left_atrium_centroid",
+     "name": "Left atrium centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "wall_la"
+     }
+    },
+    {
+     "id": "right_atrium_centroid",
+     "name": "Right atrium centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "wall_ra"
+     }
+    }
+   ]
+  },
+  {
+   "id": "aorta",
+   "name": "Aorta and its major branches",
+   "system": "Cardiovascular",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "aorta",
+     "name": "Aorta (ascending, arch, descending thoracic, abdominal)",
+     "tissue": "vessel-artery",
+     "files": [
+      "Ascending_aorta.obj",
+      "Aortic_arch.obj",
+      "Thoracic_aorta.obj",
+      "Abdominal_aorta.obj"
+     ],
+     "budget": 3200
+    },
+    {
+     "id": "brachiocephalic_trunk",
+     "name": "Brachiocephalic trunk",
+     "tissue": "vessel-artery",
+     "files": [
+      "Brachiocephalic_trunk.obj"
+     ],
+     "budget": 500
+    },
+    {
+     "id": "common_carotid_arteries",
+     "name": "Common carotid arteries",
+     "tissue": "vessel-artery",
+     "files": [
+      "Right_common_carotid_artery.obj",
+      "Left_common_carotid_artery.obj"
+     ],
+     "budget": 1000
+    },
+    {
+     "id": "subclavian_arteries",
+     "name": "Subclavian arteries",
+     "tissue": "vessel-artery",
+     "files": [
+      "Right_subclavian_artery.obj",
+      "Left_subclavian_artery.obj"
+     ],
+     "budget": 1000
+    },
+    {
+     "id": "renal_arteries",
+     "name": "Renal arteries",
+     "tissue": "vessel-artery",
+     "files": [
+      "Left_renal_artery.obj",
+      "Right_renal_artery.obj"
+     ],
+     "budget": 600
+    },
+    {
+     "id": "iliac_arteries",
+     "name": "Common, external and internal iliac arteries",
+     "tissue": "vessel-artery",
+     "files": [
+      "Common_iliac_artery.l.obj",
+      "Common_iliac_artery.r.obj",
+      "External_iliac_artery.l.obj",
+      "External_iliac_artery.r.obj",
+      "Internal_iliac_artery.l.obj",
+      "Internal_iliac_artery.r.obj"
+     ],
+     "budget": 2000
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "ascending_aorta",
+     "name": "Ascending aorta",
+     "curve": "Ascending aorta",
+     "from": "aortic_root_start"
+    },
+    {
+     "id": "aortic_arch",
+     "name": "Arch of aorta",
+     "curve": "Aortic arch",
+     "parent": "ascending_aorta",
+     "kind": "segment"
+    },
+    {
+     "id": "thoracic_aorta",
+     "name": "Descending thoracic aorta",
+     "curve": "Thoracic aorta",
+     "parent": "aortic_arch",
+     "kind": "segment"
+    },
+    {
+     "id": "abdominal_aorta",
+     "name": "Abdominal aorta",
+     "curve": "Abdominal aorta",
+     "parent": "thoracic_aorta",
+     "kind": "segment"
+    },
+    {
+     "id": "brachiocephalic_trunk",
+     "name": "Brachiocephalic trunk",
+     "curve": "Brachiocephalic trunk",
+     "parent": "aortic_arch"
+    },
+    {
+     "id": "right_common_carotid_artery",
+     "name": "Right common carotid artery",
+     "curve": "Right common carotid artery",
+     "parent": "brachiocephalic_trunk"
+    },
+    {
+     "id": "right_subclavian_artery",
+     "name": "Right subclavian artery",
+     "curve": "Right subclavian artery",
+     "parent": "brachiocephalic_trunk"
+    },
+    {
+     "id": "left_common_carotid_artery",
+     "name": "Left common carotid artery",
+     "curve": "Left common carotid artery",
+     "parent": "aortic_arch"
+    },
+    {
+     "id": "left_subclavian_artery",
+     "name": "Left subclavian artery",
+     "curve": "Left subclavian artery",
+     "parent": "aortic_arch"
+    },
+    {
+     "id": "right_renal_artery",
+     "name": "Right renal artery",
+     "curve": "Right renal artery",
+     "parent": "abdominal_aorta"
+    },
+    {
+     "id": "left_renal_artery",
+     "name": "Left renal artery",
+     "curve": "Left renal artery",
+     "parent": "abdominal_aorta"
+    },
+    {
+     "id": "right_common_iliac_artery",
+     "name": "Right common iliac artery",
+     "curve": "Common iliac artery.r",
+     "parent": "abdominal_aorta"
+    },
+    {
+     "id": "left_common_iliac_artery",
+     "name": "Left common iliac artery",
+     "curve": "Common iliac artery.l",
+     "parent": "abdominal_aorta"
+    },
+    {
+     "id": "right_external_iliac_artery",
+     "name": "Right external iliac artery",
+     "curve": "External iliac artery.r",
+     "parent": "right_common_iliac_artery"
+    },
+    {
+     "id": "left_external_iliac_artery",
+     "name": "Left external iliac artery",
+     "curve": "External iliac artery.l",
+     "parent": "left_common_iliac_artery"
+    },
+    {
+     "id": "right_internal_iliac_artery",
+     "name": "Right internal iliac artery",
+     "curve": "Internal iliac artery.r",
+     "parent": "right_common_iliac_artery"
+    },
+    {
+     "id": "left_internal_iliac_artery",
+     "name": "Left internal iliac artery",
+     "curve": "Internal iliac artery.l",
+     "parent": "left_common_iliac_artery"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "aortic_root_start",
+     "name": "Start of the ascending aorta (aortic root end of the source curve)",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Ascending aorta",
+      "end": "lowest"
+     }
+    },
+    {
+     "id": "aortic_arch_end",
+     "name": "End of the aortic arch / start of the descending thoracic aorta",
+     "rule": {
+      "type": "line_point",
+      "line": "thoracic_aorta",
+      "at": "start"
+     }
+    },
+    {
+     "id": "thoracic_aorta_end",
+     "name": "Lower end of the thoracic aorta (source boundary between thoracic and abdominal parts, diaphragm level)",
+     "rule": {
+      "type": "line_point",
+      "line": "abdominal_aorta",
+      "at": "start"
+     }
+    },
+    {
+     "id": "aortic_bifurcation",
+     "name": "Aortic bifurcation",
+     "rule": {
+      "type": "line_point",
+      "line": "abdominal_aorta",
+      "at": "end"
+     }
+    },
+    {
+     "id": "brachiocephalic_bifurcation",
+     "name": "Bifurcation of the brachiocephalic trunk",
+     "rule": {
+      "type": "line_point",
+      "line": "brachiocephalic_trunk",
+      "at": "end"
+     }
+    },
+    {
+     "id": "right_carotid_bifurcation",
+     "name": "Right common carotid bifurcation (upper end of the right common carotid curve)",
+     "rule": {
+      "type": "line_point",
+      "line": "right_common_carotid_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "left_carotid_bifurcation",
+     "name": "Left common carotid bifurcation (upper end of the left common carotid curve)",
+     "rule": {
+      "type": "line_point",
+      "line": "left_common_carotid_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "right_subclavian_artery_end",
+     "name": "Distal end of the right subclavian artery curve",
+     "rule": {
+      "type": "line_point",
+      "line": "right_subclavian_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "left_subclavian_artery_end",
+     "name": "Distal end of the left subclavian artery curve",
+     "rule": {
+      "type": "line_point",
+      "line": "left_subclavian_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "right_renal_artery_hilar_end",
+     "name": "Hilar end of the right renal artery",
+     "rule": {
+      "type": "line_point",
+      "line": "right_renal_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "left_renal_artery_hilar_end",
+     "name": "Hilar end of the left renal artery",
+     "rule": {
+      "type": "line_point",
+      "line": "left_renal_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "right_iliac_bifurcation",
+     "name": "Right common iliac bifurcation",
+     "rule": {
+      "type": "line_point",
+      "line": "right_common_iliac_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "left_iliac_bifurcation",
+     "name": "Left common iliac bifurcation",
+     "rule": {
+      "type": "line_point",
+      "line": "left_common_iliac_artery",
+      "at": "end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "coeliac-trunk",
+   "name": "Coeliac trunk and its branches",
+   "system": "Cardiovascular",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "coeliac_trunk",
+     "name": "Coeliac trunk",
+     "tissue": "vessel-artery",
+     "files": [
+      "Coeliac_trunk.obj"
+     ],
+     "budget": 400
+    },
+    {
+     "id": "common_hepatic_artery",
+     "name": "Common hepatic artery",
+     "tissue": "vessel-artery",
+     "files": [
+      "Common_hepatic_artery.obj"
+     ],
+     "budget": 400
+    },
+    {
+     "id": "proper_hepatic_artery",
+     "name": "Proper hepatic artery (continuing into the right lobe, with two short unnamed branches)",
+     "tissue": "vessel-artery",
+     "files": [
+      "Proper_hepatic_artery.obj"
+     ],
+     "budget": 1000
+    },
+    {
+     "id": "gastroduodenal_artery",
+     "name": "Gastroduodenal artery",
+     "tissue": "vessel-artery",
+     "files": [
+      "Gastroduodenal_artery.obj"
+     ],
+     "budget": 400
+    },
+    {
+     "id": "left_gastric_artery",
+     "name": "Left gastric artery",
+     "tissue": "vessel-artery",
+     "files": [
+      "Left_gastric_artery.obj"
+     ],
+     "budget": 500
+    },
+    {
+     "id": "splenic_artery",
+     "name": "Splenic artery with its hilar branches",
+     "tissue": "vessel-artery",
+     "files": [
+      "Splenic_artery.obj"
+     ],
+     "budget": 1200
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "coeliac_trunk",
+     "name": "Coeliac trunk",
+     "curve": "Coeliac trunk",
+     "parent": "abdominal_aorta"
+    },
+    {
+     "id": "common_hepatic_artery",
+     "name": "Common hepatic artery",
+     "curve": "Common hepatic artery",
+     "parent": "coeliac_trunk"
+    },
+    {
+     "id": "left_gastric_artery",
+     "name": "Left gastric artery",
+     "curve": "Left gastric artery",
+     "spline": 0,
+     "parent": "coeliac_trunk"
+    },
+    {
+     "id": "left_gastric_artery_branch",
+     "name": "Branch of the left gastric artery (unnamed in source)",
+     "curve": "Left gastric artery",
+     "spline": 1,
+     "parent": "left_gastric_artery"
+    },
+    {
+     "id": "splenic_artery",
+     "name": "Splenic artery",
+     "curve": "Splenic artery",
+     "spline": 0,
+     "parent": "coeliac_trunk"
+    },
+    {
+     "id": "splenic_artery_hilar_branch_1",
+     "name": "Hilar branch 1 of the splenic artery (unnamed in source)",
+     "curve": "Splenic artery",
+     "spline": 1,
+     "parent": "auto"
+    },
+    {
+     "id": "splenic_artery_hilar_branch_2",
+     "name": "Hilar branch 2 of the splenic artery (unnamed in source)",
+     "curve": "Splenic artery",
+     "spline": 2,
+     "parent": "auto"
+    },
+    {
+     "id": "splenic_artery_hilar_branch_3",
+     "name": "Hilar branch 3 of the splenic artery (unnamed in source)",
+     "curve": "Splenic artery",
+     "spline": 3,
+     "parent": "auto"
+    },
+    {
+     "id": "splenic_artery_hilar_branch_4",
+     "name": "Hilar branch 4 of the splenic artery (unnamed in source)",
+     "curve": "Splenic artery",
+     "spline": 4,
+     "parent": "auto"
+    },
+    {
+     "id": "splenic_artery_hilar_branch_5",
+     "name": "Hilar branch 5 of the splenic artery (unnamed in source)",
+     "curve": "Splenic artery",
+     "spline": 5,
+     "parent": "auto"
+    },
+    {
+     "id": "splenic_artery_hilar_branch_6",
+     "name": "Hilar branch 6 of the splenic artery (unnamed in source)",
+     "curve": "Splenic artery",
+     "spline": 6,
+     "parent": "auto"
+    },
+    {
+     "id": "proper_hepatic_artery",
+     "name": "Proper hepatic artery (source curve continues into the right lobe; no left hepatic branch in source)",
+     "curve": "Proper hepatic artery",
+     "spline": 0,
+     "parent": "common_hepatic_artery"
+    },
+    {
+     "id": "proper_hepatic_artery_branch_1",
+     "name": "Branch 1 of the proper hepatic artery curve (unnamed in source)",
+     "curve": "Proper hepatic artery",
+     "spline": 1,
+     "parent": "proper_hepatic_artery"
+    },
+    {
+     "id": "proper_hepatic_artery_branch_2",
+     "name": "Branch 2 of the proper hepatic artery curve (unnamed in source)",
+     "curve": "Proper hepatic artery",
+     "spline": 2,
+     "parent": "proper_hepatic_artery"
+    },
+    {
+     "id": "gastroduodenal_artery",
+     "name": "Gastroduodenal artery",
+     "curve": "Gastroduodenal artery",
+     "parent": "common_hepatic_artery"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "coeliac_trunk_division",
+     "name": "Division of the coeliac trunk (common hepatic, left gastric and splenic arteries arise here)",
+     "rule": {
+      "type": "line_point",
+      "line": "coeliac_trunk",
+      "at": "end"
+     }
+    },
+    {
+     "id": "common_hepatic_artery_division",
+     "name": "End of the common hepatic artery: origin of the gastroduodenal and proper hepatic arteries",
+     "rule": {
+      "type": "line_point",
+      "line": "common_hepatic_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "proper_hepatic_artery_end",
+     "name": "Intrahepatic end of the proper hepatic artery curve (right lobe)",
+     "rule": {
+      "type": "line_point",
+      "line": "proper_hepatic_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "gastroduodenal_artery_end",
+     "name": "Lower end of the gastroduodenal artery curve",
+     "rule": {
+      "type": "line_point",
+      "line": "gastroduodenal_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "left_gastric_artery_end",
+     "name": "Upper end of the left gastric artery curve (towards the cardia)",
+     "rule": {
+      "type": "line_point",
+      "line": "left_gastric_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "splenic_artery_end",
+     "name": "Splenic end of the splenic artery main curve",
+     "rule": {
+      "type": "line_point",
+      "line": "splenic_artery",
+      "at": "end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "mesenteric-arteries",
+   "name": "Superior and inferior mesenteric arteries",
+   "system": "Cardiovascular",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "superior_mesenteric_artery",
+     "name": "Superior mesenteric artery with its branches in the source",
+     "tissue": "vessel-artery",
+     "files": [
+      "Superior_mesenteric_artery.obj"
+     ],
+     "budget": 1200
+    },
+    {
+     "id": "sma_colic_branches",
+     "name": "Ileocolic, right colic and middle colic arteries; inferior pancreaticoduodenal artery",
+     "tissue": "vessel-artery",
+     "files": [
+      "Ileocolic_artery.obj",
+      "Right_colic_artery.obj",
+      "Middle_colic_artery.obj",
+      "Inferior_pancreaticoduodenal_artery.obj"
+     ],
+     "budget": 1200
+    },
+    {
+     "id": "inferior_mesenteric_artery",
+     "name": "Inferior mesenteric artery",
+     "tissue": "vessel-artery",
+     "files": [
+      "Inferior_mesenteric_artery.obj"
+     ],
+     "budget": 600
+    },
+    {
+     "id": "ima_branches",
+     "name": "Left colic, sigmoid and superior rectal (anorectal) arteries",
+     "tissue": "vessel-artery",
+     "files": [
+      "Left_colic_artery.obj",
+      "Sigmoid_arteries.obj",
+      "Superior_anorectal_artery.obj"
+     ],
+     "budget": 1200
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "superior_mesenteric_artery",
+     "name": "Superior mesenteric artery",
+     "curve": "Superior mesenteric artery",
+     "spline": 0,
+     "parent": "abdominal_aorta"
+    },
+    {
+     "id": "sma_branch_1",
+     "name": "Branch 1 of the superior mesenteric artery curve (unnamed in source)",
+     "curve": "Superior mesenteric artery",
+     "spline": 1,
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "sma_branch_2",
+     "name": "Branch 2 of the superior mesenteric artery curve (unnamed in source)",
+     "curve": "Superior mesenteric artery",
+     "spline": 2,
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "sma_branch_3",
+     "name": "Branch 3 of the superior mesenteric artery curve (unnamed in source)",
+     "curve": "Superior mesenteric artery",
+     "spline": 3,
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "sma_branch_4",
+     "name": "Branch 4 of the superior mesenteric artery curve (unnamed in source; runs to the left)",
+     "curve": "Superior mesenteric artery",
+     "spline": 4,
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "sma_branch_5",
+     "name": "Branch 5 of the superior mesenteric artery curve (unnamed in source)",
+     "curve": "Superior mesenteric artery",
+     "spline": 5,
+     "parent": "sma_branch_4"
+    },
+    {
+     "id": "sma_branch_6",
+     "name": "Branch 6 of the superior mesenteric artery curve (unnamed in source)",
+     "curve": "Superior mesenteric artery",
+     "spline": 6,
+     "parent": "sma_branch_4"
+    },
+    {
+     "id": "sma_branch_7",
+     "name": "Branch 7 of the superior mesenteric artery curve (unnamed in source)",
+     "curve": "Superior mesenteric artery",
+     "spline": 7,
+     "parent": "sma_branch_6"
+    },
+    {
+     "id": "inferior_pancreaticoduodenal_artery",
+     "name": "Inferior pancreaticoduodenal artery",
+     "curve": "Inferior pancreaticoduodenal artery",
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "ileocolic_artery",
+     "name": "Ileocolic artery",
+     "curve": "Ileocolic artery",
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "right_colic_artery",
+     "name": "Right colic artery",
+     "curve": "Right colic artery",
+     "spline": 0,
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "right_colic_artery_branch",
+     "name": "Branch of the right colic artery (unnamed in source)",
+     "curve": "Right colic artery",
+     "spline": 1,
+     "parent": "right_colic_artery"
+    },
+    {
+     "id": "middle_colic_artery",
+     "name": "Middle colic artery",
+     "curve": "Middle colic artery",
+     "spline": 0,
+     "parent": "superior_mesenteric_artery"
+    },
+    {
+     "id": "middle_colic_artery_branch",
+     "name": "Branch of the middle colic artery (unnamed in source)",
+     "curve": "Middle colic artery",
+     "spline": 1,
+     "parent": "middle_colic_artery"
+    },
+    {
+     "id": "inferior_mesenteric_artery",
+     "name": "Inferior mesenteric artery",
+     "curve": "Inferior mesenteric artery",
+     "parent": "abdominal_aorta"
+    },
+    {
+     "id": "left_colic_artery",
+     "name": "Left colic artery",
+     "curve": "Left colic artery",
+     "parent": "inferior_mesenteric_artery"
+    },
+    {
+     "id": "sigmoid_artery_1",
+     "name": "Sigmoid artery (curve 1 of the source's 'Sigmoid arteries')",
+     "curve": "Sigmoid arteries",
+     "spline": 0,
+     "parent": "inferior_mesenteric_artery"
+    },
+    {
+     "id": "sigmoid_artery_2",
+     "name": "Sigmoid artery (curve 2 of the source's 'Sigmoid arteries')",
+     "curve": "Sigmoid arteries",
+     "spline": 1,
+     "parent": "auto"
+    },
+    {
+     "id": "sigmoid_artery_3",
+     "name": "Sigmoid artery (curve 3 of the source's 'Sigmoid arteries')",
+     "curve": "Sigmoid arteries",
+     "spline": 2,
+     "parent": "auto"
+    },
+    {
+     "id": "sigmoid_artery_4",
+     "name": "Sigmoid artery (curve 4 of the source's 'Sigmoid arteries')",
+     "curve": "Sigmoid arteries",
+     "spline": 3,
+     "parent": "auto"
+    },
+    {
+     "id": "sigmoid_artery_5",
+     "name": "Sigmoid artery (curve 5 of the source's 'Sigmoid arteries')",
+     "curve": "Sigmoid arteries",
+     "spline": 4,
+     "parent": "auto"
+    },
+    {
+     "id": "superior_rectal_artery",
+     "name": "Superior rectal artery (Z-Anatomy: superior anorectal artery)",
+     "curve": "Superior anorectal artery",
+     "parent": "inferior_mesenteric_artery"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "superior_mesenteric_artery_end",
+     "name": "Distal end of the superior mesenteric artery curve",
+     "rule": {
+      "type": "line_point",
+      "line": "superior_mesenteric_artery",
+      "at": "end"
+     }
+    },
+    {
+     "id": "inferior_mesenteric_artery_end",
+     "name": "Lower end of the inferior mesenteric artery curve",
+     "rule": {
+      "type": "line_point",
+      "line": "inferior_mesenteric_artery",
+      "at": "end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "venae-cavae",
+   "name": "Venae cavae and their major tributaries",
+   "system": "Cardiovascular",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "inferior_vena_cava",
+     "name": "Inferior vena cava (abdominal and thoracic parts)",
+     "tissue": "vessel-vein",
+     "files": [
+      "Inferior_vena_cava_(abdominal_part).obj",
+      "Inferior_vena_cava_(thoracic_part).obj"
+     ],
+     "budget": 1200
+    },
+    {
+     "id": "superior_vena_cava",
+     "name": "Superior vena cava",
+     "tissue": "vessel-vein",
+     "files": [
+      "Superior_vena_cava.obj"
+     ],
+     "budget": 400
+    },
+    {
+     "id": "brachiocephalic_veins",
+     "name": "Brachiocephalic veins",
+     "tissue": "vessel-vein",
+     "files": [
+      "Left_brachiocephalic_vein.obj",
+      "Right_brachiocephalic_vein.obj"
+     ],
+     "budget": 800
+    },
+    {
+     "id": "hepatic_veins",
+     "name": "Hepatic veins (terminal parts)",
+     "tissue": "vessel-vein",
+     "files": [
+      "Hepatic_veins.obj"
+     ],
+     "budget": 400
+    },
+    {
+     "id": "renal_veins",
+     "name": "Renal veins",
+     "tissue": "vessel-vein",
+     "files": [
+      "Left_renal_vein.obj",
+      "Right_renal_vein.obj"
+     ],
+     "budget": 800
+    },
+    {
+     "id": "iliac_veins",
+     "name": "Common, external and internal iliac veins",
+     "tissue": "vessel-vein",
+     "files": [
+      "Common_iliac_vein.l.obj",
+      "Common_iliac_vein.r.obj",
+      "External_iliac_vein.l.obj",
+      "External_iliac_vein.r.obj",
+      "Internal_iliac_vein.l.obj",
+      "Internal_iliac_vein.r.obj"
+     ],
+     "budget": 2000
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "inferior_vena_cava_abdominal",
+     "name": "Inferior vena cava, abdominal part",
+     "curve": "Inferior vena cava (abdominal part)",
+     "from": "ivc_origin"
+    },
+    {
+     "id": "inferior_vena_cava_thoracic",
+     "name": "Inferior vena cava, thoracic part",
+     "curve": "Inferior vena cava (thoracic part)",
+     "parent": "inferior_vena_cava_abdominal",
+     "kind": "segment"
+    },
+    {
+     "id": "superior_vena_cava",
+     "name": "Superior vena cava",
+     "curve": "Superior vena cava",
+     "from": "svc_formation",
+     "orient": "down"
+    },
+    {
+     "id": "left_brachiocephalic_vein",
+     "name": "Left brachiocephalic vein",
+     "curve": "Left brachiocephalic vein",
+     "parent": "superior_vena_cava",
+     "kind": "vein"
+    },
+    {
+     "id": "right_brachiocephalic_vein",
+     "name": "Right brachiocephalic vein",
+     "curve": "Right brachiocephalic vein",
+     "parent": "superior_vena_cava",
+     "kind": "vein"
+    },
+    {
+     "id": "hepatic_vein_1",
+     "name": "Hepatic vein 1 (unnamed in source)",
+     "curve": "Hepatic veins",
+     "spline": 0,
+     "parent": "inferior_vena_cava_thoracic",
+     "kind": "vein"
+    },
+    {
+     "id": "hepatic_vein_2",
+     "name": "Hepatic vein 2 (unnamed in source)",
+     "curve": "Hepatic veins",
+     "spline": 1,
+     "parent": "inferior_vena_cava_thoracic",
+     "kind": "vein"
+    },
+    {
+     "id": "left_renal_vein",
+     "name": "Left renal vein",
+     "curve": "Left renal vein",
+     "parent": "inferior_vena_cava_abdominal",
+     "kind": "vein"
+    },
+    {
+     "id": "right_renal_vein",
+     "name": "Right renal vein",
+     "curve": "Right renal vein",
+     "parent": "inferior_vena_cava_abdominal",
+     "kind": "vein"
+    },
+    {
+     "id": "left_common_iliac_vein",
+     "name": "Left common iliac vein",
+     "curve": "Common iliac vein.l",
+     "parent": "inferior_vena_cava_abdominal",
+     "kind": "vein"
+    },
+    {
+     "id": "right_common_iliac_vein",
+     "name": "Right common iliac vein",
+     "curve": "Common iliac vein.r",
+     "parent": "inferior_vena_cava_abdominal",
+     "kind": "vein"
+    },
+    {
+     "id": "left_external_iliac_vein",
+     "name": "Left external iliac vein",
+     "curve": "External iliac vein.l",
+     "parent": "left_common_iliac_vein",
+     "kind": "vein"
+    },
+    {
+     "id": "right_external_iliac_vein",
+     "name": "Right external iliac vein",
+     "curve": "External iliac vein.r",
+     "parent": "right_common_iliac_vein",
+     "kind": "vein"
+    },
+    {
+     "id": "left_internal_iliac_vein",
+     "name": "Left internal iliac vein",
+     "curve": "Internal iliac vein.l",
+     "parent": "left_common_iliac_vein",
+     "kind": "vein"
+    },
+    {
+     "id": "right_internal_iliac_vein",
+     "name": "Right internal iliac vein",
+     "curve": "Internal iliac vein.r",
+     "parent": "right_common_iliac_vein",
+     "kind": "vein"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "ivc_origin",
+     "name": "Formation of the inferior vena cava (lower end of its source curve)",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Inferior vena cava (abdominal part)",
+      "end": "lowest"
+     }
+    },
+    {
+     "id": "ivc_upper_end",
+     "name": "Upper end of the thoracic inferior vena cava curve (at the right atrium)",
+     "rule": {
+      "type": "line_point",
+      "line": "inferior_vena_cava_thoracic",
+      "at": "end"
+     }
+    },
+    {
+     "id": "svc_formation",
+     "name": "Formation of the superior vena cava (upper end of its source curve)",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Superior vena cava",
+      "end": "highest"
+     }
+    },
+    {
+     "id": "svc_lower_end",
+     "name": "Lower end of the superior vena cava curve (at the right atrium)",
+     "rule": {
+      "type": "line_point",
+      "line": "superior_vena_cava",
+      "at": "end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "portal-venous",
+   "name": "Hepatic portal vein and its tributaries",
+   "system": "Cardiovascular",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "portal_vein",
+     "name": "Hepatic portal vein",
+     "tissue": "vessel-vein",
+     "files": [
+      "Hepatic_portal_vein.obj"
+     ],
+     "budget": 500
+    },
+    {
+     "id": "splenic_vein",
+     "name": "Splenic vein with its hilar tributaries",
+     "tissue": "vessel-vein",
+     "files": [
+      "Splenic_vein.obj"
+     ],
+     "budget": 1200
+    },
+    {
+     "id": "superior_mesenteric_vein",
+     "name": "Superior mesenteric vein",
+     "tissue": "vessel-vein",
+     "files": [
+      "Superior_mesenteric_vein.obj"
+     ],
+     "budget": 1000
+    },
+    {
+     "id": "inferior_mesenteric_vein",
+     "name": "Inferior mesenteric vein",
+     "tissue": "vessel-vein",
+     "files": [
+      "Inferior_mesenteric_vein.obj"
+     ],
+     "budget": 800
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "portal_vein",
+     "name": "Hepatic portal vein",
+     "curve": "Hepatic portal vein",
+     "from": "portal_confluence"
+    },
+    {
+     "id": "splenic_vein",
+     "name": "Splenic vein",
+     "curve": "Splenic vein",
+     "spline": 0,
+     "from": "portal_confluence",
+     "orient": "start_near:portal_confluence"
+    },
+    {
+     "id": "superior_mesenteric_vein",
+     "name": "Superior mesenteric vein",
+     "curve": "Superior mesenteric vein",
+     "from": "portal_confluence",
+     "orient": "start_near:portal_confluence"
+    },
+    {
+     "id": "inferior_mesenteric_vein",
+     "name": "Inferior mesenteric vein",
+     "curve": "Inferior mesenteric vein",
+     "parent": "splenic_vein",
+     "kind": "vein"
+    },
+    {
+     "id": "splenic_vein_hilar_tributary_1",
+     "name": "Hilar tributary 1 of the splenic vein (unnamed in source)",
+     "curve": "Splenic vein",
+     "spline": 1,
+     "parent": "auto",
+     "kind": "vein"
+    },
+    {
+     "id": "splenic_vein_hilar_tributary_2",
+     "name": "Hilar tributary 2 of the splenic vein (unnamed in source)",
+     "curve": "Splenic vein",
+     "spline": 2,
+     "parent": "auto",
+     "kind": "vein"
+    },
+    {
+     "id": "splenic_vein_hilar_tributary_3",
+     "name": "Hilar tributary 3 of the splenic vein (unnamed in source)",
+     "curve": "Splenic vein",
+     "spline": 3,
+     "parent": "auto",
+     "kind": "vein"
+    },
+    {
+     "id": "splenic_vein_hilar_tributary_4",
+     "name": "Hilar tributary 4 of the splenic vein (unnamed in source)",
+     "curve": "Splenic vein",
+     "spline": 4,
+     "parent": "auto",
+     "kind": "vein"
+    },
+    {
+     "id": "splenic_vein_hilar_tributary_5",
+     "name": "Hilar tributary 5 of the splenic vein (unnamed in source)",
+     "curve": "Splenic vein",
+     "spline": 5,
+     "parent": "auto",
+     "kind": "vein"
+    },
+    {
+     "id": "splenic_vein_hilar_tributary_6",
+     "name": "Hilar tributary 6 of the splenic vein (unnamed in source)",
+     "curve": "Splenic vein",
+     "spline": 6,
+     "parent": "auto",
+     "kind": "vein"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "portal_confluence",
+     "name": "Portal confluence: union of the splenic and superior mesenteric veins (lower end of the portal vein curve)",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Hepatic portal vein",
+      "end": "lowest"
+     }
+    },
+    {
+     "id": "portal_vein_upper_end",
+     "name": "Upper (hepatic) end of the portal vein curve",
+     "rule": {
+      "type": "line_point",
+      "line": "portal_vein",
+      "at": "end"
+     }
+    },
+    {
+     "id": "splenic_vein_hilar_end",
+     "name": "Splenic end of the splenic vein main curve",
+     "rule": {
+      "type": "line_point",
+      "line": "splenic_vein",
+      "at": "end"
+     }
+    },
+    {
+     "id": "superior_mesenteric_vein_lower_end",
+     "name": "Lower end of the superior mesenteric vein curve",
+     "rule": {
+      "type": "line_point",
+      "line": "superior_mesenteric_vein",
+      "at": "end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "liver",
+   "name": "Liver",
+   "system": "Hepatobiliary",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "liver",
+     "name": "Liver",
+     "tissue": "liver",
+     "files": [
+      "Liver.obj"
+     ],
+     "budget": 5500,
+     "subdivide": 1,
+     "smooth": 8
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "liver_dome",
+     "name": "Highest point of the liver (dome)",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "liver",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "liver_right_lateral_point",
+     "name": "Most lateral point of the right lobe",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "liver",
+      "axis": "-x"
+     }
+    },
+    {
+     "id": "liver_left_lobe_tip",
+     "name": "Tip of the left lobe (most left point)",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "liver",
+      "axis": "+x"
+     }
+    },
+    {
+     "id": "liver_lowest_point",
+     "name": "Lowest point of the liver (inferior margin of the right lobe)",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "liver",
+      "axis": "-y"
+     }
+    },
+    {
+     "id": "liver_centroid",
+     "name": "Liver centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "liver"
+     }
+    }
+   ]
+  },
+  {
+   "id": "liver-segments",
+   "name": "Liver segments (Couinaud I-VIII)",
+   "system": "Hepatobiliary",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "segment_i",
+     "name": "Segment I (caudate)",
+     "tissue": "liver",
+     "files": [
+      "Posterior_segment_of_liver_(I).obj"
+     ],
+     "budget": 1300,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "segment_ii",
+     "name": "Segment II",
+     "tissue": "liver",
+     "files": [
+      "Left_posterior_lateral_segment_of_liver_(II).obj"
+     ],
+     "budget": 1300,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "segment_iii",
+     "name": "Segment III",
+     "tissue": "liver",
+     "files": [
+      "Left_anterior_lateral_segment_of_liver_(III).obj"
+     ],
+     "budget": 1300,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "segment_iv",
+     "name": "Segment IV",
+     "tissue": "liver",
+     "files": [
+      "Left_medial_segment_of_liver_(IV).obj"
+     ],
+     "budget": 1500,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "segment_v",
+     "name": "Segment V",
+     "tissue": "liver",
+     "files": [
+      "Anterior_medial_segment_of_liver_(V).obj"
+     ],
+     "budget": 1300,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "segment_vi",
+     "name": "Segment VI",
+     "tissue": "liver",
+     "files": [
+      "Anterior_lateral_segment_of_liver_(VI).obj"
+     ],
+     "budget": 1300,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "segment_vii",
+     "name": "Segment VII",
+     "tissue": "liver",
+     "files": [
+      "Posterior_lateral_segment_of_liver_(VII).obj"
+     ],
+     "budget": 1300,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "segment_viii",
+     "name": "Segment VIII",
+     "tissue": "liver",
+     "files": [
+      "Posterior_medial_segment_of_liver_(VIII).obj"
+     ],
+     "budget": 1300,
+     "subdivide": 1,
+     "smooth": 6
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "liver_segment_i_centroid",
+     "name": "Centroid of segment I",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_i"
+     }
+    },
+    {
+     "id": "liver_segment_ii_centroid",
+     "name": "Centroid of segment II",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_ii"
+     }
+    },
+    {
+     "id": "liver_segment_iii_centroid",
+     "name": "Centroid of segment III",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_iii"
+     }
+    },
+    {
+     "id": "liver_segment_iv_centroid",
+     "name": "Centroid of segment IV",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_iv"
+     }
+    },
+    {
+     "id": "liver_segment_v_centroid",
+     "name": "Centroid of segment V",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_v"
+     }
+    },
+    {
+     "id": "liver_segment_vi_centroid",
+     "name": "Centroid of segment VI",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_vi"
+     }
+    },
+    {
+     "id": "liver_segment_vii_centroid",
+     "name": "Centroid of segment VII",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_vii"
+     }
+    },
+    {
+     "id": "liver_segment_viii_centroid",
+     "name": "Centroid of segment VIII",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "segment_viii"
+     }
+    }
+   ]
+  },
+  {
+   "id": "gallbladder",
+   "name": "Gallbladder and bile duct",
+   "system": "Hepatobiliary",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "gallbladder",
+     "name": "Gallbladder",
+     "tissue": "gallbladder",
+     "files": [
+      "Gallbladder.obj"
+     ],
+     "budget": 3000,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "bile_duct",
+     "name": "Bile duct (common bile duct)",
+     "tissue": "bile-duct",
+     "files": [
+      "Bile_duct.obj"
+     ],
+     "budget": 600
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "bile_duct",
+     "name": "Bile duct (common bile duct)",
+     "curve": "Bile duct",
+     "from": "bile_duct_upper_end",
+     "orient": "down"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "bile_duct_upper_end",
+     "name": "Upper end of the bile duct curve (where a cystic and common hepatic duct would join; neither is in the source)",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Bile duct",
+      "end": "highest"
+     }
+    },
+    {
+     "id": "bile_duct_lower_end",
+     "name": "Lower (duodenal) end of the bile duct curve",
+     "rule": {
+      "type": "line_point",
+      "line": "bile_duct",
+      "at": "end"
+     }
+    },
+    {
+     "id": "gallbladder_neck",
+     "name": "Gallbladder neck (gallbladder surface point nearest the upper end of the bile duct)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "gallbladder",
+      "to": "bile_duct_upper_end"
+     }
+    },
+    {
+     "id": "gallbladder_fundus",
+     "name": "Gallbladder fundus (gallbladder surface point farthest from the neck)",
+     "rule": {
+      "type": "mesh_farthest",
+      "part": "gallbladder",
+      "from": "gallbladder_neck"
+     }
+    },
+    {
+     "id": "gallbladder_centroid",
+     "name": "Gallbladder centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "gallbladder"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pancreas",
+   "name": "Pancreas and pancreatic ducts",
+   "system": "Gastrointestinal",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "pancreas",
+     "name": "Pancreas",
+     "tissue": "pancreas",
+     "files": [
+      "Pancreas.obj"
+     ],
+     "budget": 4500,
+     "smooth": 4
+    },
+    {
+     "id": "pancreatic_duct",
+     "name": "Main pancreatic duct with side branches",
+     "tissue": "bile-duct",
+     "files": [
+      "Pancreatic_duct.obj"
+     ],
+     "budget": 1200
+    },
+    {
+     "id": "accessory_pancreatic_duct",
+     "name": "Accessory pancreatic duct",
+     "tissue": "bile-duct",
+     "files": [
+      "Accessory_pancreatic_duct.obj"
+     ],
+     "budget": 500
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "main_pancreatic_duct",
+     "name": "Main pancreatic duct (tail to papilla)",
+     "curve": "Pancreatic duct",
+     "spline": 0,
+     "from": "pancreatic_duct_tail_end",
+     "orient": "start_near:pancreatic_duct_tail_end"
+    },
+    {
+     "id": "accessory_pancreatic_duct",
+     "name": "Accessory pancreatic duct (duodenal end first; in the source it does not reach the main duct, nearest gap 1.8 cm)",
+     "curve": "Accessory pancreatic duct",
+     "spline": 0,
+     "from": "accessory_pancreatic_duct_duodenal_end",
+     "orient": "start_near:accessory_pancreatic_duct_duodenal_end"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "pancreatic_duct_tail_end",
+     "name": "Tail end of the main pancreatic duct curve",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Pancreatic duct",
+      "end": "most_left"
+     }
+    },
+    {
+     "id": "pancreatic_duct_papillary_end",
+     "name": "Duodenal end of the main pancreatic duct curve",
+     "rule": {
+      "type": "line_point",
+      "line": "main_pancreatic_duct",
+      "at": "end"
+     }
+    },
+    {
+     "id": "accessory_pancreatic_duct_duodenal_end",
+     "name": "Duodenal end of the accessory pancreatic duct curve (its right-hand end)",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Accessory pancreatic duct",
+      "end": "most_right"
+     }
+    },
+    {
+     "id": "pancreas_tail_tip",
+     "name": "Tip of the pancreatic tail (most left point)",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "pancreas",
+      "axis": "+x"
+     }
+    },
+    {
+     "id": "pancreas_head_lowest_point",
+     "name": "Lowest point of the pancreas (head / uncinate region)",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "pancreas",
+      "axis": "-y"
+     }
+    }
+   ]
+  },
+  {
+   "id": "oesophagus",
+   "name": "Oesophagus",
+   "system": "Gastrointestinal",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "oesophagus",
+     "name": "Oesophagus",
+     "tissue": "bowel",
+     "files": [
+      "Oesophagus.obj"
+     ],
+     "budget": 1200
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "oesophagus",
+     "name": "Oesophagus",
+     "curve": "Oesophagus",
+     "from": "oesophagus_upper_end",
+     "orient": "down"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "oesophagus_upper_end",
+     "name": "Upper end of the oesophagus curve",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Oesophagus",
+      "end": "highest"
+     }
+    },
+    {
+     "id": "oesophagus_lower_end",
+     "name": "Lower end of the oesophagus curve (at the stomach)",
+     "rule": {
+      "type": "line_point",
+      "line": "oesophagus",
+      "at": "end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "stomach",
+   "name": "Stomach",
+   "system": "Gastrointestinal",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "stomach",
+     "name": "Stomach",
+     "tissue": "bowel",
+     "files": [
+      "Stomach.obj"
+     ],
+     "budget": 4500,
+     "subdivide": 1,
+     "smooth": 8
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "cardia",
+     "name": "Cardia (stomach surface point nearest the lower end of the oesophagus)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "stomach",
+      "to": "oesophagus_lower_end"
+     }
+    },
+    {
+     "id": "gastric_fundus_top",
+     "name": "Highest point of the gastric fundus",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "stomach",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "pylorus",
+     "name": "Pylorus (midpoint of the closest stomach-duodenum surface pair)",
+     "rule": {
+      "type": "mesh_contact",
+      "part": "stomach",
+      "other": "duodenum.duodenum"
+     }
+    },
+    {
+     "id": "stomach_lowest_point",
+     "name": "Lowest point of the greater curvature",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "stomach",
+      "axis": "-y"
+     }
+    }
+   ]
+  },
+  {
+   "id": "duodenum",
+   "name": "Duodenum",
+   "system": "Gastrointestinal",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "duodenum",
+     "name": "Duodenum",
+     "tissue": "bowel",
+     "files": [
+      "Duodenum.obj"
+     ],
+     "budget": 4000,
+     "subdivide": 1,
+     "smooth": 6
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "major_duodenal_papilla",
+     "name": "Major duodenal papilla (duodenal surface point nearest the lower end of the bile duct)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "duodenum",
+      "to": "bile_duct_lower_end"
+     }
+    },
+    {
+     "id": "minor_duodenal_papilla",
+     "name": "Minor duodenal papilla (duodenal surface point nearest the duodenal end of the accessory pancreatic duct)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "duodenum",
+      "to": "accessory_pancreatic_duct_duodenal_end"
+     }
+    },
+    {
+     "id": "duodenojejunal_flexure",
+     "name": "Duodenojejunal flexure (duodenal surface point nearest the duodenal end of the small-intestine curve)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "duodenum",
+      "to": "small_intestine_duodenal_end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "small-intestine",
+   "name": "Small intestine (jejunum and ileum)",
+   "system": "Gastrointestinal",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "small_intestine",
+     "name": "Jejunum and ileum (one tube; Z-Anatomy object 'Jejunum')",
+     "tissue": "bowel",
+     "files": [
+      "Jejunum.obj"
+     ],
+     "budget": 6000
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "small_intestine",
+     "name": "Small intestine, duodenojejunal end to ileal end (Z-Anatomy 'Jejunum' curve)",
+     "curve": "Jejunum",
+     "from": "small_intestine_duodenal_end",
+     "orient": "start_near:small_intestine_duodenal_end",
+     "spacing_cm": 1.0
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "small_intestine_duodenal_end",
+     "name": "Duodenal end of the small-intestine curve",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Jejunum",
+      "end": "highest"
+     }
+    },
+    {
+     "id": "terminal_ileum_end",
+     "name": "Ileal end of the small-intestine curve (at the large intestine)",
+     "rule": {
+      "type": "line_point",
+      "line": "small_intestine",
+      "at": "end"
+     }
+    }
+   ]
+  },
+  {
+   "id": "colon",
+   "name": "Large intestine",
+   "system": "Gastrointestinal",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "ascending_colon",
+     "name": "Ascending colon",
+     "tissue": "bowel",
+     "files": [
+      "Ascending_colon.obj"
+     ],
+     "budget": 2200,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "transverse_colon",
+     "name": "Transverse colon",
+     "tissue": "bowel",
+     "files": [
+      "Transverse_colon.obj"
+     ],
+     "budget": 2200,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "descending_colon",
+     "name": "Descending colon",
+     "tissue": "bowel",
+     "files": [
+      "Descending_colon.obj"
+     ],
+     "budget": 2200,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "sigmoid_colon_rectum",
+     "name": "Sigmoid colon, rectum and anal canal (one Z-Anatomy object, 'Sigmoid colon')",
+     "tissue": "bowel",
+     "files": [
+      "Sigmoid_colon.obj"
+     ],
+     "budget": 3000,
+     "subdivide": 1,
+     "smooth": 4
+    },
+    {
+     "id": "appendix",
+     "name": "Vermiform appendix",
+     "tissue": "bowel",
+     "files": [
+      "Vermiform_appendix.obj"
+     ],
+     "budget": 800,
+     "smooth": 2
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "appendix_base",
+     "name": "Base of the appendix (appendix surface point nearest the ascending colon)",
+     "rule": {
+      "type": "mesh_contact",
+      "part": "appendix",
+      "other": "colon.ascending_colon",
+      "pick": "a"
+     }
+    },
+    {
+     "id": "appendix_tip",
+     "name": "Tip of the appendix (appendix surface point farthest from its base)",
+     "rule": {
+      "type": "mesh_farthest",
+      "part": "appendix",
+      "from": "appendix_base"
+     }
+    },
+    {
+     "id": "ileocolic_junction",
+     "name": "Ileocolic junction (ascending-colon surface point nearest the ileal end of the small-intestine curve)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "ascending_colon",
+      "to": "terminal_ileum_end"
+     }
+    },
+    {
+     "id": "right_colic_flexure",
+     "name": "Right colic (hepatic) flexure (midpoint of the closest ascending-transverse colon surface pair)",
+     "rule": {
+      "type": "mesh_contact",
+      "part": "ascending_colon",
+      "other": "colon.transverse_colon"
+     }
+    },
+    {
+     "id": "left_colic_flexure",
+     "name": "Left colic (splenic) flexure (midpoint of the closest transverse-descending colon surface pair)",
+     "rule": {
+      "type": "mesh_contact",
+      "part": "transverse_colon",
+      "other": "colon.descending_colon"
+     }
+    },
+    {
+     "id": "colon_lowest_point",
+     "name": "Lowest point of the large intestine (anal end of the sigmoid/rectum object)",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "sigmoid_colon_rectum",
+      "axis": "-y"
+     }
+    }
+   ]
+  },
+  {
+   "id": "spleen",
+   "name": "Spleen",
+   "system": "Lymphoid",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "spleen",
+     "name": "Spleen",
+     "tissue": "liver",
+     "files": [
+      "Spleen.obj"
+     ],
+     "budget": 3000,
+     "smooth": 4
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "splenic_hilum",
+     "name": "Splenic hilum (spleen surface point nearest the splenic end of the splenic artery)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "spleen",
+      "to": "splenic_artery_end"
+     }
+    },
+    {
+     "id": "spleen_upper_pole",
+     "name": "Upper pole of the spleen",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "spleen",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "spleen_lower_pole",
+     "name": "Lower pole of the spleen",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "spleen",
+      "axis": "-y"
+     }
+    },
+    {
+     "id": "spleen_centroid",
+     "name": "Spleen centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "spleen"
+     }
+    }
+   ]
+  },
+  {
+   "id": "lungs",
+   "name": "Lungs",
+   "system": "Respiratory",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "right_superior_lobe",
+     "name": "Superior lobe of right lung",
+     "tissue": "lung",
+     "files": [
+      "Superior_lobe_of_right_lung.obj"
+     ],
+     "budget": 3000,
+     "subdivide": 1,
+     "smooth": 8
+    },
+    {
+     "id": "right_middle_lobe",
+     "name": "Middle lobe of right lung",
+     "tissue": "lung",
+     "files": [
+      "Middle_lobe_of_right_lung.obj"
+     ],
+     "budget": 2600,
+     "subdivide": 1,
+     "smooth": 8
+    },
+    {
+     "id": "right_inferior_lobe",
+     "name": "Inferior lobe of right lung",
+     "tissue": "lung",
+     "files": [
+      "Inferior_lobe_of_right_lung.obj"
+     ],
+     "budget": 3200,
+     "subdivide": 1,
+     "smooth": 8
+    },
+    {
+     "id": "left_superior_lobe",
+     "name": "Superior lobe of left lung",
+     "tissue": "lung",
+     "files": [
+      "Superior_lobe_of_left_lung.obj"
+     ],
+     "budget": 3200,
+     "subdivide": 1,
+     "smooth": 8
+    },
+    {
+     "id": "left_inferior_lobe",
+     "name": "Inferior lobe of left lung",
+     "tissue": "lung",
+     "files": [
+      "Inferior_lobe_of_left_lung.obj"
+     ],
+     "budget": 3200,
+     "subdivide": 1,
+     "smooth": 8
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "right_lung_apex",
+     "name": "Apex of the right lung",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "right_superior_lobe",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "left_lung_apex",
+     "name": "Apex of the left lung",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "left_superior_lobe",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "right_lung_base_lowest",
+     "name": "Lowest point of the right lung",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "right_inferior_lobe",
+      "axis": "-y"
+     }
+    },
+    {
+     "id": "left_lung_base_lowest",
+     "name": "Lowest point of the left lung",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "left_inferior_lobe",
+      "axis": "-y"
+     }
+    }
+   ]
+  },
+  {
+   "id": "airways",
+   "name": "Trachea and bronchi",
+   "system": "Respiratory",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "trachea",
+     "name": "Trachea",
+     "tissue": "cartilage",
+     "files": [
+      "Trachea.obj"
+     ],
+     "budget": 3000
+    },
+    {
+     "id": "main_bronchi",
+     "name": "Right and left main bronchi",
+     "tissue": "cartilage",
+     "files": [
+      "Right_main_bronchus.obj",
+      "Left_main_bronchus.obj"
+     ],
+     "budget": 800
+    },
+    {
+     "id": "lobar_bronchi",
+     "name": "Lobar bronchi and the right intermediate bronchus",
+     "tissue": "cartilage",
+     "files": [
+      "Right_superior_lobar_bronchus.obj",
+      "Intermediate_bronchus.r.obj",
+      "Middle_lobar_bronchus.r.obj",
+      "Right_inferior_lobar_bronchus.obj",
+      "Left_superior_lobar_bronchus.obj",
+      "Left_inferior_lobar_bronchus.obj"
+     ],
+     "budget": 2000
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "right_main_bronchus",
+     "name": "Right main bronchus",
+     "curve": "Right main bronchus",
+     "from": "carina",
+     "orient": "start_near:carina"
+    },
+    {
+     "id": "left_main_bronchus",
+     "name": "Left main bronchus",
+     "curve": "Left main bronchus",
+     "from": "carina",
+     "orient": "start_near:carina"
+    },
+    {
+     "id": "right_superior_lobar_bronchus",
+     "name": "Right superior lobar bronchus",
+     "curve": "Right superior lobar bronchus",
+     "parent": "right_main_bronchus",
+     "kind": "airway"
+    },
+    {
+     "id": "intermediate_bronchus",
+     "name": "Intermediate bronchus (right)",
+     "curve": "Intermediate bronchus.r",
+     "parent": "right_main_bronchus",
+     "kind": "segment"
+    },
+    {
+     "id": "right_middle_lobar_bronchus",
+     "name": "Middle lobar bronchus (right)",
+     "curve": "Middle lobar bronchus.r",
+     "parent": "intermediate_bronchus",
+     "kind": "airway"
+    },
+    {
+     "id": "right_inferior_lobar_bronchus",
+     "name": "Right inferior lobar bronchus",
+     "curve": "Right inferior lobar bronchus",
+     "parent": "intermediate_bronchus",
+     "kind": "airway"
+    },
+    {
+     "id": "left_superior_lobar_bronchus",
+     "name": "Left superior lobar bronchus",
+     "curve": "Left superior lobar bronchus",
+     "spline": 0,
+     "parent": "left_main_bronchus",
+     "kind": "airway"
+    },
+    {
+     "id": "lingular_bronchus",
+     "name": "Second branch of the left superior lobar bronchus curve (towards the lingula; unnamed in source)",
+     "curve": "Left superior lobar bronchus",
+     "spline": 1,
+     "parent": "left_superior_lobar_bronchus",
+     "kind": "airway"
+    },
+    {
+     "id": "left_inferior_lobar_bronchus",
+     "name": "Left inferior lobar bronchus",
+     "curve": "Left inferior lobar bronchus",
+     "parent": "left_main_bronchus",
+     "kind": "airway"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "carina",
+     "name": "Carina (shared tracheal end of the two main bronchus curves)",
+     "rule": {
+      "type": "curve_ends_meet",
+      "curves": [
+       "Right main bronchus",
+       "Left main bronchus"
+      ]
+     }
+    },
+    {
+     "id": "trachea_upper_end",
+     "name": "Upper end of the trachea",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "trachea",
+      "axis": "+y"
+     }
+    }
+   ]
+  },
+  {
+   "id": "thyroid",
+   "name": "Thyroid gland",
+   "system": "Endocrine",
+   "src": "totalseg",
+   "parts": [
+    {
+     "id": "thyroid",
+     "name": "Thyroid gland",
+     "tissue": "pancreas",
+     "files": [
+      "thyroid_gland.obj"
+     ],
+     "budget": 3000,
+     "smooth": 4
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "thyroid_centroid",
+     "name": "Thyroid centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "thyroid"
+     }
+    },
+    {
+     "id": "thyroid_right_lobe_upper_pole",
+     "name": "Upper pole of the right lobe",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "thyroid",
+      "axis": "+y",
+      "side": "right"
+     }
+    },
+    {
+     "id": "thyroid_left_lobe_upper_pole",
+     "name": "Upper pole of the left lobe",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "thyroid",
+      "axis": "+y",
+      "side": "left"
+     }
+    },
+    {
+     "id": "thyroid_right_lobe_lower_pole",
+     "name": "Lower pole of the right lobe",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "thyroid",
+      "axis": "-y",
+      "side": "right"
+     }
+    },
+    {
+     "id": "thyroid_left_lobe_lower_pole",
+     "name": "Lower pole of the left lobe",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "thyroid",
+      "axis": "-y",
+      "side": "left"
+     }
+    }
+   ]
+  },
+  {
+   "id": "adrenals",
+   "name": "Suprarenal (adrenal) glands",
+   "system": "Endocrine",
+   "src": "totalseg",
+   "parts": [
+    {
+     "id": "right_suprarenal_gland",
+     "name": "Right suprarenal gland",
+     "tissue": "pancreas",
+     "files": [
+      "adrenal_gland_right.obj"
+     ],
+     "budget": 1500,
+     "smooth": 4
+    },
+    {
+     "id": "left_suprarenal_gland",
+     "name": "Left suprarenal gland",
+     "tissue": "pancreas",
+     "files": [
+      "adrenal_gland_left.obj"
+     ],
+     "budget": 1500,
+     "smooth": 4
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "right_suprarenal_centroid",
+     "name": "Right suprarenal gland centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "right_suprarenal_gland"
+     }
+    },
+    {
+     "id": "left_suprarenal_centroid",
+     "name": "Left suprarenal gland centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "left_suprarenal_gland"
+     }
+    }
+   ]
+  },
+  {
+   "id": "kidneys",
+   "name": "Kidneys",
+   "system": "Urinary",
+   "src": "totalseg",
+   "parts": [
+    {
+     "id": "right_kidney",
+     "name": "Right kidney",
+     "tissue": "liver",
+     "files": [
+      "kidney_right.obj"
+     ],
+     "budget": 3500,
+     "smooth": 8
+    },
+    {
+     "id": "left_kidney",
+     "name": "Left kidney",
+     "tissue": "liver",
+     "files": [
+      "kidney_left.obj"
+     ],
+     "budget": 3500,
+     "smooth": 8
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "right_renal_hilum",
+     "name": "Right renal hilum (centre of the convex-hull lid over the renal sinus)",
+     "rule": {
+      "type": "hilum_lid",
+      "part": "right_kidney"
+     }
+    },
+    {
+     "id": "left_renal_hilum",
+     "name": "Left renal hilum (centre of the convex-hull lid over the renal sinus)",
+     "rule": {
+      "type": "hilum_lid",
+      "part": "left_kidney"
+     }
+    },
+    {
+     "id": "right_kidney_upper_pole",
+     "name": "Upper pole of the right kidney",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "right_kidney",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "right_kidney_lower_pole",
+     "name": "Lower pole of the right kidney",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "right_kidney",
+      "axis": "-y"
+     }
+    },
+    {
+     "id": "left_kidney_upper_pole",
+     "name": "Upper pole of the left kidney",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "left_kidney",
+      "axis": "+y"
+     }
+    },
+    {
+     "id": "left_kidney_lower_pole",
+     "name": "Lower pole of the left kidney",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "left_kidney",
+      "axis": "-y"
+     }
+    }
+   ]
+  },
+  {
+   "id": "bladder",
+   "name": "Urinary bladder and urethra",
+   "system": "Urinary",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "bladder",
+     "name": "Urinary bladder",
+     "tissue": "bowel",
+     "files": [
+      "Urinary_bladder.obj"
+     ],
+     "budget": 3000,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "urethra",
+     "name": "Urethra (male)",
+     "tissue": "bowel",
+     "files": [
+      "Urethra.obj"
+     ],
+     "budget": 800
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "urethra",
+     "name": "Urethra (male; bladder neck to external orifice)",
+     "curve": "Urethra",
+     "from": "urethra_internal_end",
+     "orient": "start_near:urethra_internal_end"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "urethra_internal_end",
+     "name": "Bladder end of the urethra curve",
+     "rule": {
+      "type": "curve_end",
+      "curve": "Urethra",
+      "end": "highest"
+     }
+    },
+    {
+     "id": "external_urethral_orifice",
+     "name": "External end of the urethra curve",
+     "rule": {
+      "type": "line_point",
+      "line": "urethra",
+      "at": "end"
+     }
+    },
+    {
+     "id": "bladder_neck",
+     "name": "Bladder neck (bladder surface point nearest the bladder end of the urethra)",
+     "rule": {
+      "type": "mesh_nearest",
+      "part": "bladder",
+      "to": "urethra_internal_end"
+     }
+    },
+    {
+     "id": "bladder_apex",
+     "name": "Highest point of the bladder",
+     "rule": {
+      "type": "mesh_extreme",
+      "part": "bladder",
+      "axis": "+y"
+     }
+    }
+   ]
+  },
+  {
+   "id": "male-reproductive",
+   "name": "Male reproductive organs",
+   "system": "Reproductive",
+   "src": "zanatomy",
+   "parts": [
+    {
+     "id": "prostate",
+     "name": "Prostate",
+     "tissue": "pancreas",
+     "files": [
+      "Prostate.obj"
+     ],
+     "budget": 1200,
+     "smooth": 2
+    },
+    {
+     "id": "seminal_glands",
+     "name": "Seminal glands (vesicles)",
+     "tissue": "pancreas",
+     "files": [
+      "Seminal_gland.l.obj",
+      "Seminal_gland.r.obj"
+     ],
+     "budget": 1200,
+     "smooth": 2
+    },
+    {
+     "id": "testes",
+     "name": "Testes",
+     "tissue": "bowel",
+     "files": [
+      "Testis.l.obj",
+      "Testis.r.obj"
+     ],
+     "budget": 1200,
+     "subdivide": 1,
+     "smooth": 6
+    },
+    {
+     "id": "epididymides",
+     "name": "Epididymides",
+     "tissue": "bowel",
+     "files": [
+      "Epididymis.l.obj",
+      "Epididymis.r.obj"
+     ],
+     "budget": 600,
+     "subdivide": 1,
+     "smooth": 4
+    },
+    {
+     "id": "ductus_deferens",
+     "name": "Ductus deferens (both)",
+     "tissue": "bowel",
+     "files": [
+      "Ductus_deferens.l.obj",
+      "Ductus_deferens.r.obj"
+     ],
+     "budget": 1200
+    },
+    {
+     "id": "ejaculatory_ducts",
+     "name": "Ejaculatory ducts",
+     "tissue": "bowel",
+     "files": [
+      "Ejaculatory_duct.l.obj",
+      "Ejaculatory_duct.r.obj"
+     ],
+     "budget": 400
+    },
+    {
+     "id": "penis",
+     "name": "Corpora cavernosa, corpus spongiosum and glans penis",
+     "tissue": "muscle",
+     "files": [
+      "Corpus_cavernosum_of_penis.obj",
+      "Corpus_spongiosum_of_penis.obj",
+      "Glans_penis.obj"
+     ],
+     "budget": 3000
+    }
+   ],
+   "centerlines": [
+    {
+     "id": "left_ductus_deferens",
+     "name": "Left ductus deferens (source curve, end to end)",
+     "curve": "Ductus deferens.l"
+    },
+    {
+     "id": "right_ductus_deferens",
+     "name": "Right ductus deferens (source curve, end to end)",
+     "curve": "Ductus deferens.r"
+    },
+    {
+     "id": "left_ejaculatory_duct",
+     "name": "Left ejaculatory duct",
+     "curve": "Ejaculatory duct.l"
+    },
+    {
+     "id": "right_ejaculatory_duct",
+     "name": "Right ejaculatory duct",
+     "curve": "Ejaculatory duct.r"
+    }
+   ],
+   "landmarks": [
+    {
+     "id": "prostate_centroid",
+     "name": "Prostate centroid",
+     "rule": {
+      "type": "mesh_centroid",
+      "part": "prostate"
+     }
+    }
+   ]
+  }
+ ]
+}

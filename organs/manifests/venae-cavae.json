@@ -1,0 +1,1517 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "venae-cavae",
+ "name": "Venae cavae and their major tributaries",
+ "system": "Cardiovascular",
+ "mesh": "venae-cavae",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "inferior_vena_cava",
+   "name": "Inferior vena cava (abdominal and thoracic parts)",
+   "tissue": "vessel-vein"
+  },
+  {
+   "id": "superior_vena_cava",
+   "name": "Superior vena cava",
+   "tissue": "vessel-vein"
+  },
+  {
+   "id": "brachiocephalic_veins",
+   "name": "Brachiocephalic veins",
+   "tissue": "vessel-vein"
+  },
+  {
+   "id": "hepatic_veins",
+   "name": "Hepatic veins (terminal parts)",
+   "tissue": "vessel-vein"
+  },
+  {
+   "id": "renal_veins",
+   "name": "Renal veins",
+   "tissue": "vessel-vein"
+  },
+  {
+   "id": "iliac_veins",
+   "name": "Common, external and internal iliac veins",
+   "tissue": "vessel-vein"
+  }
+ ],
+ "centerlines": {
+  "inferior_vena_cava_abdominal": {
+   "name": "Inferior vena cava, abdominal part",
+   "points": [
+    [
+     -0.865,
+     103.122,
+     2.51
+    ],
+    [
+     -0.872,
+     103.411,
+     2.502
+    ],
+    [
+     -0.884,
+     103.795,
+     2.507
+    ],
+    [
+     -0.897,
+     104.262,
+     2.52
+    ],
+    [
+     -0.913,
+     104.801,
+     2.539
+    ],
+    [
+     -0.93,
+     105.4,
+     2.56
+    ],
+    [
+     -0.947,
+     106.05,
+     2.581
+    ],
+    [
+     -0.964,
+     106.739,
+     2.598
+    ],
+    [
+     -0.981,
+     107.456,
+     2.609
+    ],
+    [
+     -0.996,
+     108.19,
+     2.611
+    ],
+    [
+     -1.009,
+     108.929,
+     2.601
+    ],
+    [
+     -1.018,
+     109.664,
+     2.575
+    ],
+    [
+     -1.025,
+     110.382,
+     2.53
+    ],
+    [
+     -1.024,
+     111.045,
+     2.472
+    ],
+    [
+     -1.017,
+     111.69,
+     2.401
+    ],
+    [
+     -1.005,
+     112.317,
+     2.32
+    ],
+    [
+     -0.989,
+     112.926,
+     2.231
+    ],
+    [
+     -0.972,
+     113.518,
+     2.135
+    ],
+    [
+     -0.954,
+     114.092,
+     2.035
+    ],
+    [
+     -0.939,
+     114.651,
+     1.933
+    ],
+    [
+     -0.927,
+     115.193,
+     1.83
+    ],
+    [
+     -0.921,
+     115.72,
+     1.728
+    ],
+    [
+     -0.922,
+     116.231,
+     1.63
+    ],
+    [
+     -0.933,
+     116.727,
+     1.536
+    ],
+    [
+     -0.954,
+     117.209,
+     1.45
+    ]
+   ],
+   "radius_cm": 0.863,
+   "from": "ivc_origin"
+  },
+  "inferior_vena_cava_thoracic": {
+   "name": "Inferior vena cava, thoracic part",
+   "points": [
+    [
+     -0.954,
+     117.209,
+     1.45
+    ],
+    [
+     -0.974,
+     117.669,
+     1.368
+    ],
+    [
+     -0.982,
+     118.102,
+     1.285
+    ],
+    [
+     -0.981,
+     118.514,
+     1.205
+    ],
+    [
+     -0.974,
+     118.91,
+     1.129
+    ],
+    [
+     -0.963,
+     119.296,
+     1.059
+    ],
+    [
+     -0.951,
+     119.678,
+     0.997
+    ],
+    [
+     -0.941,
+     120.06,
+     0.945
+    ],
+    [
+     -0.936,
+     120.448,
+     0.905
+    ],
+    [
+     -0.939,
+     120.848,
+     0.878
+    ],
+    [
+     -0.953,
+     121.265,
+     0.867
+    ],
+    [
+     -0.98,
+     121.705,
+     0.874
+    ],
+    [
+     -1.023,
+     122.172,
+     0.9
+    ],
+    [
+     -1.087,
+     122.597,
+     0.95
+    ],
+    [
+     -1.17,
+     122.969,
+     1.027
+    ],
+    [
+     -1.263,
+     123.312,
+     1.126
+    ],
+    [
+     -1.354,
+     123.652,
+     1.242
+    ],
+    [
+     -1.434,
+     124.013,
+     1.372
+    ],
+    [
+     -1.492,
+     124.422,
+     1.51
+    ],
+    [
+     -1.512,
+     124.772,
+     1.639
+    ],
+    [
+     -1.51,
+     125.096,
+     1.784
+    ],
+    [
+     -1.495,
+     125.402,
+     1.928
+    ],
+    [
+     -1.475,
+     125.695,
+     2.054
+    ],
+    [
+     -1.461,
+     125.982,
+     2.145
+    ],
+    [
+     -1.462,
+     126.269,
+     2.184
+    ]
+   ],
+   "radius_cm": 0.969,
+   "from": "inferior_vena_cava_thoracic_start"
+  },
+  "superior_vena_cava": {
+   "name": "Superior vena cava",
+   "points": [
+    [
+     -1.439,
+     137.415,
+     2.3
+    ],
+    [
+     -1.441,
+     137.004,
+     2.197
+    ],
+    [
+     -1.458,
+     136.712,
+     2.14
+    ],
+    [
+     -1.481,
+     136.383,
+     2.081
+    ],
+    [
+     -1.51,
+     136.03,
+     2.024
+    ],
+    [
+     -1.541,
+     135.667,
+     1.968
+    ],
+    [
+     -1.573,
+     135.308,
+     1.917
+    ],
+    [
+     -1.603,
+     134.969,
+     1.871
+    ],
+    [
+     -1.629,
+     134.662,
+     1.832
+    ],
+    [
+     -1.649,
+     134.402,
+     1.803
+    ],
+    [
+     -1.662,
+     134.08,
+     1.777
+    ]
+   ],
+   "radius_cm": 1.15,
+   "from": "svc_formation"
+  },
+  "left_brachiocephalic_vein": {
+   "name": "Left brachiocephalic vein",
+   "points": [
+    [
+     -1.439,
+     137.415,
+     2.3
+    ],
+    [
+     -1.391,
+     137.755,
+     2.427
+    ],
+    [
+     -1.207,
+     138.031,
+     2.541
+    ],
+    [
+     -0.925,
+     138.268,
+     2.639
+    ],
+    [
+     -0.582,
+     138.492,
+     2.716
+    ],
+    [
+     -0.217,
+     138.728,
+     2.768
+    ],
+    [
+     0.134,
+     139.001,
+     2.792
+    ],
+    [
+     0.432,
+     139.257,
+     2.782
+    ],
+    [
+     0.708,
+     139.472,
+     2.742
+    ],
+    [
+     0.972,
+     139.668,
+     2.677
+    ],
+    [
+     1.232,
+     139.864,
+     2.595
+    ],
+    [
+     1.498,
+     140.081,
+     2.5
+    ],
+    [
+     1.778,
+     140.341,
+     2.398
+    ],
+    [
+     2.009,
+     140.559,
+     2.303
+    ],
+    [
+     2.208,
+     140.752,
+     2.202
+    ],
+    [
+     2.379,
+     140.965,
+     2.105
+    ],
+    [
+     2.525,
+     141.244,
+     2.025
+    ]
+   ],
+   "radius_cm": 0.735,
+   "from": "left_brachiocephalic_vein_junction"
+  },
+  "right_brachiocephalic_vein": {
+   "name": "Right brachiocephalic vein",
+   "points": [
+    [
+     -1.439,
+     137.415,
+     2.3
+    ],
+    [
+     -1.485,
+     137.76,
+     2.369
+    ],
+    [
+     -1.553,
+     138.051,
+     2.336
+    ],
+    [
+     -1.638,
+     138.311,
+     2.238
+    ],
+    [
+     -1.732,
+     138.566,
+     2.111
+    ],
+    [
+     -1.831,
+     138.84,
+     1.992
+    ],
+    [
+     -1.927,
+     139.157,
+     1.917
+    ],
+    [
+     -2.032,
+     139.524,
+     1.884
+    ],
+    [
+     -2.132,
+     139.844,
+     1.874
+    ],
+    [
+     -2.225,
+     140.145,
+     1.877
+    ],
+    [
+     -2.312,
+     140.457,
+     1.885
+    ],
+    [
+     -2.391,
+     140.807,
+     1.89
+    ],
+    [
+     -2.46,
+     141.224,
+     1.882
+    ]
+   ],
+   "radius_cm": 0.763,
+   "from": "right_brachiocephalic_vein_junction"
+  },
+  "hepatic_vein_1": {
+   "name": "Hepatic vein 1 (unnamed in source)",
+   "points": [
+    [
+     -1.492,
+     124.422,
+     1.51
+    ],
+    [
+     -1.218,
+     124.325,
+     1.672
+    ],
+    [
+     -0.973,
+     124.238,
+     1.818
+    ],
+    [
+     -0.743,
+     124.156,
+     1.956
+    ],
+    [
+     -0.512,
+     124.075,
+     2.093
+    ],
+    [
+     -0.267,
+     123.988,
+     2.239
+    ],
+    [
+     0.006,
+     123.891,
+     2.402
+    ]
+   ],
+   "radius_cm": 0.35,
+   "from": "hepatic_vein_1_junction"
+  },
+  "hepatic_vein_2": {
+   "name": "Hepatic vein 2 (unnamed in source)",
+   "points": [
+    [
+     -1.492,
+     124.422,
+     1.51
+    ],
+    [
+     -1.543,
+     124.26,
+     1.898
+    ],
+    [
+     -1.59,
+     124.115,
+     2.246
+    ],
+    [
+     -1.633,
+     123.978,
+     2.573
+    ],
+    [
+     -1.677,
+     123.842,
+     2.901
+    ],
+    [
+     -1.723,
+     123.697,
+     3.249
+    ],
+    [
+     -1.775,
+     123.535,
+     3.637
+    ]
+   ],
+   "radius_cm": 0.35,
+   "from": "hepatic_vein_2_junction"
+  },
+  "left_renal_vein": {
+   "name": "Left renal vein",
+   "points": [
+    [
+     -1.025,
+     110.382,
+     2.53
+    ],
+    [
+     -0.817,
+     110.428,
+     2.681
+    ],
+    [
+     -0.579,
+     110.482,
+     2.866
+    ],
+    [
+     -0.305,
+     110.536,
+     3.02
+    ],
+    [
+     -0.066,
+     110.576,
+     3.103
+    ],
+    [
+     0.215,
+     110.617,
+     3.164
+    ],
+    [
+     0.502,
+     110.653,
+     3.162
+    ],
+    [
+     0.8,
+     110.688,
+     3.103
+    ],
+    [
+     1.054,
+     110.714,
+     3.031
+    ],
+    [
+     1.387,
+     110.743,
+     2.887
+    ],
+    [
+     1.684,
+     110.77,
+     2.682
+    ],
+    [
+     1.871,
+     110.793,
+     2.501
+    ],
+    [
+     2.033,
+     110.82,
+     2.305
+    ],
+    [
+     2.188,
+     110.852,
+     2.044
+    ],
+    [
+     2.28,
+     110.882,
+     1.776
+    ],
+    [
+     2.328,
+     110.912,
+     1.482
+    ],
+    [
+     2.352,
+     110.945,
+     1.138
+    ],
+    [
+     2.361,
+     110.971,
+     0.827
+    ],
+    [
+     2.384,
+     110.99,
+     0.546
+    ],
+    [
+     2.455,
+     111.013,
+     0.216
+    ],
+    [
+     2.548,
+     111.035,
+     -0.069
+    ]
+   ],
+   "radius_cm": 0.356,
+   "from": "left_renal_vein_junction"
+  },
+  "right_renal_vein": {
+   "name": "Right renal vein",
+   "points": [
+    [
+     -1.329,
+     110.286,
+     1.974
+    ],
+    [
+     -1.498,
+     110.225,
+     1.779
+    ],
+    [
+     -1.697,
+     110.154,
+     1.554
+    ],
+    [
+     -1.901,
+     110.083,
+     1.307
+    ],
+    [
+     -2.09,
+     110.017,
+     1.06
+    ],
+    [
+     -2.24,
+     109.963,
+     0.852
+    ],
+    [
+     -2.384,
+     109.926,
+     0.618
+    ],
+    [
+     -2.504,
+     109.912,
+     0.371
+    ],
+    [
+     -2.588,
+     109.929,
+     0.111
+    ],
+    [
+     -2.748,
+     109.953,
+     -0.209
+    ]
+   ],
+   "radius_cm": 0.385,
+   "from": "right_renal_vein_junction"
+  },
+  "left_common_iliac_vein": {
+   "name": "Left common iliac vein",
+   "points": [
+    [
+     -0.865,
+     103.122,
+     2.51
+    ],
+    [
+     -0.81,
+     102.859,
+     2.528
+    ],
+    [
+     -0.673,
+     102.529,
+     2.548
+    ],
+    [
+     -0.477,
+     102.15,
+     2.561
+    ],
+    [
+     -0.245,
+     101.737,
+     2.556
+    ],
+    [
+     -0.001,
+     101.307,
+     2.523
+    ],
+    [
+     0.234,
+     100.877,
+     2.451
+    ],
+    [
+     0.386,
+     100.592,
+     2.38
+    ],
+    [
+     0.539,
+     100.32,
+     2.299
+    ],
+    [
+     0.69,
+     100.06,
+     2.208
+    ],
+    [
+     0.838,
+     99.812,
+     2.11
+    ],
+    [
+     0.983,
+     99.573,
+     2.005
+    ],
+    [
+     1.123,
+     99.342,
+     1.896
+    ],
+    [
+     1.257,
+     99.119,
+     1.783
+    ],
+    [
+     1.384,
+     98.901,
+     1.668
+    ],
+    [
+     1.502,
+     98.689,
+     1.552
+    ],
+    [
+     1.611,
+     98.479,
+     1.437
+    ],
+    [
+     1.709,
+     98.272,
+     1.324
+    ],
+    [
+     1.796,
+     98.065,
+     1.214
+    ]
+   ],
+   "radius_cm": 0.702,
+   "from": "left_common_iliac_vein_junction"
+  },
+  "right_common_iliac_vein": {
+   "name": "Right common iliac vein",
+   "points": [
+    [
+     -0.865,
+     103.122,
+     2.51
+    ],
+    [
+     -0.912,
+     102.607,
+     2.447
+    ],
+    [
+     -0.971,
+     102.196,
+     2.365
+    ],
+    [
+     -1.047,
+     101.713,
+     2.258
+    ],
+    [
+     -1.137,
+     101.182,
+     2.132
+    ],
+    [
+     -1.236,
+     100.626,
+     1.993
+    ],
+    [
+     -1.34,
+     100.068,
+     1.847
+    ],
+    [
+     -1.446,
+     99.532,
+     1.699
+    ],
+    [
+     -1.548,
+     99.04,
+     1.556
+    ],
+    [
+     -1.643,
+     98.616,
+     1.423
+    ],
+    [
+     -1.727,
+     98.283,
+     1.307
+    ],
+    [
+     -1.796,
+     98.065,
+     1.214
+    ]
+   ],
+   "radius_cm": 0.75,
+   "from": "right_common_iliac_vein_junction"
+  },
+  "left_external_iliac_vein": {
+   "name": "Left external iliac vein",
+   "points": [
+    [
+     1.796,
+     98.065,
+     1.214
+    ],
+    [
+     1.893,
+     97.832,
+     1.103
+    ],
+    [
+     2.02,
+     97.549,
+     0.987
+    ],
+    [
+     2.172,
+     97.221,
+     0.872
+    ],
+    [
+     2.344,
+     96.854,
+     0.762
+    ],
+    [
+     2.531,
+     96.453,
+     0.663
+    ],
+    [
+     2.727,
+     96.024,
+     0.578
+    ],
+    [
+     2.928,
+     95.571,
+     0.513
+    ],
+    [
+     3.128,
+     95.1,
+     0.474
+    ],
+    [
+     3.321,
+     94.616,
+     0.464
+    ],
+    [
+     3.503,
+     94.124,
+     0.488
+    ],
+    [
+     3.669,
+     93.63,
+     0.552
+    ],
+    [
+     3.814,
+     93.138,
+     0.66
+    ],
+    [
+     3.949,
+     92.647,
+     0.826
+    ],
+    [
+     4.066,
+     92.233,
+     1.031
+    ],
+    [
+     4.165,
+     91.879,
+     1.268
+    ],
+    [
+     4.246,
+     91.566,
+     1.534
+    ],
+    [
+     4.311,
+     91.277,
+     1.822
+    ],
+    [
+     4.36,
+     90.991,
+     2.127
+    ],
+    [
+     4.394,
+     90.692,
+     2.444
+    ],
+    [
+     4.412,
+     90.36,
+     2.769
+    ],
+    [
+     4.417,
+     89.978,
+     3.095
+    ],
+    [
+     4.408,
+     89.526,
+     3.418
+    ],
+    [
+     4.386,
+     88.987,
+     3.731
+    ],
+    [
+     4.352,
+     88.342,
+     4.031
+    ]
+   ],
+   "radius_cm": 0.587,
+   "from": "left_external_iliac_vein_junction"
+  },
+  "right_external_iliac_vein": {
+   "name": "Right external iliac vein",
+   "points": [
+    [
+     -1.796,
+     98.065,
+     1.214
+    ],
+    [
+     -1.893,
+     97.832,
+     1.103
+    ],
+    [
+     -2.02,
+     97.549,
+     0.987
+    ],
+    [
+     -2.172,
+     97.221,
+     0.872
+    ],
+    [
+     -2.344,
+     96.854,
+     0.762
+    ],
+    [
+     -2.531,
+     96.453,
+     0.663
+    ],
+    [
+     -2.727,
+     96.024,
+     0.578
+    ],
+    [
+     -2.928,
+     95.571,
+     0.513
+    ],
+    [
+     -3.128,
+     95.1,
+     0.474
+    ],
+    [
+     -3.321,
+     94.616,
+     0.464
+    ],
+    [
+     -3.503,
+     94.124,
+     0.488
+    ],
+    [
+     -3.669,
+     93.63,
+     0.552
+    ],
+    [
+     -3.814,
+     93.138,
+     0.66
+    ],
+    [
+     -3.949,
+     92.647,
+     0.826
+    ],
+    [
+     -4.066,
+     92.233,
+     1.031
+    ],
+    [
+     -4.165,
+     91.879,
+     1.268
+    ],
+    [
+     -4.246,
+     91.566,
+     1.534
+    ],
+    [
+     -4.311,
+     91.277,
+     1.822
+    ],
+    [
+     -4.36,
+     90.991,
+     2.127
+    ],
+    [
+     -4.394,
+     90.692,
+     2.444
+    ],
+    [
+     -4.412,
+     90.36,
+     2.769
+    ],
+    [
+     -4.417,
+     89.978,
+     3.095
+    ],
+    [
+     -4.408,
+     89.526,
+     3.418
+    ],
+    [
+     -4.386,
+     88.987,
+     3.731
+    ],
+    [
+     -4.352,
+     88.342,
+     4.031
+    ]
+   ],
+   "radius_cm": 0.587,
+   "from": "right_external_iliac_vein_junction"
+  },
+  "left_internal_iliac_vein": {
+   "name": "Left internal iliac vein",
+   "points": [
+    [
+     1.796,
+     98.065,
+     1.214
+    ],
+    [
+     1.956,
+     97.713,
+     0.989
+    ],
+    [
+     2.112,
+     97.456,
+     0.747
+    ],
+    [
+     2.26,
+     97.249,
+     0.495
+    ],
+    [
+     2.394,
+     97.05,
+     0.237
+    ],
+    [
+     2.512,
+     96.816,
+     -0.02
+    ],
+    [
+     2.608,
+     96.503,
+     -0.271
+    ],
+    [
+     2.661,
+     96.094,
+     -0.511
+    ],
+    [
+     2.656,
+     95.682,
+     -0.701
+    ],
+    [
+     2.622,
+     95.276,
+     -0.86
+    ],
+    [
+     2.586,
+     94.888,
+     -1.006
+    ],
+    [
+     2.579,
+     94.528,
+     -1.157
+    ],
+    [
+     2.628,
+     94.207,
+     -1.33
+    ]
+   ],
+   "radius_cm": 0.415,
+   "from": "left_internal_iliac_vein_junction"
+  },
+  "right_internal_iliac_vein": {
+   "name": "Right internal iliac vein",
+   "points": [
+    [
+     -1.796,
+     98.065,
+     1.214
+    ],
+    [
+     -1.956,
+     97.713,
+     0.989
+    ],
+    [
+     -2.112,
+     97.456,
+     0.747
+    ],
+    [
+     -2.26,
+     97.249,
+     0.495
+    ],
+    [
+     -2.394,
+     97.05,
+     0.237
+    ],
+    [
+     -2.512,
+     96.816,
+     -0.02
+    ],
+    [
+     -2.608,
+     96.503,
+     -0.271
+    ],
+    [
+     -2.661,
+     96.094,
+     -0.511
+    ],
+    [
+     -2.656,
+     95.682,
+     -0.701
+    ],
+    [
+     -2.622,
+     95.276,
+     -0.86
+    ],
+    [
+     -2.586,
+     94.888,
+     -1.006
+    ],
+    [
+     -2.579,
+     94.528,
+     -1.157
+    ],
+    [
+     -2.628,
+     94.207,
+     -1.33
+    ]
+   ],
+   "radius_cm": 0.415,
+   "from": "right_internal_iliac_vein_junction"
+  }
+ },
+ "landmarks": {
+  "ivc_origin": {
+   "name": "Formation of the inferior vena cava (lower end of its source curve)",
+   "p": [
+    -0.865,
+    103.122,
+    2.51
+   ],
+   "derived": "lowest end of Z-Anatomy curve 'Inferior vena cava (abdominal part)' (spline 0)"
+  },
+  "svc_formation": {
+   "name": "Formation of the superior vena cava (upper end of its source curve)",
+   "p": [
+    -1.439,
+    137.415,
+    2.3
+   ],
+   "derived": "highest end of Z-Anatomy curve 'Superior vena cava' (spline 0)"
+  },
+  "inferior_vena_cava_thoracic_start": {
+   "name": "Start of the inferior vena cava, thoracic part (end of the inferior vena cava, abdominal part)",
+   "p": [
+    -0.954,
+    117.209,
+    1.45
+   ],
+   "derived": "end of Z-Anatomy curve 'Inferior vena cava (thoracic part)' nearest the 'inferior_vena_cava_abdominal' centre line; it lies 0.00 cm from that line"
+  },
+  "left_brachiocephalic_vein_junction": {
+   "name": "Junction of the left brachiocephalic vein with the superior vena cava",
+   "p": [
+    -1.439,
+    137.415,
+    2.3
+   ],
+   "derived": "end of Z-Anatomy curve 'Left brachiocephalic vein' nearest the 'superior_vena_cava' centre line; it lies 0.00 cm from that line"
+  },
+  "right_brachiocephalic_vein_junction": {
+   "name": "Junction of the right brachiocephalic vein with the superior vena cava",
+   "p": [
+    -1.439,
+    137.415,
+    2.3
+   ],
+   "derived": "end of Z-Anatomy curve 'Right brachiocephalic vein' nearest the 'superior_vena_cava' centre line; it lies 0.00 cm from that line"
+  },
+  "hepatic_vein_1_junction": {
+   "name": "Junction of the hepatic vein 1 with the inferior vena cava, thoracic part",
+   "p": [
+    -1.492,
+    124.422,
+    1.51
+   ],
+   "derived": "end of Z-Anatomy curve 'Hepatic veins' nearest the 'inferior_vena_cava_thoracic' centre line; it lies 0.00 cm from that line"
+  },
+  "hepatic_vein_2_junction": {
+   "name": "Junction of the hepatic vein 2 with the inferior vena cava, thoracic part",
+   "p": [
+    -1.492,
+    124.422,
+    1.51
+   ],
+   "derived": "end of Z-Anatomy curve 'Hepatic veins' spline 1 nearest the 'inferior_vena_cava_thoracic' centre line; it lies 0.00 cm from that line"
+  },
+  "left_renal_vein_junction": {
+   "name": "Junction of the left renal vein with the inferior vena cava, abdominal part",
+   "p": [
+    -1.025,
+    110.382,
+    2.53
+   ],
+   "derived": "end of Z-Anatomy curve 'Left renal vein' nearest the 'inferior_vena_cava_abdominal' centre line; it lies 0.00 cm from that line"
+  },
+  "right_renal_vein_junction": {
+   "name": "Junction of the right renal vein with the inferior vena cava, abdominal part",
+   "p": [
+    -1.329,
+    110.286,
+    1.974
+   ],
+   "derived": "end of Z-Anatomy curve 'Right renal vein' nearest the 'inferior_vena_cava_abdominal' centre line; it lies 0.64 cm from that line"
+  },
+  "left_common_iliac_vein_junction": {
+   "name": "Junction of the left common iliac vein with the inferior vena cava, abdominal part",
+   "p": [
+    -0.865,
+    103.122,
+    2.51
+   ],
+   "derived": "end of Z-Anatomy curve 'Common iliac vein.l' nearest the 'inferior_vena_cava_abdominal' centre line; it lies 0.00 cm from that line"
+  },
+  "right_common_iliac_vein_junction": {
+   "name": "Junction of the right common iliac vein with the inferior vena cava, abdominal part",
+   "p": [
+    -0.865,
+    103.122,
+    2.51
+   ],
+   "derived": "end of Z-Anatomy curve 'Common iliac vein.r' nearest the 'inferior_vena_cava_abdominal' centre line; it lies 0.00 cm from that line"
+  },
+  "left_external_iliac_vein_junction": {
+   "name": "Junction of the left external iliac vein with the left common iliac vein",
+   "p": [
+    1.796,
+    98.065,
+    1.214
+   ],
+   "derived": "end of Z-Anatomy curve 'External iliac vein.l' nearest the 'left_common_iliac_vein' centre line; it lies 0.00 cm from that line"
+  },
+  "right_external_iliac_vein_junction": {
+   "name": "Junction of the right external iliac vein with the right common iliac vein",
+   "p": [
+    -1.796,
+    98.065,
+    1.214
+   ],
+   "derived": "end of Z-Anatomy curve 'External iliac vein.r' nearest the 'right_common_iliac_vein' centre line; it lies 0.00 cm from that line"
+  },
+  "left_internal_iliac_vein_junction": {
+   "name": "Junction of the left internal iliac vein with the left common iliac vein",
+   "p": [
+    1.796,
+    98.065,
+    1.214
+   ],
+   "derived": "end of Z-Anatomy curve 'Internal iliac vein.l' nearest the 'left_common_iliac_vein' centre line; it lies 0.00 cm from that line"
+  },
+  "right_internal_iliac_vein_junction": {
+   "name": "Junction of the right internal iliac vein with the right common iliac vein",
+   "p": [
+    -1.796,
+    98.065,
+    1.214
+   ],
+   "derived": "end of Z-Anatomy curve 'Internal iliac vein.r' nearest the 'right_common_iliac_vein' centre line; it lies 0.00 cm from that line"
+  },
+  "ivc_upper_end": {
+   "name": "Upper end of the thoracic inferior vena cava curve (at the right atrium)",
+   "p": [
+    -1.462,
+    126.269,
+    2.184
+   ],
+   "derived": "end point of centre line 'inferior_vena_cava_thoracic' (Z-Anatomy curve 'Inferior vena cava (thoracic part)')"
+  },
+  "svc_lower_end": {
+   "name": "Lower end of the superior vena cava curve (at the right atrium)",
+   "p": [
+    -1.662,
+    134.08,
+    1.777
+   ],
+   "derived": "end point of centre line 'superior_vena_cava' (Z-Anatomy curve 'Superior vena cava')"
+  }
+ }
+}

@@ -1,0 +1,77 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "kidneys",
+ "name": "Kidneys",
+ "system": "Urinary",
+ "mesh": "kidneys",
+ "credit": "totalsegmentator",
+ "parts": [
+  {
+   "id": "right_kidney",
+   "name": "Right kidney",
+   "tissue": "liver"
+  },
+  {
+   "id": "left_kidney",
+   "name": "Left kidney",
+   "tissue": "liver"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "right_renal_hilum": {
+   "name": "Right renal hilum (centre of the convex-hull lid over the renal sinus)",
+   "p": [
+    -2.974,
+    110.287,
+    0.103
+   ],
+   "derived": "area centroid of the 19 convex-hull facets of baked 'right_kidney' whose centres lie > 4 mm from the kidney surface (the lid over the renal sinus)"
+  },
+  "left_renal_hilum": {
+   "name": "Left renal hilum (centre of the convex-hull lid over the renal sinus)",
+   "p": [
+    3.062,
+    110.938,
+    0.199
+   ],
+   "derived": "area centroid of the 26 convex-hull facets of baked 'left_kidney' whose centres lie > 4 mm from the kidney surface (the lid over the renal sinus)"
+  },
+  "right_kidney_upper_pole": {
+   "name": "Upper pole of the right kidney",
+   "p": [
+    -4.219,
+    115.919,
+    -2.482
+   ],
+   "derived": "baked 'right_kidney' vertex with the largest y"
+  },
+  "right_kidney_lower_pole": {
+   "name": "Lower pole of the right kidney",
+   "p": [
+    -5.908,
+    105.149,
+    0.611
+   ],
+   "derived": "baked 'right_kidney' vertex with the smallest y"
+  },
+  "left_kidney_upper_pole": {
+   "name": "Upper pole of the left kidney",
+   "p": [
+    3.438,
+    115.695,
+    -2.097
+   ],
+   "derived": "baked 'left_kidney' vertex with the largest y"
+  },
+  "left_kidney_lower_pole": {
+   "name": "Lower pole of the left kidney",
+   "p": [
+    6.394,
+    105.345,
+    0.582
+   ],
+   "derived": "baked 'left_kidney' vertex with the smallest y"
+  }
+ }
+}

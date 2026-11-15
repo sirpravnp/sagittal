@@ -1,0 +1,125 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "liver-segments",
+ "name": "Liver segments (Couinaud I-VIII)",
+ "system": "Hepatobiliary",
+ "mesh": "liver-segments",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "segment_i",
+   "name": "Segment I (caudate)",
+   "tissue": "liver"
+  },
+  {
+   "id": "segment_ii",
+   "name": "Segment II",
+   "tissue": "liver"
+  },
+  {
+   "id": "segment_iii",
+   "name": "Segment III",
+   "tissue": "liver"
+  },
+  {
+   "id": "segment_iv",
+   "name": "Segment IV",
+   "tissue": "liver"
+  },
+  {
+   "id": "segment_v",
+   "name": "Segment V",
+   "tissue": "liver"
+  },
+  {
+   "id": "segment_vi",
+   "name": "Segment VI",
+   "tissue": "liver"
+  },
+  {
+   "id": "segment_vii",
+   "name": "Segment VII",
+   "tissue": "liver"
+  },
+  {
+   "id": "segment_viii",
+   "name": "Segment VIII",
+   "tissue": "liver"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "liver_segment_i_centroid": {
+   "name": "Centroid of segment I",
+   "p": [
+    -1.077,
+    119.891,
+    2.53
+   ],
+   "derived": "volume centroid of the baked 'segment_i' mesh"
+  },
+  "liver_segment_ii_centroid": {
+   "name": "Centroid of segment II",
+   "p": [
+    3.915,
+    122.736,
+    5.529
+   ],
+   "derived": "volume centroid of the baked 'segment_ii' mesh"
+  },
+  "liver_segment_iii_centroid": {
+   "name": "Centroid of segment III",
+   "p": [
+    2.046,
+    119.456,
+    7.174
+   ],
+   "derived": "volume centroid of the baked 'segment_iii' mesh"
+  },
+  "liver_segment_iv_centroid": {
+   "name": "Centroid of segment IV",
+   "p": [
+    -1.861,
+    116.771,
+    6.277
+   ],
+   "derived": "volume centroid of the baked 'segment_iv' mesh"
+  },
+  "liver_segment_v_centroid": {
+   "name": "Centroid of segment V",
+   "p": [
+    -6.372,
+    115.656,
+    5.884
+   ],
+   "derived": "volume centroid of the baked 'segment_v' mesh"
+  },
+  "liver_segment_vi_centroid": {
+   "name": "Centroid of segment VI",
+   "p": [
+    -8.189,
+    114.663,
+    0.831
+   ],
+   "derived": "volume centroid of the baked 'segment_vi' mesh"
+  },
+  "liver_segment_vii_centroid": {
+   "name": "Centroid of segment VII",
+   "p": [
+    -7.369,
+    119.814,
+    -1.275
+   ],
+   "derived": "volume centroid of the baked 'segment_vii' mesh"
+  },
+  "liver_segment_viii_centroid": {
+   "name": "Centroid of segment VIII",
+   "p": [
+    -6.034,
+    121.927,
+    3.654
+   ],
+   "derived": "volume centroid of the baked 'segment_viii' mesh"
+  }
+ }
+}

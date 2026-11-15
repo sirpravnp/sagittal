@@ -1,0 +1,55 @@
+{
+  "name": "colon",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "ascending_colon": {
+      "files": [
+        "Ascending_colon.obj"
+      ],
+      "budget": 2200,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "transverse_colon": {
+      "files": [
+        "Transverse_colon.obj"
+      ],
+      "budget": 2200,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "descending_colon": {
+      "files": [
+        "Descending_colon.obj"
+      ],
+      "budget": 2200,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "sigmoid_colon_rectum": {
+      "files": [
+        "Sigmoid_colon.obj"
+      ],
+      "budget": 3000,
+      "subdivide": 1,
+      "smooth": 4
+    },
+    "appendix": {
+      "files": [
+        "Vermiform_appendix.obj"
+      ],
+      "budget": 800,
+      "smooth": 2
+    }
+  }
+}

@@ -1,0 +1,241 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "gallbladder",
+ "name": "Gallbladder and bile duct",
+ "system": "Hepatobiliary",
+ "mesh": "gallbladder",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "gallbladder",
+   "name": "Gallbladder",
+   "tissue": "gallbladder"
+  },
+  {
+   "id": "bile_duct",
+   "name": "Bile duct (common bile duct)",
+   "tissue": "bile-duct"
+  }
+ ],
+ "centerlines": {
+  "bile_duct": {
+   "name": "Bile duct (common bile duct)",
+   "points": [
+    [
+     -3.019,
+     115.737,
+     3.916
+    ],
+    [
+     -2.781,
+     115.936,
+     3.859
+    ],
+    [
+     -2.541,
+     116.125,
+     3.885
+    ],
+    [
+     -2.259,
+     116.144,
+     3.911
+    ],
+    [
+     -1.899,
+     115.928,
+     3.914
+    ],
+    [
+     -1.67,
+     115.624,
+     3.923
+    ],
+    [
+     -1.54,
+     115.25,
+     3.933
+    ],
+    [
+     -1.478,
+     114.826,
+     3.939
+    ],
+    [
+     -1.45,
+     114.372,
+     3.933
+    ],
+    [
+     -1.426,
+     113.908,
+     3.911
+    ],
+    [
+     -1.416,
+     113.575,
+     3.874
+    ],
+    [
+     -1.448,
+     113.282,
+     3.823
+    ],
+    [
+     -1.535,
+     113.002,
+     3.776
+    ],
+    [
+     -1.69,
+     112.711,
+     3.75
+    ],
+    [
+     -1.898,
+     112.455,
+     3.756
+    ],
+    [
+     -2.131,
+     112.276,
+     3.785
+    ],
+    [
+     -2.391,
+     112.122,
+     3.822
+    ],
+    [
+     -2.678,
+     111.943,
+     3.852
+    ],
+    [
+     -2.942,
+     111.778,
+     3.873
+    ],
+    [
+     -3.191,
+     111.647,
+     3.896
+    ],
+    [
+     -3.429,
+     111.529,
+     3.916
+    ],
+    [
+     -3.662,
+     111.405,
+     3.928
+    ],
+    [
+     -3.895,
+     111.256,
+     3.928
+    ],
+    [
+     -4.134,
+     111.06,
+     3.911
+    ],
+    [
+     -4.394,
+     110.788,
+     3.886
+    ],
+    [
+     -4.599,
+     110.514,
+     3.864
+    ],
+    [
+     -4.771,
+     110.239,
+     3.832
+    ],
+    [
+     -4.933,
+     109.965,
+     3.773
+    ],
+    [
+     -5.106,
+     109.692,
+     3.673
+    ],
+    [
+     -5.313,
+     109.421,
+     3.518
+    ],
+    [
+     -5.474,
+     109.253,
+     3.346
+    ],
+    [
+     -5.607,
+     109.141,
+     3.145
+    ],
+    [
+     -5.757,
+     109.015,
+     2.922
+    ]
+   ],
+   "radius_cm": 0.104,
+   "from": "bile_duct_upper_end"
+  }
+ },
+ "landmarks": {
+  "bile_duct_upper_end": {
+   "name": "Upper end of the bile duct curve (where a cystic and common hepatic duct would join; neither is in the source)",
+   "p": [
+    -3.019,
+    115.737,
+    3.916
+   ],
+   "derived": "highest end of Z-Anatomy curve 'Bile duct' (spline 0)"
+  },
+  "gallbladder_neck": {
+   "name": "Gallbladder neck (gallbladder surface point nearest the upper end of the bile duct)",
+   "p": [
+    -3.011,
+    115.801,
+    4.02
+   ],
+   "derived": "baked 'gallbladder' vertex nearest landmark 'bile_duct_upper_end' (0.12 cm away)"
+  },
+  "gallbladder_fundus": {
+   "name": "Gallbladder fundus (gallbladder surface point farthest from the neck)",
+   "p": [
+    -5.479,
+    111.704,
+    7.601
+   ],
+   "derived": "baked 'gallbladder' vertex farthest from landmark 'gallbladder_neck'"
+  },
+  "gallbladder_centroid": {
+   "name": "Gallbladder centroid",
+   "p": [
+    -4.946,
+    113.328,
+    5.701
+   ],
+   "derived": "volume centroid of the baked 'gallbladder' mesh"
+  },
+  "bile_duct_lower_end": {
+   "name": "Lower (duodenal) end of the bile duct curve",
+   "p": [
+    -5.757,
+    109.015,
+    2.922
+   ],
+   "derived": "end point of centre line 'bile_duct' (Z-Anatomy curve 'Bile duct')"
+  }
+ }
+}

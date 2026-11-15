@@ -1,0 +1,39 @@
+# Z-Anatomy objects for the base organ library (organs/). Extract with:
+#   .venv/bin/python tools/meshes/extract_blend.py <cache>/zanatomy/extracted/Z-Anatomy/Startup.blend \
+#     --out <cache>/zanatomy-organs/obj --sides 16 --match-file tools/organs/zanatomy_organs.txt
+# Never add: Kidney.l/.r, Renal pelvis, Intrarenal arteries/veins (Z-Anatomy credits a CC BY-NC kidney
+# model), inner-ear objects (CC BY-NC-SA), Brainder cortex / white matter (licence unclear).
+# Also never: Ureter.l/.r and Suprarenal gland.l/.r (may come from that same CC BY-NC kidney model;
+# licence unclear, so not used; adrenals come from TotalSegmentator instead).
+# --- organ meshes
+^(Liver|Gallbladder|Stomach|Spleen|Pancreas|Duodenum|Trachea|Prostate|Glans penis|Urinary bladder|Vermiform appendix)$
+^(Ascending|Transverse|Descending|Sigmoid) colon$
+^(Superior|Middle|Inferior) lobe of (left|right) lung$
+^(Left|Right) (atrium|ventricle)$
+^Seminal gland\.(l|r)$
+^(Testis|Epididymis)\.(l|r)$
+^Corpus (cavernosum|spongiosum) of penis$
+^Vertebra (C[3-7]|T[0-9]+|L[1-5])$
+^(Atlas|Axis)
+segment of liver \((I|II|III|IV|V|VI|VII|VIII)\)$
+# --- curves swept into tubes
+^(Ascending aorta|Aortic arch|Thoracic aorta|Abdominal aorta)$
+^(Brachiocephalic trunk|(Left|Right) common carotid artery|(Left|Right) subclavian artery)$
+^(Coeliac trunk|Common hepatic artery|Proper hepatic artery|Gastroduodenal artery|Left gastric artery|Splenic artery)$
+^(Superior|Inferior) mesenteric (artery|vein)$
+^(Left|Right) renal (artery|vein)$
+^(Common|External|Internal) iliac (artery|vein)\.(l|r)$
+^(Hepatic portal vein|Splenic vein|Hepatic veins)$
+^Inferior vena cava \((abdominal|thoracic) part\)$
+^(Superior vena cava|(Left|Right) brachiocephalic vein)$
+^(Bile duct|Pancreatic duct|Accessory pancreatic duct)$
+^(Oesophagus|Jejunum)$
+^(Left|Right) main bronchus$
+^Intermediate bronchus\.r$
+^Middle lobar bronchus\.r$
+^(Left|Right) (superior|inferior) lobar bronchus$
+^Ductus deferens\.(l|r)$
+^Ejaculatory duct\.(l|r)$
+^Urethra$
+^(Ileocolic|Right colic|Middle colic|Left colic) artery$
+^(Sigmoid arteries|Superior anorectal artery|Inferior pancreaticoduodenal artery)$

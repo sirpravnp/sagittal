@@ -1,0 +1,54 @@
+{
+ "schema": "sagittal-organ/0",
+ "id": "stomach",
+ "name": "Stomach",
+ "system": "Gastrointestinal",
+ "mesh": "stomach",
+ "credit": "zanatomy",
+ "parts": [
+  {
+   "id": "stomach",
+   "name": "Stomach",
+   "tissue": "bowel"
+  }
+ ],
+ "centerlines": {},
+ "landmarks": {
+  "gastric_fundus_top": {
+   "name": "Highest point of the gastric fundus",
+   "p": [
+    5.898,
+    122.933,
+    2.169
+   ],
+   "derived": "baked 'stomach' vertex with the largest y"
+  },
+  "pylorus": {
+   "name": "Pylorus (midpoint of the closest stomach-duodenum surface pair)",
+   "p": [
+    -2.788,
+    113.607,
+    5.702
+   ],
+   "derived": "midpoint of the closest vertex pair between baked 'stomach' and 'duodenum.duodenum' (0.07 cm gap)"
+  },
+  "stomach_lowest_point": {
+   "name": "Lowest point of the greater curvature",
+   "p": [
+    2.453,
+    110.322,
+    7.435
+   ],
+   "derived": "baked 'stomach' vertex with the smallest y"
+  },
+  "cardia": {
+   "name": "Cardia (stomach surface point nearest the lower end of the oesophagus)",
+   "p": [
+    1.259,
+    119.718,
+    1.1
+   ],
+   "derived": "baked 'stomach' vertex nearest landmark 'oesophagus_lower_end' (0.38 cm away)"
+  }
+ }
+}

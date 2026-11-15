@@ -1,0 +1,58 @@
+{
+  "name": "heart",
+  "credit": "rodero-heart",
+  "license": "CC BY 4.0",
+  "source": "Rodero et al. 2021 average heart (doi:10.5281/zenodo.4593739), per-chamber surfaces from rodero/work/parts, registered by tools/organs/register.py",
+  "source_root": "${ASSETS}/organs-registered/heart",
+  "transform": {
+    "axes": [
+      "x",
+      "y",
+      "z"
+    ],
+    "scale": 1
+  },
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "wall_lv": {
+      "files": [
+        "wall_lv.obj"
+      ],
+      "budget": 4500,
+      "smooth": 3
+    },
+    "wall_rv": {
+      "files": [
+        "wall_rv.obj"
+      ],
+      "budget": 3800,
+      "smooth": 3
+    },
+    "wall_la": {
+      "files": [
+        "wall_la.obj"
+      ],
+      "budget": 2800,
+      "smooth": 3
+    },
+    "wall_ra": {
+      "files": [
+        "wall_ra.obj"
+      ],
+      "budget": 2800,
+      "smooth": 3
+    },
+    "aortic_root": {
+      "files": [
+        "aorta.obj"
+      ],
+      "budget": 1500,
+      "smooth": 3
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "name": "male-reproductive",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "prostate": {
+      "files": [
+        "Prostate.obj"
+      ],
+      "budget": 1200,
+      "smooth": 2
+    },
+    "seminal_glands": {
+      "files": [
+        "Seminal_gland.l.obj",
+        "Seminal_gland.r.obj"
+      ],
+      "budget": 1200,
+      "smooth": 2
+    },
+    "testes": {
+      "files": [
+        "Testis.l.obj",
+        "Testis.r.obj"
+      ],
+      "budget": 1200,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "epididymides": {
+      "files": [
+        "Epididymis.l.obj",
+        "Epididymis.r.obj"
+      ],
+      "budget": 600,
+      "subdivide": 1,
+      "smooth": 4
+    },
+    "ductus_deferens": {
+      "files": [
+        "Ductus_deferens.l.obj",
+        "Ductus_deferens.r.obj"
+      ],
+      "budget": 1200
+    },
+    "ejaculatory_ducts": {
+      "files": [
+        "Ejaculatory_duct.l.obj",
+        "Ejaculatory_duct.r.obj"
+      ],
+      "budget": 400
+    },
+    "penis": {
+      "files": [
+        "Corpus_cavernosum_of_penis.obj",
+        "Corpus_spongiosum_of_penis.obj",
+        "Glans_penis.obj"
+      ],
+      "budget": 3000
+    }
+  }
+}

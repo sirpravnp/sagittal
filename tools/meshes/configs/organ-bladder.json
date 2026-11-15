@@ -1,0 +1,30 @@
+{
+  "name": "bladder",
+  "credit": "zanatomy",
+  "license": "CC BY-SA 4.0",
+  "source": "Z-Anatomy Startup.blend (BodyParts3D-derived), extracted with tools/meshes/extract_blend.py --sides 16 --match-file tools/organs/zanatomy_organs.txt into zanatomy-organs/obj",
+  "source_root": "${ASSETS}/zanatomy-organs/obj",
+  "transform": "zanatomy",
+  "center": [
+    0,
+    0,
+    0
+  ],
+  "default_budget": 1500,
+  "parts": {
+    "bladder": {
+      "files": [
+        "Urinary_bladder.obj"
+      ],
+      "budget": 3000,
+      "subdivide": 1,
+      "smooth": 6
+    },
+    "urethra": {
+      "files": [
+        "Urethra.obj"
+      ],
+      "budget": 800
+    }
+  }
+}

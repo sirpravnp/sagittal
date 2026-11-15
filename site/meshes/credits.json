@@ -12,6 +12,10 @@
     "dundee-cahid": {
       "text": "University of Dundee CAHID, Cranial Nerves and Foramina (via Z-Anatomy)",
       "licence": "CC BY 4.0"
+    },
+    "totalsegmentator": {
+      "text": "TotalSegmentator CT dataset, subject s1304 (Wasserthal et al. 2023; doi:10.5281/zenodo.10047292)",
+      "licence": "CC BY 4.0"
     }
   },
   "extra": {
