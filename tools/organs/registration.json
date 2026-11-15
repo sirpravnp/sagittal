@@ -1,0 +1,266 @@
+{
+ "frame": "cm, +x patient left, +y superior, +z anterior; Z-Anatomy world frame (Blender x, z, -y x 100)",
+ "rodero_heart": {
+  "transform": {
+   "scale": 0.9962,
+   "rotation": [
+    [
+     0.99888,
+     0.04701,
+     -0.00553
+    ],
+    [
+     -0.04553,
+     0.98617,
+     0.15937
+    ],
+    [
+     0.01295,
+     -0.15893,
+     0.9872
+    ]
+   ],
+   "translation_cm": [
+    2.882,
+    128.318,
+    2.641
+   ],
+   "rotation_angle_deg": 9.56
+  },
+  "pairs": [
+   "left_ventricle_centroid",
+   "right_ventricle_centroid",
+   "left_atrium_centroid",
+   "right_atrium_centroid",
+   "aortic_valve",
+   "pulmonary_valve"
+  ],
+  "residual_cm": {
+   "left_ventricle_centroid": 0.32,
+   "right_ventricle_centroid": 0.18,
+   "left_atrium_centroid": 0.77,
+   "right_atrium_centroid": 0.28,
+   "aortic_valve": 0.79,
+   "pulmonary_valve": 0.09
+  },
+  "residual_rms_cm": 0.49,
+  "source": "Rodero et al. 2021 average heart (doi:10.5281/zenodo.4593739), rodero/work/parts",
+  "target": "Z-Anatomy heart chambers (centroids of the cage vertices), ascending aorta start, pulmonary trunk base",
+  "valve_centres_cm": {
+   "mitral": [
+    3.26,
+    129.2,
+    0.36
+   ],
+   "tricuspid": [
+    -0.32,
+    128.23,
+    3.2
+   ],
+   "aortic": [
+    2.15,
+    130.89,
+    2.12
+   ],
+   "pulmonary": [
+    3.35,
+    132.74,
+    4.49
+   ]
+  }
+ },
+ "totalseg_abdomen": {
+  "levels": [
+   "T10",
+   "T11",
+   "T12",
+   "L1",
+   "L2",
+   "L3",
+   "L4"
+  ],
+  "icp_rms_cm": 0.366,
+  "icp_median_cm": 0.233,
+  "centroid_residual_cm": {
+   "T10": 1.67,
+   "T11": 0.67,
+   "T12": 0.51,
+   "L1": 0.6,
+   "L2": 0.41,
+   "L3": 0.24,
+   "L4": 0.58
+  },
+  "centroid_residual_rms_cm": 0.79,
+  "transform": {
+   "scale": 0.975,
+   "rotation": [
+    [
+     0.99873,
+     -0.01167,
+     0.04892
+    ],
+    [
+     0.01432,
+     0.99843,
+     -0.05416
+    ],
+    [
+     -0.04821,
+     0.0548,
+     0.99733
+    ]
+   ],
+   "translation_cm": [
+    1.224,
+    133.049,
+    -4.023
+   ],
+   "rotation_angle_deg": 4.25
+  },
+  "source": "TotalSegmentator CT dataset v2.0.1 subject s1304 (doi:10.5281/zenodo.10047292)",
+  "parts": [
+   "kidney_left",
+   "kidney_right"
+  ],
+  "kidney_hilum_translation": {
+   "kidney_left": {
+    "hilum_before_cm": [
+     5.55,
+     105.97,
+     2.2
+    ],
+    "target_cm": [
+     3.23,
+     111.0,
+     -0.28
+    ],
+    "translation_cm": [
+     -2.32,
+     5.03,
+     -2.49
+    ],
+    "translation_length_cm": 6.07,
+    "lid_facets": 46,
+    "distance_to_kidney_surface_cm": {
+     "renal_artery_end": 1.47,
+     "renal_vein_end": 1.4,
+     "ureter_upper_end": 0.28
+    }
+   },
+   "kidney_right": {
+    "hilum_before_cm": [
+     -4.95,
+     106.61,
+     1.06
+    ],
+    "target_cm": [
+     -3.09,
+     109.74,
+     -0.07
+    ],
+    "translation_cm": [
+     1.86,
+     3.14,
+     -1.12
+    ],
+    "translation_length_cm": 3.82,
+    "lid_facets": 34,
+    "distance_to_kidney_surface_cm": {
+     "renal_artery_end": 1.14,
+     "renal_vein_end": 1.31,
+     "ureter_upper_end": 0.38
+    }
+   }
+  }
+ },
+ "totalseg_neck": {
+  "levels": [
+   "C3",
+   "C4",
+   "C5",
+   "C6",
+   "C7",
+   "T1",
+   "T2",
+   "T3"
+  ],
+  "icp_rms_cm": 0.198,
+  "icp_median_cm": 0.143,
+  "centroid_residual_cm": {
+   "C3": 0.29,
+   "C4": 0.18,
+   "C5": 0.14,
+   "C6": 0.24,
+   "C7": 0.15,
+   "T1": 0.15,
+   "T2": 0.13,
+   "T3": 0.34
+  },
+  "centroid_residual_rms_cm": 0.22,
+  "transform": {
+   "scale": 0.9186,
+   "rotation": [
+    [
+     0.99678,
+     -0.02382,
+     0.07655
+    ],
+    [
+     0.00914,
+     0.98238,
+     0.18668
+    ],
+    [
+     -0.07965,
+     -0.18538,
+     0.97943
+    ]
+   ],
+   "translation_cm": [
+    1.279,
+    136.958,
+    -7.979
+   ],
+   "rotation_angle_deg": 11.68
+  },
+  "source": "TotalSegmentator CT dataset v2.0.1 subject s1304 (doi:10.5281/zenodo.10047292)",
+  "parts": [
+   "thyroid_gland"
+  ]
+ },
+ "totalseg_brain": {
+  "transform": {
+   "scale": 1.0155,
+   "rotation": [
+    [
+     0.97628,
+     -0.01868,
+     0.21571
+    ],
+    [
+     -0.00158,
+     0.99563,
+     0.09341
+    ],
+    [
+     -0.21652,
+     -0.09153,
+     0.97198
+    ]
+   ],
+   "translation_cm": [
+    0.929,
+    135.331,
+    -10.785
+   ],
+   "rotation_angle_deg": 13.6
+  },
+  "icp_rms_cm": 0.321,
+  "icp_median_cm": 0.194,
+  "p95_surface_distance_cm": 0.653,
+  "source": "TotalSegmentator s1304 brain mask; target: Z-Anatomy endocast (zanatomy-neuro/derived/Endocast.obj)",
+  "parts": [
+   "brain"
+  ]
+ }
+}
