@@ -16,6 +16,11 @@ Date: 2026-11-15. Status: draft for approval. Supersedes the "phase 1 premade li
   - The package is still laid out so it can be served from a CDN unchanged later (relative
     paths, versioned folder).
   - The skill is written to be public and open source, but stays in this repo for now.
+- **Visual identity (user, 2026-11-15, replaces "move away from Claude's look"):** Claude's
+  colours (warm cream paper, clay/terracotta accent, serif type) with a vintage anatomy
+  textbook feel: numbered plates, small-caps headings, hairline ink rules, italic serif labels
+  with fine ink leader lines. Figures and site share it. My call: the 3D stage is paper-toned in
+  light mode (like an atlas plate) and warm dark in dark mode.
 - **No variant catalogue.** Students create their own variants; we do not author or store
   variants. Every variant is built by Claude at request time from the base organs' landmarks
   and centre lines (the "landmarks" route below becomes the only route). What we ship and
