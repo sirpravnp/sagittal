@@ -679,6 +679,8 @@
       open: open,
       setLabelsVisible: setLabelsVisible,
       setBackground: setBackground,
+      // opt-in: move the camera to distance z (3..16), e.g. a page refitting to a new stage aspect
+      setZoom: function (z) { if (!(z > 0)) return; cam.position.z = Math.max(3, Math.min(16, z)); if (renderer && cur) frame(true); },
       getState: function () { return Object.assign({}, st); },
       debug: function () {
         return {

@@ -8,7 +8,8 @@
  * opts: { organs (default window.SagittalOrgans), credits (site/meshes/credits.json; default
  * window.SagittalCredits), id (default 'figure'), orientEl (an element on the stage that the
  * player keeps filled with where the viewer stands, e.g. "Posterior view · patient's right on
- * screen right", updated as the user rotates) }.
+ * screen right", updated as the user rotates), aspect (stage width / height: a narrow stage
+ * steps the camera back), explicitZoom (true: keep view.zoom as given) }.
  *
  * Two views, chosen by control `v`: 'normal' (the listed organs plus `base` structures) and
  * 'variant' (with `variant.edits` applied). Organs are drawn from their baked meshes, except a part
@@ -80,20 +81,33 @@
   function T(kind, opts) { return Kit.tissue(kind, Object.assign({ sheen: 0 }, opts || {})); }
   // glow: the structure is what this view changes (see build); it glows in its own colour.
   var GLOW = 0.6;
-  // clay: what the variant view changes is tinted toward the page's clay accent, the way an old
-  // atlas prints the abnormal vessel in a second colour (base structures keep their tissue colour).
-  var CLAY = 0xc0603e, CLAY_MIX = 0.45;
-  function mixHex(a, b, f) {
-    var r = ((a >> 16) & 255) * (1 - f) + ((b >> 16) & 255) * f, g = ((a >> 8) & 255) * (1 - f) + ((b >> 8) & 255) * f, bl = (a & 255) * (1 - f) + (b & 255) * f;
-    return (Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(bl);
+  // The variant's second print colour. What the variant view adds or moves is not tinted from its
+  // tissue colour (a clay tint vanishes on red arteries): it is printed pale and hatched in clay,
+  // the way an old atlas marks the abnormal vessel, and outlined (see contour()). Pale paper with
+  // clay hatching differs in value from every tissue colour (all mid or dark) in both themes.
+  var PRINT_PAPER = '#f2e4cc', PRINT_INK = '#a8492a', PRINT_SOLID = 0xe7b48f;
+  var hatchTex = null;
+  function hatch(repeatAlong) {
+    if (!hatchTex) {
+      var c = document.createElement('canvas'); c.width = c.height = 64;
+      var x = c.getContext('2d');
+      x.fillStyle = PRINT_PAPER; x.fillRect(0, 0, 64, 64);
+      x.strokeStyle = PRINT_INK; x.lineWidth = 9;
+      for (var i = -64; i <= 128; i += 22) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + 64, 64); x.stroke(); }
+      hatchTex = new THREE.CanvasTexture(c);
+      hatchTex.wrapS = hatchTex.wrapT = THREE.RepeatWrapping;
+      hatchTex.encoding = THREE.sRGBEncoding;
+      hatchTex.anisotropy = 4;
+    }
+    var t = hatchTex.clone(); t.needsUpdate = true;
+    t.repeat.set(Math.max(1, repeatAlong), 3);
+    t.userData.kitShared = false;
+    return t;
   }
   function styled(kind, st, glow, clay) {
     var o = {};
     if (st && st.color) o.color = st.color;
-    if (clay) {
-      var base = o.color !== undefined ? new THREE.Color(o.color).getHex() : (function () { var m = Kit.tissue(kind), h = m.color.getHex(); m.dispose(); return h; })();
-      o.color = mixHex(base, CLAY, CLAY_MIX);
-    }
+    if (clay) { o.color = PRINT_SOLID; glow = false; o.emissive = 0x000000; }
     if (st && st.opacity !== undefined && st.opacity < 1) { o.opacity = st.opacity; o.depthWrite = false; }
     if (glow) {
       if (!o.color) { var m = Kit.tissue(kind); o.emissive = m.color.getHex(); m.dispose(); } else o.emissive = o.color;
@@ -130,14 +144,23 @@
     return { group: grp, tube: me, geo: geo };
   }
   // An engraved contour round a tube: its geometry pushed out along the normals, back faces only,
-  // flat dark ink. Marks what the variant adds or moves whatever its tissue colour.
-  var CONTOUR = 0x3b1a0e;
+  // flat ink in the stage's contrast colour (dark on paper, paper on the dark stage; the page sets
+  // it with SagittalPlayer.setContour(css) and on theme change).
+  var contourColor = null, contourMats = []; // a THREE.Color, made on first use (load needs no THREE)
   function contour(d, r) {
     var geo = d.geo.clone(), pos = geo.attributes.position, nor = geo.attributes.normal, w = Math.max(0.03, r * 0.2);
     for (var i = 0; i < pos.count; i++) pos.setXYZ(i, pos.getX(i) + nor.getX(i) * w, pos.getY(i) + nor.getY(i) * w, pos.getZ(i) + nor.getZ(i) * w);
-    var m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: CONTOUR, side: THREE.BackSide }));
+    if (!contourColor) contourColor = new THREE.Color(0x2a1a12);
+    var mat = new THREE.MeshBasicMaterial({ color: contourColor.clone(), side: THREE.BackSide });
+    contourMats.push(mat);
+    var m = new THREE.Mesh(geo, mat);
     m.userData.contour = true;
     d.group.add(m);
+  }
+  // The variant print on a tube: hatch repeated about every 0.8 cm along it.
+  function printTube(d, pts) {
+    var mat = d.tube.material;
+    mat.map = hatch(lenOf(pts) / 0.8); mat.color.set(0xffffff); mat.needsUpdate = true;
   }
 
   /* ---------- the organ model: parts, which centre lines draw which part ---------- */
@@ -287,7 +310,8 @@
       // What this view changes glows: in the variant, new and moved structures; in the normal
       // view, the structures the variant removes or moves.
       function glows(ref) { return variant ? !!moved[ref] : !!(removed[ref] || moved[ref]); }
-      var hot = {}; // ref/id -> drawn as changed by the variant (variant view only): clay tint, clay label
+      var hot = {}; // ref/id -> drawn as changed by the variant (variant view only): print, contour, clay label
+      contourMats = [];
 
       // 1. Organs.
       listed.forEach(function (oid) {
@@ -316,7 +340,7 @@
             var r = cl.radius_cm || 0.1;
             var g1 = glows(lref) || glows(ref); if (variant && g1) hot[lref] = true;
             var d = duct(pg, pts, r, cl.parent ? 0.85 : 0.9, styled(kind, style, g1, variant && g1));
-            if (variant && g1) contour(d, r);
+            if (variant && g1) { printTube(d, pts); contour(d, r); }
             objs[lref] = d.group; lines[lref] = pts; drawn.push(lref);
           });
         });
@@ -331,9 +355,9 @@
         if (pts.length < 2) return;
         var g2 = isBase ? glows(e.id) : true, h2 = variant && g2;
         if (h2) hot[e.id] = true;
-        // a structure the variant adds or moves is drawn a little heavier as well as clay-tinted
+        // a structure the variant adds or moves is drawn a little heavier, printed and outlined
         var d = duct(body, pts, e.radius_cm * (h2 ? 1.12 : 1), 1, styled(e.tissue, null, g2, h2));
-        if (h2) contour(d, e.radius_cm);
+        if (h2) { printTube(d, pts); contour(d, e.radius_cm); }
         objs[e.id] = d.group; lines[e.id] = pts; drawn.push(e.id);
       }
       baseRoutes.forEach(function (e) { drawRoute(e, true); });
@@ -444,11 +468,16 @@
       return '3D models: ' + ids.map(function (c) { return src[c].text + ', ' + src[c].licence; }).join('; ') + '. ' + (credits.changes || '');
     }
 
+    var baseZoom = R.view && R.view.zoom ? R.view.zoom : ZOOM;
     var def = {
       id: sceneId,
       meshes: meshIds,
       center: sc(region.c),
-      zoom: fitZoom(R.view && R.view.zoom ? R.view.zoom : ZOOM, opts.aspect),
+      // The spec's view.zoom (or the default) frames a wide stage and is refitted to the stage's
+      // aspect; a zoom the page asks for explicitly (opts.explicitZoom, e.g. ?zoom= from
+      // look-figure) is kept as given. fitBase: what the page refits from on resize.
+      zoom: opts.explicitZoom ? baseZoom : fitZoom(baseZoom, opts.aspect),
+      fitBase: opts.explicitZoom ? null : baseZoom,
       rot: R.view && R.view.rot ? R.view.rot.slice() : ROT.slice(),
       controls: controls,
       build: build,
@@ -518,10 +547,19 @@
   var api = {
     register: register,
     orientation: orientation,
+    fitZoom: fitZoom,
     // What the most recent build of the most recently registered figure drew:
     // { view, drawn: [structure refs and route ids], labels: [texts], dropped: [label texts not
     // drawn], orientation, scale } (null before any build).
     debug: function () { return null; },
+    // Contour colour for what the variant marks (a CSS colour); recolours the current figure.
+    // The caller redraws (e.g. viewer.setBackground on a theme change).
+    setContour: function (css) {
+      var c = String(css || '').trim();
+      if (!c) return;
+      try { contourColor = new THREE.Color(c); } catch (e) { return; }
+      contourMats.forEach(function (m) { m.color.copy(contourColor); });
+    },
   };
   window.SagittalPlayer = api;
 })();

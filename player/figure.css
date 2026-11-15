@@ -29,6 +29,7 @@
   --stage-mut:#5f5748;               /* hint, footer */
   --stage-knock:rgba(238,231,216,.92); /* paper knocked out behind a label */
   --stage-halo:rgba(238,231,216,.9);   /* paper halo under a leader */
+  --stage-contour:#2a1a12;             /* outline of what the variant changes (contrasts with the stage) */
   /* type */
   --serif:"EB Garamond","Iowan Old Style","Palatino Linotype",Palatino,"URW Palladio L",P052,"Book Antiqua",Georgia,serif;
   --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace; /* error listings only */
@@ -45,7 +46,7 @@
     --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;--rule-ctl:#776d5c;
     --acc:#e08b68;--acc-ink:#1d1b17;--sel:#5a3527;
     --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#b3a792;
-    --stage-knock:rgba(36,32,27,.9);--stage-halo:rgba(36,32,27,.88);
+    --stage-knock:rgba(36,32,27,.9);--stage-halo:rgba(36,32,27,.88);--stage-contour:#f3e7d3;
   }
 }
 :root[data-theme="dark"]{
@@ -53,7 +54,7 @@
   --bg:#1d1b17;--surface:#26231e;--ink:#eee7d8;--ink-2:#d2c9b7;--mut:#a79d8a;--rule:#3d372f;--rule-ctl:#776d5c;
   --acc:#e08b68;--acc-ink:#1d1b17;--sel:#5a3527;
   --stage:#24201b;--stage-ink:#efe6d4;--stage-mut:#b3a792;
-  --stage-knock:rgba(36,32,27,.9);--stage-halo:rgba(36,32,27,.88);
+  --stage-knock:rgba(36,32,27,.9);--stage-halo:rgba(36,32,27,.88);--stage-contour:#f3e7d3;
 }
 
 *{box-sizing:border-box}
@@ -97,7 +98,7 @@ a:hover{color:var(--ink);text-decoration-color:var(--acc);text-decoration-thickn
 /* what the variant changes: clay caption, leader and dot (the mesh is clay-tinted by the player) */
 .fig .lab.is-variant{color:var(--acc);font-weight:500}
 .fig .is-variant .kit-leader{stroke:var(--acc);stroke-width:1.2px}
-.fig .is-variant .kit-anchor{fill:var(--acc);r:2.8px}
+.fig .is-variant .kit-anchor{fill:var(--stage-ink);stroke:var(--acc);stroke-width:1.6px;r:3px}
 .fig .is-variant.is-occluded .kit-anchor{fill:var(--stage);stroke:var(--acc)}
 .fig .is-occluded .kit-anchor{fill:var(--stage);stroke:var(--stage-ink);stroke-width:1px}
 .fig-orient{position:absolute;left:14px;top:11px;z-index:1;max-width:calc(100% - 28px);pointer-events:none;margin:0;

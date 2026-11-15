@@ -37,7 +37,6 @@
       .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60).replace(/-+$/, '') || 'figure';
   }
   function host(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } }
-  function uniq(a) { var out = []; a.forEach(function (x) { if (out.indexOf(x) < 0) out.push(x); }); return out; }
 
   /* ---------- info panel ---------- */
   // "Changed from base anatomy" in plain anatomical language, built from the resolved spec: what
@@ -46,55 +45,54 @@
   // "to the right of", "toward segment IV"), in the library's own names for them.
   var DIRW = { posterior: 'behind', anterior: 'in front of', superior: 'above', inferior: 'below', left: 'to the left of', right: 'to the right of' };
   function provenanceHtml(R, nameOf) {
-    var own = {};
-    (R.base || []).concat(R.variant.edits || []).forEach(function (e) { if (e.id) own[e.id] = e.name || e.id; });
-    // A readable noun phrase for a library structure, landmark or one of the spec's own routes:
-    // source notes (after ': ' or in brackets) and "curve" wording dropped, "Centroid of segment
-    // IV" said as "segment IV".
-    function phrase(ref) {
-      var full = ref.indexOf('/') >= 0 ? nameOf(ref) : (own[ref] || ref);
-      var t = String(full).split(': ')[0].replace(/\s*\([^()]*\)/g, '').replace(/ curve\b/g, '').replace(/\s+/g, ' ').trim();
+    var own = {}, kindOwn = {};
+    (R.base || []).concat(R.variant.edits || []).forEach(function (e) { if (e.id) { own[e.id] = e.name || e.id; kindOwn[e.id] = e.tissue || ''; } });
+    function fullName(ref) { return ref.indexOf('/') >= 0 ? nameOf(ref) : (own[ref] || ref); }
+    // A readable noun phrase. Structures: source notes (after ': ', in brackets) and "curve"
+    // dropped. Landmarks keep a closing location note ("(right lobe)"); "Centroid of segment IV"
+    // is said as segment IV (and only ever approached: "toward segment IV").
+    function phrase(ref, landmark) {
+      var t = String(fullName(ref)).split(': ')[0], tail = '';
+      // a short closing note on a landmark is a location ("(right lobe)"); a long one is a source note
+      if (landmark) { var m = /\s*(\(([^()]*)\))\s*$/.exec(t); if (m && m[2].split(/\s+/).length <= 3 && !/[;,]/.test(m[2])) { tail = ' ' + m[1]; t = t.slice(0, m.index); } }
+      t = t.replace(/\s*\([^()]*\)/g, '').replace(/ curve\b/g, '').replace(/\s+/g, ' ').trim();
       var seg = /^centroid of (segment .+)$/i.exec(t);
       if (seg) return { text: seg[1], toward: true };
       t = t.charAt(0).toLowerCase() + t.slice(1);
       if (!/^the /.test(t)) t = 'the ' + t;
-      return { text: t, toward: false, full: full };
+      return { text: t + tail, toward: false };
     }
-    function wpRef(w) { return w.landmark || w.on; }
-    // waypoints -> "behind the portal confluence, behind and to the right of the upper end of the
-    // bile duct, along the proper hepatic artery"
-    function passes(wps, skip) {
+    // artery, vein or duct: decides "arises from" (artery), "drains into" (vein), "joins" (duct)
+    function kind(ref, tissue) {
+      var t = tissue || kindOwn[ref] || '', n = fullName(ref);
+      if (/artery/.test(t) || (!t && /arter|aorta|trunk/i.test(n))) return 'artery';
+      if (/vein/.test(t) || (!t && /vein/i.test(n))) return 'vein';
+      return 'duct';
+    }
+    // via waypoints -> "behind the portal confluence, behind and to the right of …, along the
+    // course of the proper hepatic artery". A direction word is used only where the waypoint has
+    // that offset from the named landmark or line; landmark centroids are only approached.
+    function route(wps, skipLines) {
       var parts = [], prev = null;
       (wps || []).forEach(function (w) {
-        var ref = wpRef(w), ph = phrase(ref), how;
-        if (w.on && !w.landmark && !w.offset && skip.indexOf(ph.text) >= 0) return; // "along" itself or its parent line
-        if (w.offset) how = DIRW[w.offset.dir] || 'near';
-        else if (w.on && !w.landmark) how = 'along';
-        else if (w.offset) how = DIRW[w.offset.dir] || 'near';
-        else how = ph.toward ? 'toward' : 'through';
-        if (prev && prev.ref === ref) {
-          if (prev.hows.indexOf(how) < 0) prev.hows.push(how);
-          return;
-        }
+        var ref = w.landmark || w.on, isLine = !w.landmark, ph = phrase(ref, !isLine), how;
+        if (ph.toward) how = 'toward';
+        else if (w.offset) how = DIRW[w.offset.dir];
+        else if (isLine) { if (skipLines.indexOf(ref) >= 0) return; how = 'along the course of'; }
+        else how = 'through';
+        if (prev && prev.ref === ref) { if (prev.hows.indexOf(how) < 0) prev.hows.push(how); return; }
         prev = { ref: ref, ph: ph, hows: [how] };
         parts.push(prev);
       });
       return parts.map(function (p) {
         var h = p.hows;
-        // to one side, behind (or in front), then to the other side: it crosses behind (in front of) it
+        // to one side, behind (in front of), then to the other side of the same thing: it crosses
         var across = h.indexOf('to the left of') >= 0 && h.indexOf('to the right of') >= 0;
         if (across && h.indexOf('behind') >= 0) return 'crosses behind ' + p.ph.text;
         if (across && h.indexOf('in front of') >= 0) return 'crosses in front of ' + p.ph.text;
         return h.join(' and ') + ' ' + p.ph.text;
-      }).join(', ').replace(/passes crosses/g, 'crosses');
+      });
     }
-    function endAt(w) {
-      if (!w) return '';
-      var ph = phrase(wpRef(w));
-      if (w.offset) return (DIRW[w.offset.dir] || 'near') + ' ' + ph.text;
-      return (ph.toward ? 'toward ' : 'at ') + ph.text;
-    }
-    function startAt(w) { return w ? (w.on && !w.landmark ? phrase(w.on).text : endAt(w).replace(/^at /, '')) : ''; }
     function editFor(pv) {
       var list = pv.view === 'both' ? (R.base || []) : (R.variant.edits || []);
       for (var i = 0; i < list.length; i++) {
@@ -103,28 +101,44 @@
       }
       return null;
     }
+    function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
     function sentence(pv) {
-      var e = editFor(pv) || {}, out = [];
-      var self = phrase(pv.structure).text, fromLine = e.from && e.from.on && !e.from.landmark ? phrase(e.from.on).text : null;
-      var alongOnly = fromLine && (e.via || []).length && (e.via || []).every(function (w) { return w.on === e.from.on && !w.landmark; });
-      var cap = function (t) { return t.charAt(0).toUpperCase() + t.slice(1); };
+      var e = editFor(pv) || {}, k = kind(pv.structure, e.tissue);
+      var join = k === 'artery' ? 'arises from' : k === 'vein' ? 'drains into' : 'joins';
       if (pv.op === 'remove') return pv.view === 'both' ? 'Not drawn.' : 'Not present in the variant.';
       if (pv.op === 'move_insertion') {
         var to = pv.on && pv.on[0] ? phrase(pv.on[0]).text : '';
-        return to ? 'Arises from ' + to + ' instead.' : 'Its origin moves.';
+        return to ? cap(join) + ' ' + to + ' instead.' : 'Its origin moves.';
       }
-      if (pv.op === 'duplicate') out.push('A second ' + phrase(pv.structure).text.replace(/^the /, ''));
-      else if (pv.op === 'branch' && e.from) out.push('Arises from ' + startAt(e.from));
-      else if (alongOnly) out.push('Runs along ' + fromLine);
-      else if (e.from) out.push('Runs from ' + startAt(e.from));
-      var via = passes(e.via, [self].concat(fromLine && pv.op !== 'branch' ? [fromLine] : []));
-      if (via) out.push(/^crosses /.test(via) ? via : 'passes ' + via);
-      var toLine = e.to && e.to.on && !e.to.landmark ? phrase(e.to.on).text : null;
-      if (e.to && toLine && toLine !== self && !e.to.offset) out.push('joins ' + toLine);
-      else if (e.to && toLine !== self) out.push((pv.op === 'route' && !via && !alongOnly ? 'to ' : 'ends ') + endAt(e.to));
+      var self = phrase(pv.structure).text, out = [], skip = [];
+      var fromLine = e.from && e.from.on && !e.from.landmark ? e.from.on : null;
+      // a route drawn on one library line from start to end follows that line
+      var follows = pv.op !== 'branch' && fromLine && (e.via || []).length && (e.via || []).every(function (w) { return w.on === fromLine && !w.landmark && !w.offset; });
+      if (pv.op === 'duplicate') out.push('A second ' + self.replace(/^the /, ''));
+      else if (pv.op === 'branch' && fromLine) out.push(cap(join) + ' ' + phrase(fromLine).text);
+      else if (follows) { out.push("Follows the base anatomy's " + phrase(fromLine).text.replace(/^the /, '')); skip.push(fromLine); }
+      else if (e.from && e.from.landmark) out.push('Runs from ' + phrase(e.from.landmark, true).text);
+      else if (fromLine) { out.push('Runs from ' + phrase(fromLine).text); skip.push(fromLine); }
+      (e.via || []).forEach(function (w) { if (w.on && !w.landmark && phrase(w.on).text === self) skip.push(w.on); });
+      var via = route(e.via, skip);
+      if (via.length) {
+        out.push(via.map(function (v, i) {
+          if (/^crosses /.test(v)) return v;
+          return (i === 0 ? 'passes ' : /^crosses /.test(via[i - 1]) ? 'then passes ' : '') + v;
+        }).join(', '));
+      }
+      if (e.to) {
+        if (e.to.landmark) {
+          var tp = phrase(e.to.landmark, true);
+          out.push('ends ' + (tp.toward ? 'toward ' : e.to.offset ? DIRW[e.to.offset.dir] + ' ' : 'at ') + tp.text);
+        } else if (e.to.on && skip.indexOf(e.to.on) < 0 && phrase(e.to.on).text !== self) {
+          var lt = phrase(e.to.on).text;
+          out.push(e.to.offset ? 'ends ' + DIRW[e.to.offset.dir] + ' ' + lt : (k === 'artery' ? 'ends on ' : join + ' ') + lt);
+        }
+      }
       if (!out.length) return '';
-      var lead = pv.view === 'both' ? '' : (pv.op === 'duplicate' ? '' : 'Added. ');
-      return lead + cap(out.join('; ').replace(/; (to|ends) /, function (m, w) { return w === 'to' ? ' to ' : '; ends '; })) + '.';
+      var lead = pv.view === 'both' || pv.op === 'duplicate' ? '' : 'Added. ';
+      return lead + cap(out.join('; ')) + '.';
     }
     var groups = [
       { key: 'variant', title: 'In the variant', list: (R.provenance || []).filter(function (pv) { return pv.view !== 'both'; }) },
@@ -237,19 +251,30 @@
     var D = build(root, R);
     document.title = R.title + ' · Sagittal';
     var aspect = D.stage.clientWidth / (D.stage.clientHeight || 1);
-    var def = window.SagittalPlayer.register(R, { credits: o.credits || window.SagittalCredits || null, organs: o.organs, orientEl: D.orient, aspect: aspect });
+    var def = window.SagittalPlayer.register(R, { credits: o.credits || window.SagittalCredits || null, organs: o.organs, orientEl: D.orient, aspect: aspect,
+      explicitZoom: /[?&]zoom=/.test(location.search) });
     var staging = el('div'); // the kit builds its controls here; they are moved into the control row
     function stageColour() { return getComputedStyle(D.stage).backgroundColor; }
     var viewer = window.Kit.createViewer({ canvas: D.cv, labelsEl: D.labels, controlsEl: staging, infoEl: D.info,
       background: stageColour(), leaderStyle: 'css' });
     // the clear colour follows the theme (prefers-color-scheme, or data-theme on <html>)
-    function retone() { viewer.setBackground(stageColour()); }
+    function contourColour() { return getComputedStyle(D.stage).getPropertyValue('--stage-contour'); }
+    function retone() { window.SagittalPlayer.setContour(contourColour()); viewer.setBackground(stageColour()); }
+    window.SagittalPlayer.setContour(contourColour());
     if (window.matchMedia) {
       var mq = window.matchMedia('(prefers-color-scheme: dark)');
       if (mq.addEventListener) mq.addEventListener('change', retone); else if (mq.addListener) mq.addListener(retone);
     }
     if (window.MutationObserver) new MutationObserver(retone).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
     viewer.open(def.id, o.state || {});
+    // refit the default framing when the stage changes shape (phone rotated, window resized)
+    if (def.fitBase && window.ResizeObserver) {
+      var lastZoom = def.zoom;
+      new ResizeObserver(function () {
+        var z = window.SagittalPlayer.fitZoom(def.fitBase, D.stage.clientWidth / (D.stage.clientHeight || 1));
+        if (Math.abs(z - lastZoom) > 0.01) { lastZoom = z; viewer.setZoom(z); }
+      }).observe(D.stage);
+    }
     Array.prototype.slice.call(staging.children).forEach(function (c) {
       if (c.classList.contains('chk')) { D.opts.appendChild(c); return; }
       c.hidden = true; D.view.appendChild(c); // the kit's select: driven by the radio group

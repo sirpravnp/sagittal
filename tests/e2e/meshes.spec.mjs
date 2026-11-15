@@ -103,7 +103,9 @@ test('viewer credits the scene models and links to the credits page', async ({ p
   await expect(link).toHaveAttribute('href', 'credits.html');
   await link.click();
   // CREDITS.md typeset as HTML: its sections are headings, its links are links
-  await expect(page.locator('#credits-text h2', { hasText: 'zanatomy' }).first()).toBeVisible();
+  // headings name the sources (credits.json), not their ids
+  await expect(page.locator('#credits-text h2', { hasText: 'Z-Anatomy' }).first()).toBeVisible();
+  expect(await page.locator('#credits-text h2').allInnerTexts()).not.toContain('zanatomy');
   await expect(page.locator('#credits-text a[href="https://creativecommons.org/licenses/by-sa/4.0/"]').first()).toBeVisible();
   expect(await page.locator('#credits-text').innerText()).not.toMatch(/^#+ /m);
   await expect(page.locator('#credits-text')).toContainText('University of Dundee');
