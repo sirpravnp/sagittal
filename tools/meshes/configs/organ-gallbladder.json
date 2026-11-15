@@ -24,7 +24,32 @@
       "files": [
         "Bile_duct.obj"
       ],
-      "budget": 600
+      "budget": 600,
+      "rigid": {
+        "rotation": [
+          [
+            0.986909,
+            -0.114787,
+            -0.113286
+          ],
+          [
+            0.078684,
+            0.955867,
+            -0.283066
+          ],
+          [
+            0.140779,
+            0.270447,
+            0.952386
+          ]
+        ],
+        "translation": [
+          13.6892,
+          6.4538,
+          -30.6892
+        ],
+        "why": "tools/organs/corrections.json bile_duct_onto_d2"
+      }
     }
   }
 }

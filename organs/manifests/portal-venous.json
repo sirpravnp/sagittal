@@ -337,7 +337,7 @@
    ],
    "radius_cm": 0.145,
    "from": "portal_confluence",
-   "parent": null
+   "parent": "portal_vein"
   },
   "superior_mesenteric_vein": {
    "name": "Superior mesenteric vein",
@@ -800,7 +800,7 @@
    ],
    "radius_cm": 0.173,
    "from": "portal_confluence",
-   "parent": null
+   "parent": "portal_vein"
   },
   "inferior_mesenteric_vein": {
    "name": "Inferior mesenteric vein",

@@ -469,7 +469,7 @@
     109.421,
     3.518
    ],
-   "derived": "end point of centre line 'main_pancreatic_duct' (Z-Anatomy curve 'Pancreatic duct')"
+   "derived": "end point of centre line 'main_pancreatic_duct' (Z-Anatomy curve 'Pancreatic duct'); in the source the main pancreatic duct ends on the bile duct 0.8 cm in front of the descending duodenum; it is not moved with the corrected bile duct (rotating it would take its body out of the pancreas), so this point lies about 2 cm from the corrected bile duct and does not reach the duodenum: route to 'duodenum/major_duodenal_papilla' for the ampulla"
   }
  }
 }
