@@ -165,7 +165,8 @@ S=$SAGITTAL_ASSETS/ct-totalseg/raw/s1304/segmentations
 .venv/bin/python tools/organs/register.py
 # 4. bake configs (tools/meshes/configs/organ-<id>.json), meshes, manifests, index
 .venv/bin/python tools/organs/build.py
-# 5. centre-line parents (writes "parent" into the manifests), then the runtime bundle
+# 5. centre-line parents (writes "parent" into the manifests), then the runtime bundle and the
+#    student skill's reference (skills/sagittal/reference/organs.md and spec.md, a copy of docs/spec.md)
 node tools/organs/parents.mjs && npm run organs
 npm test && npm run test:py
 ```
