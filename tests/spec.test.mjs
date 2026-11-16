@@ -67,6 +67,16 @@ const only = (spec, error) => {
 
 /* ---------- happy paths ---------- */
 
+test('a figure of normal anatomy needs no variant: one view, no edits', () => {
+  const s = example(); delete s.variant;
+  s.labels = (s.labels || []).filter((l) => !(l.views && l.views.length === 1 && l.views[0] === 'variant'));
+  s.labels = (s.labels || []).filter((l) => l.on !== 'rrha');
+  const r = run(s);
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.resolved.variant, null);
+  assert.ok(r.resolved.provenance.every((p) => p.view !== 'variant'));
+});
+
 test('the plan example validates against the fixture organs', () => {
   const r = run(example());
   assert.deepEqual(r.errors, []);

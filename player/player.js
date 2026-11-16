@@ -292,7 +292,9 @@
 
     var orgKey = {};
     listed.forEach(function (oid) { orgKey[oid] = 'o_' + oid.replace(/[^a-z0-9]/g, '_'); });
-    var controls = [{ k: 'v', label: 'View', def: 'variant', opts: [['normal', 'Normal anatomy'], ['variant', R.variant.label]] }];
+    var controls = [R.variant
+      ? { k: 'v', label: 'View', def: 'variant', opts: [['normal', 'Normal anatomy'], ['variant', R.variant.label]] }
+      : { k: 'v', label: 'View', def: 'normal', opts: [['normal', 'Normal anatomy']] }];
     listed.forEach(function (oid) { controls.push({ k: orgKey[oid], label: M[oid].name, type: 'chk', def: true }); });
 
     var meshIds = [];

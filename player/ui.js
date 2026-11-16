@@ -43,7 +43,7 @@
   var DIRW = { posterior: 'behind', anterior: 'in front of', superior: 'above', inferior: 'below', left: 'to the left of', right: 'to the right of' };
   function provenanceHtml(R, nameOf) {
     var own = {}, kindOwn = {};
-    (R.base || []).concat(R.variant.edits || []).forEach(function (e) { if (e.id) { own[e.id] = e.name || e.id; kindOwn[e.id] = e.tissue || ''; } });
+    (R.base || []).concat((R.variant && R.variant.edits) || []).forEach(function (e) { if (e.id) { own[e.id] = e.name || e.id; kindOwn[e.id] = e.tissue || ''; } });
     function fullName(ref) { return ref.indexOf('/') >= 0 ? nameOf(ref) : (own[ref] || ref); }
     // A readable noun phrase. Structures: source notes (after ': ', in brackets) and "curve"
     // dropped. Landmarks keep a closing location note ("(right lobe)"); "Centroid of segment IV"
@@ -91,7 +91,7 @@
       });
     }
     function editFor(pv) {
-      var list = pv.view === 'both' ? (R.base || []) : (R.variant.edits || []);
+      var list = pv.view === 'both' ? (R.base || []) : ((R.variant && R.variant.edits) || []);
       for (var i = 0; i < list.length; i++) {
         var e = list[i];
         if ((e.id || e.structure) === pv.structure && e.op === pv.op) return e;
@@ -219,6 +219,7 @@
       var w = el('span', 'seg'); w.append(r, l); seg.appendChild(w); radios[o[0]] = r;
     });
     view.appendChild(seg);
+    if (!R.variant) view.hidden = true; // normal anatomy only: nothing to switch
     var organs = el('fieldset', 'fig-organs');
     var lg = el('legend', 'fig-k', 'Show'); organs.appendChild(lg);
     var opts = el('div', 'opts'); organs.appendChild(opts);
@@ -287,7 +288,7 @@
     var labelsOn = true;
     D.toggle.onchange = function () { labelsOn = D.toggle.checked; viewer.setLabelsVisible(labelsOn); };
 
-    function viewKey() { return viewer.getState().v || 'variant'; }
+    function viewKey() { return viewer.getState().v || (R.variant ? 'variant' : 'normal'); }
 
     function snapshot(so) {
       so = so || {};

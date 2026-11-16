@@ -388,7 +388,8 @@
 
     // 5. Variant edits.
     var removeEdits = [];                  // [{ path, ref }]
-    if (!isObj(R.variant)) err('variant', 'must be an object');
+    if (R.variant === undefined) R.variant = null; // normal anatomy only: one view, no edits
+    else if (!isObj(R.variant)) err('variant', 'must be an object');
     else {
       checkKeys(R.variant, 'variant', KEYS.variant);
       str(R.variant.label, 'variant.label', LIMITS.label);

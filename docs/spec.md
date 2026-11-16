@@ -2,10 +2,10 @@
 
 You (Claude) write one JSON document per figure. `player/spec.js` validates it
 (`SagittalSpec.validate(spec, SagittalOrgans)`); the page renders only a spec with no errors.
-Every figure has exactly two views, chosen in a dropdown:
+A figure of normal anatomy has one view. A figure of a variant has two, chosen with a switch:
 
 - **normal**: the base anatomy (the organs you list, plus any `base` structures);
-- **variant**: the same anatomy with your `variant.edits` applied.
+- **variant**: the same anatomy with your `variant.edits` applied (only when you give `variant`).
 
 You never give coordinates. Every point is a named landmark, a point along a named centre line,
 or one of those moved by a short offset. The organs, their parts, landmarks and centre lines are
@@ -36,7 +36,7 @@ Centimetres, **+x patient's left, +y superior, +z anterior**. So *right* is -x, 
 | `topic` | no | short subject, at most 40 characters (e.g. `"Hepatobiliary"`) |
 | `organs` | yes | 1 to 12 base organs to draw, with optional part styles |
 | `base` | no | up to 20 `route`/`branch` ops: structures the library lacks, drawn in **both** views |
-| `variant` | yes | `{ "label", "edits" }`: the variant view |
+| `variant` | no | `{ "label", "edits" }`: the variant view; leave it out for normal anatomy |
 | `labels` | no | up to 20 labels |
 | `claims` | yes | 1 to 12 facts for the info panel, each citing references |
 | `view` | no | starting camera `{ "rot": [x, y], "zoom" }` |
