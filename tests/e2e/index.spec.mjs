@@ -91,7 +91,8 @@ test('every heading is at most four words; no review disclaimer anywhere', async
   expect(cmds).toContain('https://sagittal-mcp.fly.dev/mcp');
   expect(cmds).toContain('claude mcp add --transport http --scope user sagittal https://sagittal-mcp.fly.dev/mcp');
   for (const t of ['claude.ai', 'ChatGPT', 'Claude Code', '~/.claude/skills']) await expect(install).toContainText(t);
-  await expect(install.locator('ol > li')).toHaveCount(4);
+  await expect(install.locator('ol > li')).toHaveCount(5);
+  await expect(install).toContainText('any AI app that accepts MCP connectors');
   await expect(page.locator('#how .steps li')).toHaveCount(3);
   expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   expect(await page.content()).not.toContain('nreviewed');

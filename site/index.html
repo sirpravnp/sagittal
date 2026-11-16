@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Sagittal: text-to-image for anatomy</title>
-<meta name="description" content="Ask Claude Code for any anatomical structure, region or variant and get a labelled 3D figure you can turn, compare and save, built from real reconstructed anatomy.">
+<meta name="description" content="Ask any AI that supports MCP connectors (Claude, ChatGPT and others) for any anatomical structure, region or variant and get a labelled 3D figure you can turn, compare and save, built from real reconstructed anatomy.">
 
 <!-- Optional: the GitHub repository URL, e.g. https://github.com/OWNER/sagittal. Left empty, it is
      worked out from an OWNER.github.io/REPO address; the GitHub links are hidden if neither is known. -->
@@ -23,7 +23,7 @@
     <div class="mast-text">
       <h1>Sagittal</h1>
       <p class="desc">Text-to-image for anatomy</p>
-      <p class="ask"><span class="ask-who">You, in Claude Code</span><span class="ask-line">Draw a replaced right hepatic artery off the SMA.</span></p>
+      <p class="ask"><span class="ask-who">You, in Claude or ChatGPT</span><span class="ask-line">Draw a replaced right hepatic artery off the SMA.</span></p>
       <p class="intro">You get a labelled 3D figure you can turn, compare and save. It is built from real reconstructed anatomy, not drawn from memory, and every fact on it cites a source.</p>
     </div>
     <figure class="mast-fig">
@@ -55,8 +55,8 @@
       <h2 id="how-h">How it works</h2>
       <div class="sec-body">
         <ol class="steps">
-          <li><h3>Ask</h3><p>Ask Claude Code for any structure, region or variant in your own words: <q>the hepatobiliary tree</q>, <q>the aortic arch and its branches</q>, <q>a replaced right hepatic artery off the SMA</q>.</p></li>
-          <li><h3>Build</h3><p>The skill starts from base organs reconstructed from open CT data and atlases. New vessels and ducts are drawn only through named landmarks, and every claim cites a source.</p></li>
+          <li><h3>Ask</h3><p>Ask your AI for any structure, region or variant in your own words: <q>the hepatobiliary tree</q>, <q>the aortic arch and its branches</q>, <q>a replaced right hepatic artery off the SMA</q>.</p></li>
+          <li><h3>Build</h3><p>Sagittal starts from base organs reconstructed from open CT data and atlases. New vessels and ducts are drawn only through named landmarks, and every claim cites a source.</p></li>
           <li><h3>Study</h3><p>Open the figure it saves. Rotate it, turn structures on and off, compare a variant with normal anatomy, read the cited claims, and save the labelled figure as an image.</p></li>
         </ol>
       </div>
@@ -65,13 +65,14 @@
     <section class="sec" id="install" aria-labelledby="install-h">
       <h2 id="install-h">Use Sagittal</h2>
       <div class="sec-body">
-        <p class="sec-note">Add the Sagittal connector to the AI app you already use. Nothing to install; figures appear in the chat.</p>
+        <p class="sec-note">Sagittal is an MCP server, so it works with any AI app that accepts MCP connectors: Claude, ChatGPT, Claude Code and others. Add this address as a connector; there is nothing to install, and figures appear in the chat.</p>
         <pre class="cmd"><code>https://sagittal-mcp.fly.dev/mcp</code></pre>
         <ol class="install">
           <li><p><strong>claude.ai or Claude Desktop:</strong> Settings, Connectors, Add custom connector. Paste the address above.</p></li>
           <li><p><strong>ChatGPT:</strong> Settings, Apps and Connectors, turn on developer mode, then create a connector with the address above.</p></li>
           <li><p><strong>Claude Code:</strong> run this once in a terminal.</p>
             <pre class="cmd"><code>claude mcp add --transport http --scope user sagittal https://sagittal-mcp.fly.dev/mcp</code></pre></li>
+          <li><p><strong>Any other MCP client:</strong> add a remote (Streamable HTTP) MCP server with the address above.</p></li>
           <li><p>Then ask for a figure, for example <q>the aortic arch and its branches</q> or <q>an aberrant right subclavian artery</q>.</p></li>
         </ol>
         <p class="sec-note">Prefer to run it yourself? Clone <a href="https://github.com/sirpravnp/sagittal">the repository</a> and link <code>skills/sagittal</code> into <code>~/.claude/skills</code> to use it as a Claude Code skill.</p>
