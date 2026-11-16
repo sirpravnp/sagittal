@@ -63,18 +63,18 @@
     </section>
 
     <section class="sec" id="install" aria-labelledby="install-h">
-      <h2 id="install-h">Install the skill</h2>
+      <h2 id="install-h">Use Sagittal</h2>
       <div class="sec-body">
-        <p class="sec-note">You need Claude Code, Anthropic's command-line coding tool. Claude Code reads personal skills from <code>~/.claude/skills</code>, the <code>.claude/skills</code> folder in your home directory; linking the skill there makes it available in every project.</p>
+        <p class="sec-note">Add the Sagittal connector to the AI app you already use. Nothing to install; figures appear in the chat.</p>
+        <pre class="cmd"><code>https://sagittal-mcp.fly.dev/mcp</code></pre>
         <ol class="install">
-          <li><p>Clone this repository and go into it:</p>
-            <pre class="cmd"><code>git clone &lt;this repository&gt;
-cd sagittal</code></pre></li>
-          <li><p>Link the skill into your skills folder (the first line creates the folder if it is missing):</p>
-            <pre class="cmd"><code>mkdir -p ~/.claude/skills
-ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal</code></pre></li>
-          <li><p>Start Claude Code and ask for a figure, for example <q>the aortic arch and its branches</q> or <q>an aberrant right subclavian artery</q>.</p></li>
+          <li><p><strong>claude.ai or Claude Desktop:</strong> Settings, Connectors, Add custom connector. Paste the address above.</p></li>
+          <li><p><strong>ChatGPT:</strong> Settings, Apps and Connectors, turn on developer mode, then create a connector with the address above.</p></li>
+          <li><p><strong>Claude Code:</strong> run this once in a terminal.</p>
+            <pre class="cmd"><code>claude mcp add --transport http --scope user sagittal https://sagittal-mcp.fly.dev/mcp</code></pre></li>
+          <li><p>Then ask for a figure, for example <q>the aortic arch and its branches</q> or <q>an aberrant right subclavian artery</q>.</p></li>
         </ol>
+        <p class="sec-note">Prefer to run it yourself? Clone <a href="https://github.com/sirpravnp/sagittal">the repository</a> and link <code>skills/sagittal</code> into <code>~/.claude/skills</code> to use it as a Claude Code skill.</p>
       </div>
     </section>
 

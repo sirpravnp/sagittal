@@ -82,18 +82,16 @@ test('every heading is at most four words; no review disclaimer anywhere', async
   const heads = await page.locator('h1, h2, h3, h4, h5, h6').allInnerTexts();
   expect(heads.length).toBeGreaterThanOrEqual(7);
   for (const h of heads) expect(h.trim().split(/\s+/).length, `heading "${h}"`).toBeLessThanOrEqual(4);
-  for (const t of ['Same subject, two figures', 'How it works', 'Install the skill', 'Examples', 'Credits']) {
+  for (const t of ['Same subject, two figures', 'How it works', 'Use Sagittal', 'Examples', 'Credits']) {
     expect(heads.map((h) => h.trim())).toContain(t);
   }
-  // install: prerequisite, then the steps in order, and where the skills folder is
+  // use: the connector address, steps for claude.ai, ChatGPT and Claude Code, and the self-host route
   const install = page.locator('#install');
-  await expect(install).toContainText('Claude Code');
-  await expect(install).toContainText('~/.claude/skills');
   const cmds = (await install.locator('pre').allInnerTexts()).join('\n');
-  const order = ['git clone <this repository>', 'cd sagittal', 'mkdir -p ~/.claude/skills', 'ln -s "$PWD/skills/sagittal" ~/.claude/skills/sagittal'];
-  let at = -1;
-  for (const c of order) { const i = cmds.indexOf(c); expect(i, c).toBeGreaterThan(at); at = i; }
-  await expect(install.locator('ol > li')).toHaveCount(3);
+  expect(cmds).toContain('https://sagittal-mcp.fly.dev/mcp');
+  expect(cmds).toContain('claude mcp add --transport http --scope user sagittal https://sagittal-mcp.fly.dev/mcp');
+  for (const t of ['claude.ai', 'ChatGPT', 'Claude Code', '~/.claude/skills']) await expect(install).toContainText(t);
+  await expect(install.locator('ol > li')).toHaveCount(4);
   await expect(page.locator('#how .steps li')).toHaveCount(3);
   expect(await page.locator('body').innerText()).not.toContain('nreviewed');
   expect(await page.content()).not.toContain('nreviewed');
